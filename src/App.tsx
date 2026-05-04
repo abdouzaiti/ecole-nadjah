@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
 import LandingPage from './pages/LandingPage';
@@ -24,6 +25,13 @@ const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 
 };
 
 function AppRoutes() {
+  const { i18n } = useTranslation();
+  
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar />

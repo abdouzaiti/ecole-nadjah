@@ -17,6 +17,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarItem {
   name: string;
@@ -28,19 +29,22 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
   const { user, logout } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === 'ar';
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className={cn("min-h-screen bg-white flex", isAr && "flex-row-reverse")}>
       {/* Desktop Sidebar */}
       <aside className={cn(
-        "hidden lg:flex flex-col w-72 bg-navy border-r border-white/5 transition-all duration-300 relative z-30"
+        "hidden lg:flex flex-col w-72 bg-navy border-r border-white/5 transition-all duration-300 relative z-30",
+        isAr ? "border-l border-r-0" : "border-r border-l-0"
       )}>
         <div className="p-8 pb-4">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className={cn("flex items-center gap-3", isAr && "flex-row-reverse")}>
             <div className="w-10 h-10 flex items-center justify-center">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain shadow-sm rounded-lg" />
             </div>
-            <span className="text-xl font-serif font-bold text-white tracking-tight text-nowrap">ÉCOLE NADJAH</span>
+            <span className="text-xl font-serif font-bold text-white tracking-tight text-nowrap">{t('school_name')}</span>
           </Link>
         </div>
 
@@ -55,12 +59,13 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm group",
                   isActive 
                     ? "bg-blue-accent/10 text-blue-accent" 
-                    : "text-white/50 hover:text-white hover:bg-white/5"
+                    : "text-white/50 hover:text-white hover:bg-white/5",
+                  isAr && "flex-row-reverse text-right"
                 )}
               >
                 <item.icon size={20} className={cn(isActive ? "text-blue-accent" : "group-hover:text-white")} />
                 {item.name}
-                {isActive && <motion.div layoutId="activePointer" className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-accent" />}
+                {isActive && <motion.div layoutId="activePointer" className={cn("w-1.5 h-1.5 rounded-full bg-blue-accent", isAr ? "mr-auto" : "ml-auto")} />}
               </Link>
             );
           })}
@@ -68,22 +73,27 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
 
         <div className="p-4 border-t border-white/5 space-y-2">
           <div className="px-4 py-4 mb-4 bg-white/5 rounded-2xl">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-accent/20 flex items-center justify-center text-blue-accent font-bold">
+            <div className={cn("flex items-center gap-3", isAr && "flex-row-reverse")}>
+              <div className="w-10 h-10 rounded-xl bg-blue-accent/20 flex items-center justify-center text-blue-accent font-bold shrink-0">
                 {user?.name.charAt(0)}
               </div>
-              <div className="overflow-hidden">
+              <div className={cn("overflow-hidden", isAr && "text-right")}>
                 <p className="text-sm font-bold text-white truncate">{user?.name}</p>
-                <p className="text-xs text-white/40 truncate uppercase tracking-widest">{user?.role}</p>
+                <p className="text-xs text-white/40 truncate uppercase tracking-widest leading-none mt-1">
+                   {user?.role === 'STUDENT' ? t('auth.roles.student') : user?.role === 'TEACHER' ? t('auth.roles.teacher') : t('auth.roles.admin')}
+                </p>
               </div>
             </div>
           </div>
           <button 
             onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-all font-medium text-sm group"
+            className={cn(
+               "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-all font-medium text-sm group",
+               isAr && "flex-row-reverse"
+            )}
           >
-            <LogOut size={20} />
-            Déconnexion
+            <LogOut size={20} className={isAr && "rotate-180"} />
+            {t('dashboard.sidebar.logout')}
           </button>
         </div>
       </aside>
@@ -91,31 +101,36 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
       {/* Main Content */}
       <div className="flex-grow flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 lg:px-8 shrink-0">
-          <div className="flex items-center gap-4 flex-grow max-w-xl">
+        <header className={cn("h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 lg:px-8 shrink-0", isAr && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-4 flex-grow max-w-xl", isAr && "flex-row-reverse")}>
              <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 text-navy">
                <Menu />
              </button>
              <div className="relative w-full hidden sm:block">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+               <Search className={cn("absolute top-1/2 -translate-y-1/2 text-gray-400", isAr ? "right-3" : "left-3")} size={18} />
                <input 
                  type="text" 
-                 placeholder="Rechercher des ressources, cours, élèves..." 
-                 className="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-navy outline-none text-sm transition-all"
+                 placeholder={t('dashboard.search_placeholder')} 
+                 className={cn(
+                    "w-full py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-navy outline-none text-sm transition-all",
+                    isAr ? "pr-10 pl-4 text-right" : "pl-10 pr-4 text-left"
+                 )}
                />
              </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className={cn("flex items-center gap-4", isAr && "flex-row-reverse")}>
              <button className="p-2 text-gray-400 hover:text-navy hover:bg-gray-50 rounded-xl relative">
                 <Bell size={20} />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                <span className={cn("absolute top-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white", isAr ? "left-2" : "right-2")}></span>
              </button>
              <div className="h-10 w-px bg-gray-100 mx-2 hidden sm:block"></div>
-             <div className="hidden sm:flex items-center gap-3">
-                <div className="text-right">
+             <div className={cn("hidden sm:flex items-center gap-3", isAr && "flex-row-reverse")}>
+                <div className={cn(isAr ? "text-right" : "text-left")}>
                    <p className="text-sm font-bold text-navy leading-none">{user?.name}</p>
-                   <p className="text-[10px] uppercase font-bold text-blue-accent tracking-widest mt-1">{user?.role}</p>
+                   <p className={cn("text-[10px] uppercase font-bold text-blue-accent tracking-widest mt-1", isAr ? "text-right" : "text-left")}>
+                      {user?.role === 'STUDENT' ? t('auth.roles.student') : user?.role === 'TEACHER' ? t('auth.roles.teacher') : t('auth.roles.admin')}
+                   </p>
                 </div>
                 <div className="w-10 h-10 rounded-full navy-gradient border-2 border-white overflow-hidden flex items-center justify-center text-white font-bold">
                    <img src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name}&background=0A1D37&color=fff`} alt="" />
@@ -142,15 +157,15 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
                className="absolute inset-0 bg-navy/40 backdrop-blur-sm" 
             />
             <motion.div 
-              initial={{ x: '-100%' }}
+              initial={{ x: isAr ? '100%' : '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              className="absolute top-0 left-0 bottom-0 w-72 bg-navy p-6 shadow-2xl"
+              exit={{ x: isAr ? '100%' : '-100%' }}
+              className={cn("absolute top-0 bottom-0 w-72 bg-navy p-6 shadow-2xl", isAr ? "right-0" : "left-0")}
             >
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-3">
+              <div className={cn("flex justify-between items-center mb-10", isAr && "flex-row-reverse")}>
+                <div className={cn("flex items-center gap-3", isAr && "flex-row-reverse")}>
                    <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
-                   <span className="text-xl font-serif text-white font-bold">ÉCOLE NADJAH</span>
+                   <span className="text-xl font-serif text-white font-bold">{t('school_name')}</span>
                 </div>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-white/50"><X /></button>
               </div>
@@ -163,7 +178,8 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
                       "flex items-center gap-3 px-4 py-4 rounded-xl text-white/50 font-medium",
-                      location.pathname === item.path && "bg-blue-accent/10 text-blue-accent"
+                      location.pathname === item.path && "bg-blue-accent/10 text-blue-accent",
+                      isAr && "flex-row-reverse text-right"
                     )}
                   >
                     <item.icon size={20} />

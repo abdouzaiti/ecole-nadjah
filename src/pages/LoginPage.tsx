@@ -5,11 +5,15 @@ import { UserRole } from '../data/types';
 import { Button, Card } from '../components/ui';
 import { motion } from 'motion/react';
 import { Shield, GraduationCap, Laptop, Lock, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { cn } from '../lib/utils';
 
 export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<UserRole>('STUDENT');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === 'ar';
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,9 +22,9 @@ export default function LoginPage() {
   };
 
   const roles = [
-    { id: 'STUDENT', label: 'Élève', icon: <GraduationCap size={20} /> },
-    { id: 'TEACHER', label: 'Enseignant', icon: <Laptop size={20} /> },
-    { id: 'ADMIN', label: 'Admin', icon: <Shield size={20} /> },
+    { id: 'STUDENT', label: t('auth.roles.student'), icon: <GraduationCap size={20} /> },
+    { id: 'TEACHER', label: t('auth.roles.teacher'), icon: <Laptop size={20} /> },
+    { id: 'ADMIN', label: t('auth.roles.admin'), icon: <Shield size={20} /> },
   ];
 
   return (
@@ -35,11 +39,11 @@ export default function LoginPage() {
           
           <div className="text-center mb-10">
             <img src="/logo.png" alt="Logo" className="w-20 h-20 mx-auto mb-4 object-contain" />
-            <h1 className="text-4xl font-serif text-navy mb-2">Bienvenue</h1>
-            <p className="text-navy/50">Accédez à votre espace sécurisé</p>
+            <h1 className="text-4xl font-serif text-navy mb-2">{t('auth.welcome')}</h1>
+            <p className="text-navy/50">{t('auth.access_secure')}</p>
           </div>
 
-          <div className="flex gap-2 p-1 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
+          <div className={cn("flex gap-2 p-1 bg-gray-50 rounded-2xl mb-8 border border-gray-100", isAr && "flex-row-reverse")}>
             {roles.map((role) => (
               <button
                 key={role.id}
@@ -59,40 +63,46 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-4">
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-navy/30" size={20} />
+                <Mail className={cn("absolute top-1/2 -translate-y-1/2 text-navy/30", isAr ? "right-4" : "left-4")} size={20} />
                 <input 
                   type="email" 
                   required 
-                  placeholder="Email académique" 
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-navy/20 focus:ring-4 focus:ring-navy/5 outline-none transition-all"
+                  placeholder={t('auth.email_placeholder')} 
+                  className={cn(
+                    "w-full py-4 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-navy/20 focus:ring-4 focus:ring-navy/5 outline-none transition-all",
+                    isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left"
+                  )}
                 />
               </div>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-navy/30" size={20} />
+                <Lock className={cn("absolute top-1/2 -translate-y-1/2 text-navy/30", isAr ? "right-4" : "left-4")} size={20} />
                 <input 
                   type="password" 
                   required 
-                  placeholder="Mot de passe" 
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-navy/20 focus:ring-4 focus:ring-navy/5 outline-none transition-all"
+                  placeholder={t('auth.password_placeholder')} 
+                  className={cn(
+                    "w-full py-4 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-navy/20 focus:ring-4 focus:ring-navy/5 outline-none transition-all",
+                    isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left"
+                  )}
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-navy/60 cursor-pointer">
+            <div className={cn("flex items-center justify-between text-sm", isAr && "flex-row-reverse text-right")}>
+              <label className={cn("flex items-center gap-2 text-navy/60 cursor-pointer", isAr && "flex-row-reverse")}>
                 <input type="checkbox" className="rounded text-navy focus:ring-navy" />
-                Se souvenir de moi
+                {t('auth.remember_me')}
               </label>
-              <a href="#" className="text-navy hover:underline font-medium">Mot de passe oublié ?</a>
+              <a href="#" className="text-navy hover:underline font-medium">{t('auth.forgot_password')}</a>
             </div>
 
             <Button type="submit" variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold shadow-lg shadow-navy/20">
-              Se Connecter
+              {t('auth.login_button')}
             </Button>
           </form>
 
-          <p className="text-center mt-8 text-navy/60 text-sm">
-            Vous n'avez pas encore de compte ? <a href="/register" className="text-navy font-bold hover:underline">Inscrivez-vous ici</a>
+          <p className={cn("text-center mt-8 text-navy/60 text-sm", isAr && "flex flex-row-reverse justify-center gap-2")}>
+            {t('auth.no_account')} <a href="/register" className="text-navy font-bold hover:underline">{t('auth.register_here')}</a>
           </p>
         </Card>
       </motion.div>

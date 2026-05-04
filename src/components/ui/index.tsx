@@ -4,7 +4,10 @@ import { cn } from '../../lib/utils';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'navy' | 'accent';
   size?: 'sm' | 'md' | 'lg';
-  children: ReactNode;
+  children?: React.ReactNode;
+  className?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 export function Button({ 
@@ -45,9 +48,10 @@ export function Button({
 }
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
   hoverEffect?: boolean;
+  key?: React.Key;
 }
 
 export function Card({ children, className, hoverEffect = true, ...props }: CardProps) {

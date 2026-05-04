@@ -15,9 +15,15 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 
 export default function LiveClassPage() {
   const { id } = useParams();
+  const { t, i18n } = useTranslation();
+  const { user: currentUser } = useAuth();
+  const isAr = i18n.language === 'ar';
+  
   const [messages, setMessages] = useState([
     { user: 'Sofiane', text: 'Bonjour professeur !', time: '10:01' },
     { user: 'Amira', text: 'Es-ce que le cours sera enregistré ?', time: '10:02' },
@@ -28,7 +34,7 @@ export default function LiveClassPage() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
-    setMessages([...messages, { user: 'Moi', text: inputText, time: '10:05' }]);
+    setMessages([...messages, { user: 'Me', text: inputText, time: '10:05' }]);
     setInputText('');
   };
 
@@ -37,20 +43,20 @@ export default function LiveClassPage() {
       {/* Video Area */}
       <div className="flex-grow flex flex-col gap-4">
         <div className="flex-grow bg-navy-light/20 rounded-3xl relative overflow-hidden group shadow-2xl border border-white/5 flex items-center justify-center">
-           <div className="text-center">
+            <div className="text-center">
               <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10 group-hover:scale-110 transition-transform duration-500">
                 <Video size={48} className="text-blue-accent opacity-40" />
               </div>
-              <p className="text-white/20 font-serif text-xl tracking-widest uppercase">Flux Vidéo en Attente</p>
+              <p className="text-white/20 font-serif text-xl tracking-widest uppercase">{t('dashboard.student.live.waiting_stream')}</p>
            </div>
            
            {/* Indicators */}
-           <div className="absolute top-6 left-6 flex gap-3">
+           <div className={cn("absolute top-6 flex gap-3", isAr ? "right-6" : "left-6")}>
               <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 animate-pulse">
-                 <span className="w-2 h-2 bg-white rounded-full"></span> EN DIRECT
+                 <span className="w-2 h-2 bg-white rounded-full"></span> {t('dashboard.student.live_now')}
               </div>
               <div className="bg-black/40 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 border border-white/10">
-                 <Users size={14} /> 142 Participants
+                 <Users size={14} /> 142 {t('dashboard.student.live.participants')}
               </div>
            </div>
 
@@ -61,9 +67,9 @@ export default function LiveClassPage() {
            </div>
 
            {/* Name Badge */}
-           <div className="absolute bottom-24 left-6 py-2 px-4 bg-navy/60 backdrop-blur-md rounded-xl border border-white/10">
+           <div className={cn("absolute bottom-24 py-2 px-4 bg-navy/60 backdrop-blur-md rounded-xl border border-white/10", isAr ? "right-6 text-right" : "left-6")}>
               <p className="text-white font-bold text-sm">Dr. Sarah Amine</p>
-              <p className="text-blue-accent text-[10px] uppercase font-bold tracking-widest">Enseignant • Mathématiques</p>
+              <p className="text-blue-accent text-[10px] uppercase font-bold tracking-widest">{t('dashboard.roles.teacher')} • {t('subjects.math')}</p>
            </div>
 
            {/* Controls Container */}
@@ -75,8 +81,8 @@ export default function LiveClassPage() {
               <button className="p-3 bg-white/10 text-white rounded-full hover:bg-white hover:text-navy transition-all"><Settings size={20} /></button>
               <div className="w-px h-6 bg-white/10 mx-2"></div>
               <Link to="/dashboard/student">
-                <button className="p-3 bg-red-500 text-white rounded-full px-6 flex items-center gap-2 hover:bg-red-600 transition-all shadow-lg shadow-red-500/20">
-                   <LogOut size={20} className="rotate-180" /> <span className="font-bold text-xs uppercase tracking-widest">Quitter</span>
+                <button className={cn("p-3 bg-red-500 text-white rounded-full px-6 flex items-center gap-2 hover:bg-red-600 transition-all shadow-lg shadow-red-500/20", isAr && "flex-row-reverse")}>
+                   <LogOut size={20} className={isAr ? "" : "rotate-180"} /> <span className="font-bold text-xs uppercase tracking-widest">{t('dashboard.student.live.quit')}</span>
                 </button>
               </Link>
            </div>
@@ -94,9 +100,9 @@ export default function LiveClassPage() {
 
       {/* Sidebar Chat */}
       <div className="w-full lg:w-96 flex flex-col h-full bg-navy-light/40 backdrop-blur-md rounded-3xl border border-white/5 overflow-hidden">
-         <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
-            <h3 className="text-white font-serif text-xl flex items-center gap-2">
-               <MessageSquare size={20} className="text-blue-accent" /> Chat en Direct
+         <div className={cn("p-6 border-b border-white/5 flex justify-between items-center bg-white/5", isAr && "flex-row-reverse")}>
+            <h3 className={cn("text-white font-serif text-xl flex items-center gap-2", isAr && "flex-row-reverse")}>
+               <MessageSquare size={20} className="text-blue-accent" /> {t('dashboard.student.live.chat')}
             </h3>
             <button className="text-white/40"><X size={20} /></button>
          </div>
@@ -107,17 +113,17 @@ export default function LiveClassPage() {
                 key={i} 
                 initial={{ opacity: 0, x: 10 }} 
                 animate={{ opacity: 1, x: 0 }}
-                className={cn("max-w-[85%] space-y-1", m.user === 'Moi' ? "ml-auto text-right" : "")}
+                className={cn("max-w-[85%] space-y-1", m.user === 'Moi' || m.user === 'Me' ? "ml-auto text-right" : "")}
               >
-                 <div className="flex items-center gap-2 mb-1 justify-end" style={{ flexDirection: m.user === 'Moi' ? 'row' : 'row-reverse' }}>
+                 <div className={cn("flex items-center gap-2 mb-1", (m.user === 'Moi' || m.user === 'Me') ? "justify-end" : "justify-start", isAr && "flex-row-reverse")}>
                    <span className="text-[10px] text-white/30">{m.time}</span>
-                   <span className="text-xs font-bold text-blue-accent">{m.user}</span>
+                   <span className="text-xs font-bold text-blue-accent">{m.user === 'Me' || m.user === 'Moi' ? (isAr ? 'أنا' : 'Me') : m.user}</span>
                  </div>
                  <div className={cn(
                    "p-3 rounded-2xl text-sm leading-relaxed",
-                   m.user === 'Moi' ? "bg-blue-accent text-white rounded-tr-none" : "bg-white/10 text-white/80 rounded-tl-none border border-white/5"
+                   (m.user === 'Moi' || m.user === 'Me') ? "bg-blue-accent text-white rounded-tr-none" : "bg-white/10 text-white/80 rounded-tl-none border border-white/5"
                  )}>
-                   {m.text}
+                    {m.text}
                  </div>
               </motion.div>
             ))}
@@ -129,14 +135,14 @@ export default function LiveClassPage() {
                  type="text" 
                  value={inputText}
                  onChange={(e) => setInputText(e.target.value)}
-                 placeholder="Écrire un message..."
-                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-4 pr-14 text-white focus:ring-2 focus:ring-blue-accent outline-none transition-all placeholder:text-white/20"
+                 placeholder={t('dashboard.student.live.write_message')}
+                 className={cn("w-full bg-white/5 border border-white/10 rounded-2xl py-4 flex items-center text-white focus:ring-2 focus:ring-blue-accent outline-none transition-all placeholder:text-white/20", isAr ? "pr-4 pl-14 text-right" : "pl-4 pr-14 text-left")}
                />
                <button 
                  type="submit"
-                 className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-blue-accent text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-accent/20 hover:scale-105 transition-transform"
+                 className={cn("absolute top-1/2 -translate-y-1/2 w-10 h-10 bg-blue-accent text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-accent/20 hover:scale-105 transition-transform", isAr ? "left-2" : "right-2")}
                >
-                 <Send size={18} />
+                 <Send size={18} className={isAr && "rotate-180"} />
                </button>
             </form>
          </div>
@@ -144,5 +150,3 @@ export default function LiveClassPage() {
     </div>
   );
 }
-
-import { cn } from '../lib/utils';

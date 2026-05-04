@@ -5,49 +5,59 @@ import { BookOpen, Search, Filter, Play, Clock, User, Download, Share2 } from 'l
 import { MOCK_COURSES } from '../data/mock';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function ReplaysPage() {
-  const [activeFilter, setActiveFilter] = useState('Tous');
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === 'ar';
+  
+  const [activeFilter, setActiveFilter] = useState('all');
+  
   const sidebarItems = [
-    { name: 'Ma Bibliothèque', icon: BookOpen, path: '/dashboard/student' },
+    { name: t('dashboard.sidebar.library'), icon: BookOpen, path: '/dashboard/student' },
   ];
 
-  const filters = ['Tous', 'Récent', 'Populaire', 'Favoris'];
+  const filters = [
+    { id: 'all', label: t('replays.filters.all') },
+    { id: 'recent', label: t('replays.filters.recent') },
+    { id: 'popular', label: t('replays.filters.popular') },
+    { id: 'favorites', label: t('replays.filters.favorites') }
+  ];
 
   return (
     <DashboardLayout items={sidebarItems}>
       <div className="space-y-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h1 className="text-3xl font-serif text-navy">Bibliothèque des Replays</h1>
-            <p className="text-navy/50">Retrouvez tous vos cours enregistrés pour révision.</p>
+        <div className={cn("flex flex-col md:flex-row justify-between items-start md:items-center gap-6", isAr && "flex-row-reverse")}>
+          <div className={cn(isAr && "text-right")}>
+            <h1 className="text-3xl font-serif text-navy font-bold">{t('replays.title')}</h1>
+            <p className="text-navy/50 font-sans">{t('replays.subtitle')}</p>
           </div>
-          <div className="flex gap-4 w-full md:w-auto">
+          <div className={cn("flex gap-4 w-full md:w-auto", isAr && "flex-row-reverse")}>
              <div className="relative flex-grow md:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Search className={cn("absolute top-1/2 -translate-y-1/2 text-gray-400", isAr ? "right-3" : "left-3")} size={18} />
                 <input 
                   type="text" 
-                  placeholder="Rechercher par titre..." 
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-navy outline-none text-sm transition-all shadow-sm"
+                  placeholder={t('replays.search_placeholder')} 
+                  className={cn("w-full py-3 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-navy outline-none text-sm transition-all shadow-sm", isAr ? "pr-10 pl-4 text-right" : "pl-10 pr-4 text-left")}
                 />
              </div>
-             <Button variant="outline" className="flex items-center gap-2">
-                <Filter size={18} /> Filtres
+             <Button variant="outline" className={cn("flex items-center gap-2", isAr && "flex-row-reverse")}>
+                <Filter size={18} /> {t('dashboard.admin.table.actions')}
              </Button>
           </div>
         </div>
 
-        <div className="flex gap-3 h-10">
+        <div className={cn("flex gap-3 h-10", isAr && "flex-row-reverse")}>
           {filters.map(f => (
             <button 
-              key={f}
-              onClick={() => setActiveFilter(f)}
+              key={f.id}
+              onClick={() => setActiveFilter(f.id)}
               className={cn(
                 "px-4 py-1 rounded-lg text-sm font-medium transition-all",
-                activeFilter === f ? "bg-navy text-white" : "bg-white text-navy/60 hover:bg-gray-50 border border-gray-100"
+                activeFilter === f.id ? "bg-navy text-white shadow-md" : "bg-white text-navy/60 hover:bg-gray-50 border border-gray-100"
               )}
             >
-              {f}
+              {f.label}
             </button>
           ))}
         </div>
@@ -73,29 +83,29 @@ export default function ReplaysPage() {
                          {course.duration}
                       </div>
                    </div>
-                   <div className="p-6">
-                      <div className="flex justify-between items-start mb-4">
+                   <div className={cn("p-6", isAr && "text-right")}>
+                      <div className={cn("flex justify-between items-start mb-4", isAr && "flex-row-reverse")}>
                          <Badge variant="accent">{course.subject}</Badge>
-                         <div className="flex gap-2">
+                         <div className={cn("flex gap-2", isAr && "flex-row-reverse")}>
                             <button className="text-navy/20 hover:text-blue-accent transition-colors"><Share2 size={16} /></button>
                             <button className="text-navy/20 hover:text-navy transition-colors"><Download size={16} /></button>
                          </div>
                       </div>
                       <h3 className="text-xl font-serif text-navy mb-4 group-hover:text-blue-accent transition-colors line-clamp-1">{course.title}</h3>
                       <div className="flex flex-col gap-3">
-                         <div className="flex items-center gap-2 text-sm text-navy/60">
+                         <div className={cn("flex items-center gap-2 text-sm text-navy/60", isAr && "flex-row-reverse")}>
                             <User size={16} className="text-blue-accent" />
                             <span>{course.teacherName}</span>
                          </div>
-                         <div className="flex items-center gap-2 text-sm text-navy/60">
+                         <div className={cn("flex items-center gap-2 text-sm text-navy/60", isAr && "flex-row-reverse")}>
                             <Clock size={16} className="text-blue-accent" />
-                            <span>Publié le {course.date}</span>
+                            <span>{t('replays.published_on')} {course.date}</span>
                          </div>
                       </div>
-                      <div className="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center">
+                      <div className={cn("mt-6 pt-6 border-t border-gray-100 flex justify-between items-center", isAr && "flex-row-reverse")}>
                          <span className="text-xs font-bold text-navy/40 uppercase tracking-widest">{course.level}</span>
-                         <Button variant="ghost" size="sm" className="p-0 hover:text-blue-accent group/btn flex items-center gap-1 font-bold text-xs uppercase tracking-widest">
-                            Regarder <Play size={12} fill="currentColor" className="group-hover/btn:translate-x-1 transition-transform" />
+                         <Button variant="ghost" size="sm" className={cn("p-0 hover:text-blue-accent group/btn flex items-center gap-1 font-bold text-xs uppercase tracking-widest", isAr && "flex-row-reverse")}>
+                            {t('replays.watch')} <Play size={12} fill="currentColor" className={cn("group-hover/btn:translate-x-1 transition-transform", isAr && "rotate-180 group-hover/btn:-translate-x-1")} />
                          </Button>
                       </div>
                    </div>
