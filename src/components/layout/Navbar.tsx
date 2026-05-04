@@ -26,7 +26,7 @@ export function Navbar() {
               <img src="/logo.png" alt="École Nadjah Logo" className="w-full h-full object-contain shadow-sm rounded-lg" />
             </div>
             <div>
-              <span className="text-xl font-serif font-bold text-navy tracking-tight block leading-none">École Nadjah</span>
+              <span className="text-xl font-serif font-bold text-navy tracking-tight block leading-none">ÉCOLE NADJAH</span>
               <span className="text-[10px] uppercase tracking-[0.2em] text-blue-accent font-bold">Excellence & Vision</span>
             </div>
           </Link>

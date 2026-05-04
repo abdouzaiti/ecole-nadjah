@@ -40,7 +40,7 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
             <div className="w-10 h-10 flex items-center justify-center">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain shadow-sm rounded-lg" />
             </div>
-            <span className="text-xl font-serif font-bold text-white tracking-tight">Nadjah Portal</span>
+            <span className="text-xl font-serif font-bold text-white tracking-tight text-nowrap">ÉCOLE NADJAH</span>
           </Link>
         </div>
 
@@ -150,7 +150,7 @@ export function DashboardLayout({ children, items }: { children: ReactNode, item
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-3">
                    <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
-                   <span className="text-xl font-serif text-white font-bold">Nadjah Portal</span>
+                   <span className="text-xl font-serif text-white font-bold">ÉCOLE NADJAH</span>
                 </div>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-white/50"><X /></button>
               </div>

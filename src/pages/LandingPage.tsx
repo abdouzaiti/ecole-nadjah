@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Button, Card, Badge } from '../components/ui';
-import { ArrowRight, CheckCircle2, ShieldCheck, Users, Monitor, MapPin, Phone, Mail, GraduationCap } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ShieldCheck, Users, Monitor, MapPin, Phone, Mail, GraduationCap, Facebook, Instagram, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 
@@ -35,12 +35,11 @@ export default function LandingPage() {
           >
             <Badge variant="accent">Inscriptions Ouvertes 2026-2027</Badge>
             <h1 className="text-5xl md:text-7xl font-serif text-navy mt-6 mb-6 leading-[1.1]">
-              École Nadjah: <br />
-              <span className="text-blue-accent italic">Former les leaders</span> de demain
+              ÉCOLE NADJAH : <br />
+              <span className="text-blue-accent italic">L'Excellence</span> Digitale
             </h1>
             <p className="text-xl text-navy/60 mb-10 font-sans max-w-xl">
-              Une institution d'excellence dédiée à l'épanouissement intellectuel et personnel de chaque élève. 
-              Une éducation moderne, des valeurs fortes.
+              Bienvenue sur la plateforme officielle de l'ÉCOLE NADJAH. Un écosystème éducatif complet offrant des cours en direct, un accès illimité aux replays haute définition, un suivi pédagogique en temps réel et une gestion administrative simplifiée pour une réussite garantie.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/register">
@@ -155,7 +154,6 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-serif mt-6 mb-8 uppercase tracking-tight text-white">Une Éducation de Prestige</h2>
             <div className="space-y-8">
               {[
-                { title: "Infrastructures Modernes", desc: "Salles de classe connectées, laboratoires de pointe et espaces sportifs.", icon: <ShieldCheck className="text-blue-accent" /> },
                 { title: "Digital Learning", desc: "Plateforme interactive intégrée pour un suivi hybride efficace.", icon: <Monitor className="text-blue-accent" /> },
                 { title: "Enseignement Personnalisé", desc: "Des classes réduites pour une attention dédiée à chaque élève.", icon: <Users className="text-blue-accent" /> },
               ].map((item, i) => (
@@ -196,9 +194,14 @@ export default function LandingPage() {
               <h2 className="text-4xl font-serif text-navy mb-8">Nous Contacter</h2>
               <div className="space-y-6">
                 <div className="flex items-center gap-4 group">
-                  <div className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors">
+                  <a 
+                    href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors shrink-0"
+                  >
                     <MapPin size={20} />
-                  </div>
+                  </a>
                   <a 
                     href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
@@ -208,17 +211,33 @@ export default function LandingPage() {
                     École Nadjah, Mostaganem, Algérie
                   </a>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner">
+                <div className="flex items-start gap-4 group">
+                  <a href="tel:0669812895" className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner shrink-0 group-hover:bg-blue-accent/10 transition-colors">
                     <Phone size={20} />
+                  </a>
+                  <div className="flex flex-col">
+                    <a href="tel:0669812895" className="text-lg text-navy/70 hover:text-blue-accent transition-colors">0669 81 28 95</a>
+                    <a href="tel:0790356012" className="text-lg text-navy/70 hover:text-blue-accent transition-colors">0790 35 60 12</a>
+                    <a href="tel:045416134" className="text-lg text-navy/70 hover:text-blue-accent transition-colors">045 41 61 34</a>
                   </div>
-                  <span className="text-lg text-navy/70">+213 (0) 45 70 00 00</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner">
+                <div className="flex items-center gap-4 group">
+                  <a 
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors"
+                  >
                     <Mail size={20} />
-                  </div>
-                  <span className="text-lg text-navy/70">contact@elnadjah-dz.com</span>
+                  </a>
+                  <a 
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-lg text-navy/70 hover:text-blue-accent transition-colors"
+                  >
+                    ecole.el.nadjah.mosta.27@gmail.com
+                  </a>
                 </div>
               </div>
               
@@ -270,14 +289,21 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
              <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain invert brightness-0" />
-             <span className="text-white font-serif font-bold text-lg">École Nadjah</span>
+             <span className="text-white font-serif font-bold text-lg">ÉCOLE NADJAH</span>
           </div>
           <div className="text-sm">
-            © 2026 École Nadjah. Tous droits réservés. Design by Excellence.
+            © 2026 ÉCOLE NADJAH. Tous droits réservés. Design by Excellence.
           </div>
-          <div className="flex gap-6 text-sm uppercase tracking-widest font-bold">
-            <a href="#" className="hover:text-white transition-colors">Confidentialité</a>
-            <a href="#" className="hover:text-white transition-colors text-white/40">Mentions Légales</a>
+          <div className="flex gap-6">
+            <a href="https://www.facebook.com/Ecole.nadjhah.27?locale=fr_FR" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors">
+              <Facebook size={20} />
+            </a>
+            <a href="https://www.instagram.com/ecole.nadjah.27/" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors">
+              <Instagram size={20} />
+            </a>
+            <a href="https://www.youtube.com/@ecolenadjahmostaganem304" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors">
+              <Youtube size={20} />
+            </a>
           </div>
         </div>
       </footer>
