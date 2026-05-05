@@ -48,6 +48,13 @@ const resources = {
         "title": "لماذا تختارنا ؟",
         "subtitle": "تعليم متميز"
       },
+      "about": {
+        "title": "قصتنا ومهمتنا",
+        "description1": "تعتبر مدرسة النجاح بمستغانم منبراً تعليمياً متميزاً يسعى لتوفير بيئة تعليمية محفزة تهدف إلى تنمية قدرات الطلاب الأكاديمية والشخصية.",
+        "description2": "نحن نؤمن بأن كل طفل لديه إمكانيات فريدة، ومهمتنا هي توجيههم نحو التميز من خلال مناهج تعليمية متطورة وفريق تربوي متخصص.",
+        "years_exp": "سنة من الخبرة",
+        "graduates": "خريج ناجح"
+      },
       "form": {
         "title": "أرسل رسالة",
         "name": "الاسم",
@@ -273,6 +280,13 @@ const resources = {
         "title": "Pourquoi Nous Choisir ?",
         "subtitle": "Une Éducation de Prestige"
       },
+      "about": {
+        "title": "Notre Histoire & Mission",
+        "description1": "L'École Nadjah de Mostaganem est une institution éducative de premier plan qui s'efforce de fournir un environnement d'apprentissage stimulant visant à développer les capacités académiques et personnelles des élèves.",
+        "description2": "Nous croyons que chaque enfant a un potentiel unique, et notre mission est de les guider vers l'excellence grâce à des programmes éducatifs avancés et une équipe pédagogique spécialisée.",
+        "years_exp": "Ans d'Expérience",
+        "graduates": "Diplômés Succès"
+      },
       "form": {
         "title": "Envoyez un message",
         "name": "Nom",
@@ -497,6 +511,13 @@ const resources = {
       "why_us": {
         "title": "Why Choose Us?",
         "subtitle": "Prestige Education"
+      },
+      "about": {
+        "title": "Our Story & Mission",
+        "description1": "Nadjah School in Mostaganem is a premier educational institution striving to provide a stimulating learning environment aimed at developing students' academic and personal abilities.",
+        "description2": "We believe every child has unique potential, and our mission is to guide them toward excellence through advanced educational curricula and a specialized pedagogical team.",
+        "years_exp": "Years Experience",
+        "graduates": "Successful Graduates"
       },
       "form": {
         "title": "Send a message",

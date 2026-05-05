@@ -115,7 +115,7 @@ export function Navbar() {
                   <Button size="sm" variant="ghost">{t('login')}</Button>
                 </Link>
                 <Link to="/register">
-                  <Button size="sm" variant="navy">{t('register_now')}</Button>
+                  <Button size="sm" variant="navy" style={{ backgroundColor: '#1b1ba3' }}>{t('register_now')}</Button>
                 </Link>
               </div>
             )}

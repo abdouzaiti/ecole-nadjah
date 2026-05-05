@@ -26,11 +26,11 @@ export default function LandingPage() {
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center pt-20 bg-white overflow-hidden">
+      <section className="relative h-[80vh] flex items-center pt-20 overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
         <div className={cn(
           "absolute top-0 w-1/3 h-full bg-navy/5 -skew-x-12 translate-x-20 z-0",
           isAr ? "left-0" : "right-0"
-        )}></div>
+        )} style={{ backgroundColor: '#ffffff' }}></div>
         <div className={cn(
           "absolute bottom-0 w-64 h-64 bg-blue-accent/5 rounded-full blur-3xl z-0",
           isAr ? "right-0 translate-x-1/2 translate-y-1/2" : "left-0 -translate-x-1/2 translate-y-1/2"
@@ -53,7 +53,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/register">
-                <Button size="lg" variant="navy" className="w-full sm:w-auto px-10">{t('register_now')}</Button>
+                <Button size="lg" variant="navy" className="w-full sm:w-auto px-10" style={{ backgroundColor: '#0d1585' }}>{t('register_now')}</Button>
               </Link>
               <a href="#programs">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
@@ -66,7 +66,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="relative z-20 -mt-16 mb-24 max-w-7xl mx-auto px-4">
+      <section className="relative z-20 mt-20 mb-24 max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[
             { label: t('stats.students'), value: "1,200+", icon: <Users size={24} /> },
@@ -157,6 +157,49 @@ export default function LandingPage() {
                 </Card>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-24 bg-cream overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className={cn("relative", isAr ? "order-last" : "")}>
+              <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80" 
+                  alt="Students at École Nadjah" 
+                  className="w-full h-full object-cover aspect-square"
+                />
+              </div>
+              <div className={cn(
+                "absolute -bottom-10 -right-10 w-64 h-64 bg-navy rounded-3xl -z-0 opacity-10",
+                isAr ? "left-10 right-auto" : "right-10"
+              )}></div>
+            </div>
+            
+            <div className={cn(isAr && "text-right")}>
+              <Badge variant="accent">{t('nav.about')}</Badge>
+              <h2 className="text-4xl md:text-5xl font-serif text-navy mt-6 mb-8">{t('about.title')}</h2>
+              <p className="text-navy/70 text-lg leading-relaxed mb-8">
+                {t('about.description1')}
+              </p>
+              <p className="text-navy/70 text-lg leading-relaxed mb-10">
+                {t('about.description2')}
+              </p>
+              
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <div className="text-3xl font-serif font-bold text-navy mb-2">15+</div>
+                  <div className="text-sm font-medium text-navy/40 uppercase tracking-widest">{t('about.years_exp')}</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-serif font-bold text-navy mb-2">2000+</div>
+                  <div className="text-sm font-medium text-navy/40 uppercase tracking-widest">{t('about.graduates')}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -309,7 +352,7 @@ export default function LandingPage() {
                 </div>
                 <input type="text" placeholder={t('form.subject')} className={cn("bg-white border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-navy outline-none", isAr && "text-right")} />
                 <textarea placeholder={t('form.message')} rows={4} className={cn("bg-white border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-navy outline-none", isAr && "text-right")} />
-                <Button variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold">{t('form.send')}</Button>
+                <Button variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold" style={{ backgroundColor: '#230d8b' }}>{t('form.send')}</Button>
               </form>
             </Card>
           </div>

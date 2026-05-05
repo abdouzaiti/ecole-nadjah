@@ -44,6 +44,19 @@ export const MOCK_COURSES: Course[] = [
     description: 'Comprendre les changements majeurs du 19ème siècle.',
     duration: '45m',
     date: '2024-05-02'
+  },
+  {
+    id: 'c4',
+    title: 'Marketing Digital pour Entreprises',
+    teacherId: 't4',
+    teacherName: 'M. Sami R.',
+    level: 'Formation',
+    subject: 'Formation',
+    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop',
+    videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    description: 'Apprenez les stratégies de marketing numérique pour booster votre activité.',
+    duration: '1h 15m',
+    date: '2024-05-04'
   }
 ];
 
@@ -74,4 +87,5 @@ export const MOCK_REGISTRATIONS: RegistrationRequest[] = [
   { id: 'r1', studentName: 'Sofiane Meloussi', parentName: 'Ahmed Meloussi', level: 'Secondaire', contact: '0555 12 34 56', date: '2024-05-02', status: 'PENDING' },
   { id: 'r2', studentName: 'Amira Kaci', parentName: 'Lyna Kaci', level: 'Moyen', contact: '0661 98 76 54', date: '2024-05-03', status: 'PENDING' },
   { id: 'r3', studentName: 'Imane B.', parentName: 'Karim B.', level: 'Primaire', contact: '0770 12 88 99', date: '2024-05-01', status: 'APPROVED' },
+  { id: 'r4', studentName: 'Yassine T.', parentName: 'Personnel', level: 'Formation', contact: '0665 11 22 33', date: '2024-05-04', status: 'PENDING' },
 ];
