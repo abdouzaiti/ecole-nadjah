@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, Loader2, Minus, Maximize2, Bot } from 'lucide-react';
+import { MessageSquare, X, Send, Loader2, Minus, Maximize2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
@@ -108,8 +108,8 @@ export const ChatBot: React.FC = () => {
             {/* Header */}
             <div className="bg-navy p-4 flex items-center justify-between text-white shrink-0">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                  <Bot size={18} />
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1 overflow-hidden">
+                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold">{t('chatbot.name', 'Assistant Nadjah')}</span>
               </div>
@@ -213,14 +213,14 @@ export const ChatBot: React.FC = () => {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 90, opacity: 0 }}
             >
-              <MessageSquare size={24} />
+              <X size={24} />
             </motion.div>
           ) : (
             <motion.div
               key="open"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
             >
               <MessageSquare size={24} />
             </motion.div>
