@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Button, Card, Badge } from '../components/ui';
-import { ArrowRight, CheckCircle2, ShieldCheck, Users, Monitor, MapPin, Phone, Mail, GraduationCap, Facebook, Instagram, Youtube } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ShieldCheck, Users, Monitor, MapPin, Phone, Mail, GraduationCap, Facebook, Instagram, Youtube, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -69,10 +69,10 @@ export default function LandingPage() {
       <section className="relative z-20 mt-20 mb-24 max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[
-            { label: t('stats.students'), value: "1,200+", icon: <Users size={24} /> },
+            { label: t('stats.students'), value: "+500", icon: <Users size={24} /> },
             { label: t('stats.bac_success'), value: "98%", icon: <GraduationCap size={24} /> },
-            { label: t('stats.teachers'), value: "85", icon: <CheckCircle2 size={24} /> },
-            { label: t('stats.online_courses'), value: "500+", icon: <Monitor size={24} /> },
+            { label: t('stats.teachers'), value: "+20", icon: <CheckCircle2 size={24} /> },
+            { label: t('stats.online_courses'), value: "+30", icon: <Monitor size={24} /> },
           ].map((stat, i) => (
             <motion.div
               key={i}
@@ -106,31 +106,62 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-24 mt-16 pt-16">
             {[
               { 
                 level: t('levels.primary'), 
                 desc: t('levels.primary_desc'),
                 icon: <GraduationCap size={48} className="text-blue-accent" />,
-                color: "bg-blue-accent/5"
+                color: "bg-blue-accent/5",
+                images: [
+                  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80",
+                  "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&q=80",
+                  "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80"
+                ]
               },
               { 
                 level: t('levels.middle'), 
                 desc: t('levels.middle_desc'),
                 icon: <CheckCircle2 size={48} className="text-blue-accent" />,
-                color: "bg-navy/5"
+                color: "bg-navy/5",
+                images: [
+                  "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=400&q=80",
+                  "https://images.unsplash.com/photo-1544391682-1718ec277b0c?w=400&q=80",
+                  "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80"
+                ]
               },
               { 
                 level: t('levels.high'), 
                 desc: t('levels.high_desc'),
                 icon: <ShieldCheck size={48} className="text-blue-accent" />,
-                color: "bg-blue-accent/5"
+                color: "bg-blue-accent/5",
+                images: [
+                  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&q=80",
+                  "https://images.unsplash.com/photo-1588072432836-e10032774350?w=400&q=80",
+                  "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=80"
+                ]
               },
               { 
                 level: t('levels.formation'), 
                 desc: t('levels.formation_desc'),
                 icon: <Monitor size={48} className="text-blue-accent" />,
-                color: "bg-navy/5"
+                color: "bg-navy/5",
+                images: [
+                  "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&q=80",
+                  "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80",
+                  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&q=80"
+                ]
+              },
+              { 
+                level: t('levels.courses'), 
+                desc: t('levels.courses_desc'),
+                icon: <BookOpen size={48} className="text-blue-accent" />,
+                color: "bg-blue-accent/5",
+                images: [
+                  "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=80",
+                  "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=400&q=80",
+                  "https://images.unsplash.com/photo-1522071823991-b960d996281a?w=400&q=80"
+                ]
               },
             ].map((p, i) => (
               <motion.div
@@ -140,16 +171,41 @@ export default function LandingPage() {
                 transition={{ delay: i * 0.2 }}
                 viewport={{ once: true }}
               >
-                <Card className={cn("p-0 overflow-hidden group border-gray-100", isAr && "text-right")}>
-                  <div className={cn("h-48 flex items-center justify-center transition-colors duration-500", p.color)}>
-                    <div className="group-hover:scale-110 transition-transform duration-500">
-                      {p.icon}
+                <Card className={cn("p-0 group border-none bg-transparent relative shadow-none", isAr && "text-right flex flex-col h-full")}>
+                  <div className={cn("h-[400px] flex items-center justify-center transition-colors duration-500 relative rounded-3xl bg-transparent")}>
+                    {/* Bouquet of Images - Emerging Pattern */}
+                    <div className="relative w-full h-full flex items-end justify-center z-20 pb-0">
+                      {p.images.map((img, idx) => (
+                        <motion.div
+                          key={idx}
+                          className="absolute w-56 h-56 rounded-2xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-black/5 origin-bottom"
+                          initial={false}
+                          animate={{
+                            rotate: idx === 0 ? -15 : idx === 1 ? 0 : 15,
+                            x: idx === 0 ? -60 : idx === 1 ? 0 : 60,
+                            y: idx === 1 ? -10 : 30, 
+                            scale: idx === 1 ? 1.05 : 0.9,
+                            zIndex: idx === 1 ? 25 : 10
+                          }}
+                          whileHover={{
+                            rotate: idx === 0 ? -25 : idx === 1 ? 0 : 25,
+                            x: idx === 0 ? -120 : idx === 1 ? 0 : 120,
+                            y: idx === 1 ? -110 : -70,
+                            scale: 1.35,
+                            zIndex: 40
+                          }}
+                          transition={{ type: "spring", stiffness: 180, damping: 15 }}
+                        >
+                          <img src={img} alt="" className="w-full h-full object-cover" />
+                        </motion.div>
+                      ))}
                     </div>
                   </div>
-                  <div className="p-8">
-                    <h3 className="text-2xl font-serif mb-4 text-navy">{p.level}</h3>
-                    <p className="text-navy/60 mb-6 leading-relaxed">{p.desc}</p>
-                    <Button variant="ghost" className={cn("p-0 group-hover:text-blue-accent flex items-center gap-2", isAr && "flex-row-reverse")}>
+                  <div className="p-10 pt-16 flex-grow bg-white rounded-3xl shadow-2xl -mt-24 border border-gray-100 relative z-30">
+                    <h3 className="text-3xl font-serif mb-4 text-navy">{p.level}</h3>
+                    <p className="text-navy/60 mb-8 leading-relaxed line-clamp-3 text-lg">{p.desc}</p>
+                    
+                    <Button variant="ghost" className={cn("p-0 group-hover:text-blue-accent flex items-center gap-2 mt-auto w-fit", isAr && "flex-row-reverse ml-auto")}>
                       {t('learn_more')} 
                       <ArrowRight size={18} className={cn("transition-transform", isAr ? "group-hover:-translate-x-2 rotate-180" : "group-hover:translate-x-2")} />
                     </Button>

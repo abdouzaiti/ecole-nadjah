@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -16,6 +16,8 @@ import TeacherDashboard from './pages/dashboards/TeacherDashboard';
 import StudentDashboard from './pages/dashboards/StudentDashboard';
 import LiveClassPage from './pages/LiveClassPage';
 import ReplaysPage from './pages/ReplaysPage';
+import SplashScreen from './SplashScreen';
+import { AnimatePresence } from 'motion/react';
 
 const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
   const { isAuthenticated, user } = useAuth();
@@ -26,6 +28,7 @@ const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 
 
 function AppRoutes() {
   const { i18n } = useTranslation();
+  const [showSplash, setShowSplash] = useState(true);
   
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
@@ -33,61 +36,67 @@ function AppRoutes() {
   }, [i18n.language]);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Navbar />
-      <main className="flex-grow pt-20">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegistrationPage />} />
-          
-          <Route 
-            path="/dashboard/admin" 
-            element={
-              <ProtectedRoute role="ADMIN">
-                <AdminDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route 
-            path="/dashboard/teacher" 
-            element={
-              <ProtectedRoute role="TEACHER">
-                <TeacherDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route 
-            path="/dashboard/student" 
-            element={
-              <ProtectedRoute role="STUDENT">
-                <StudentDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route 
-            path="/live/:id" 
-            element={
-              <ProtectedRoute>
-                <LiveClassPage />
-              </ProtectedRoute>
-            } 
-          />
+    <AnimatePresence mode="wait">
+      {showSplash ? (
+        <SplashScreen key="splash" onEnter={() => setShowSplash(false)} />
+      ) : (
+        <div key="main-app" className="min-h-screen bg-white flex flex-col">
+          <Navbar />
+          <main className="flex-grow pt-20">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegistrationPage />} />
+              
+              <Route 
+                path="/dashboard/admin" 
+                element={
+                  <ProtectedRoute role="ADMIN">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/dashboard/teacher" 
+                element={
+                  <ProtectedRoute role="TEACHER">
+                    <TeacherDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/dashboard/student" 
+                element={
+                  <ProtectedRoute role="STUDENT">
+                    <StudentDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/live/:id" 
+                element={
+                  <ProtectedRoute>
+                    <LiveClassPage />
+                  </ProtectedRoute>
+                } 
+              />
 
-          <Route 
-            path="/replays" 
-            element={
-              <ProtectedRoute>
-                <ReplaysPage />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </main>
-    </div>
+              <Route 
+                path="/replays" 
+                element={
+                  <ProtectedRoute>
+                    <ReplaysPage />
+                  </ProtectedRoute>
+                } 
+              />
+            </Routes>
+          </main>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
 

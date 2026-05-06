@@ -42,7 +42,9 @@ const resources = {
         "high": "ثانوي",
         "high_desc": "إعداد التميز للبكالوريا والتوجيه الجامعي.",
         "formation": "تكوين",
-        "formation_desc": "برامج تدريبية متخصصة لتطوير المهارات العملية والمهنية."
+        "formation_desc": "برامج تدريبية متخصصة لتطوير المهارات العملية والمهنية.",
+        "courses": "دورات تقوية",
+        "courses_desc": "حصص دعم مكثفة في المواد الأساسية لمواجهة صعوبات التعلم والتميز الدراسي."
       },
       "why_us": {
         "title": "لماذا تختارنا ؟",
@@ -274,7 +276,9 @@ const resources = {
         "high": "Secondaire",
         "high_desc": "Préparer l'excellence pour le Baccalauréat et l'orientation universitaire.",
         "formation": "Formation",
-        "formation_desc": "Des programmes de formation spécialisés pour le développement des compétences professionnelles."
+        "formation_desc": "Des programmes de formation spécialisés pour le développement des compétences professionnelles.",
+        "courses": "Cours de Soutien",
+        "courses_desc": "Des cours de soutien intensifs dans les matières principales pour surmonter les difficultés et exceller."
       },
       "why_us": {
         "title": "Pourquoi Nous Choisir ?",
@@ -506,7 +510,9 @@ const resources = {
         "high": "High School",
         "high_desc": "Preparing for excellence in the Baccalaureate and university orientation.",
         "formation": "Training",
-        "formation_desc": "Specialized training programs for professional skill development."
+        "formation_desc": "Specialized training programs for professional skill development.",
+        "courses": "Support Courses",
+        "courses_desc": "Intensive support classes in core subjects to overcome learning difficulties and achieve academic excellence."
       },
       "why_us": {
         "title": "Why Choose Us?",
