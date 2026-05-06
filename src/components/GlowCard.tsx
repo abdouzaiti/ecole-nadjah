@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, ReactNode } from 'react';
+import { cn } from '../lib/utils';
 
 interface GlowCardProps {
   children: ReactNode;
@@ -76,7 +77,7 @@ const GlowCard: React.FC<GlowCardProps> = ({
       '--spread': spread,
       '--radius': '14',
       '--border': '2',
-      '--backdrop': 'rgba(255, 255, 255, 1)',
+      '--backdrop': 'transparent',
       '--backup-border': 'rgba(0, 0, 0, 0.05)',
       '--size': '300',
       '--outer': '1',
@@ -182,18 +183,13 @@ const GlowCard: React.FC<GlowCardProps> = ({
         ref={cardRef}
         data-glow
         style={getInlineStyles()}
-        className={`
-          ${getSizeClasses()}
-          ${!customSize && (!width || !height) ? 'aspect-[3/4]' : ''}
-          rounded-2xl 
-          relative 
-          grid 
-          grid-rows-[1fr_auto] 
-          shadow-[0_1rem_2rem_-1rem_black] 
-          p-4 
-          gap-4 
-          ${className}
-        `}
+        className={cn(
+          "rounded-2xl relative shadow-[0_1rem_2rem_-1rem_black]",
+          !customSize && "grid grid-rows-[1fr_auto] p-4 gap-4",
+          !customSize && (!width || !height) && "aspect-[3/4]",
+          !customSize && getSizeClasses(),
+          className
+        )}
       >
         <div data-glow-inner></div>
         {children}

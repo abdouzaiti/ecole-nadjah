@@ -410,7 +410,7 @@ export default function LandingPage() {
               </a>
             </div>
             
-            <Card className="bg-cream border-none p-10">
+            <GlowCard glowColor="blue" customSize className="bg-cream border-none p-10">
               <h3 className={cn("text-3xl font-serif mb-6 text-navy", isAr && "text-right")}>{t('form.title')}</h3>
               <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -421,7 +421,7 @@ export default function LandingPage() {
                 <textarea placeholder={t('form.message')} rows={4} className={cn("bg-white border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-navy outline-none", isAr && "text-right")} />
                 <Button variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold" style={{ backgroundColor: '#230d8b' }}>{t('form.send')}</Button>
               </form>
-            </Card>
+            </GlowCard>
           </div>
         </div>
       </section>
