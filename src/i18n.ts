@@ -17,6 +17,7 @@ const resources = {
       "view_google_maps": "عرض على خرائط جوجل",
       "open_maps_app": "فتح تطبيق الخرائط",
       "register_now": "سجل الآن",
+      "close": "إغلاق",
       "login": "تسجيل الدخول",
       "all": "الكل",
       "our_pillars": "ركائزنا",
@@ -44,7 +45,14 @@ const resources = {
         "formation": "تكوين",
         "formation_desc": "برامج تدريبية متخصصة لتطوير المهارات العملية والمهنية.",
         "courses": "دورات تقوية",
-        "courses_desc": "حصص دعم مكثفة في المواد الأساسية لمواجهة صعوبات التعلم والتميز الدراسي."
+        "courses_desc": "حصص دعم مكثفة في المواد الأساسية لمواجهة صعوبات التعلم والتميز الدراسي.",
+        "details": {
+          "primary": ["السنة الأولى", "السنة الثانية", "السنة الثالثة", "السنة الرابعة", "السنة الخامسة"],
+          "middle": ["السنة الأولى", "السنة الثانية", "السنة الثالثة", "السنة الرابعة"],
+          "high": ["السنة الأولى", "السنة الثانية", "السنة الثالثة"],
+          "formation": ["المعلوماتية", "الهندسة المعمارية", "التصميم", "اللغات"],
+          "courses": ["التاريخ والجغرافيا", "الرياضيات", "اللغة العربية", "الفيزياء", "الفلسفة"]
+        }
       },
       "why_us": {
         "title": "لماذا تختارنا ؟",
@@ -251,6 +259,7 @@ const resources = {
       "view_google_maps": "Voir sur Google Maps",
       "open_maps_app": "Ouvrir l'application Maps",
       "register_now": "S'inscrire Maintenant",
+      "close": "Fermer",
       "login": "Se Connecter",
       "all": "Tous",
       "our_pillars": "Nos Piliers",
@@ -278,7 +287,14 @@ const resources = {
         "formation": "Formation",
         "formation_desc": "Des programmes de formation spécialisés pour le développement des compétences professionnelles.",
         "courses": "Cours de Soutien",
-        "courses_desc": "Des cours de soutien intensifs dans les matières principales pour surmonter les difficultés et exceller."
+        "courses_desc": "Des cours de soutien intensifs dans les matières principales pour surmonter les difficultés et exceller.",
+        "details": {
+          "primary": ["1ère année", "2ème année", "3ème année", "4ème année", "5ème année"],
+          "middle": ["1ère année", "2ème année", "3ème année", "4ème année"],
+          "high": ["1ère année", "2ème année", "3ème année"],
+          "formation": ["Informatique", "Architecture", "Design", "Langues"],
+          "courses": ["Histoire / Géo", "Mathématiques", "Arabe", "Physique", "Philosophie"]
+        }
       },
       "why_us": {
         "title": "Pourquoi Nous Choisir ?",
@@ -485,6 +501,7 @@ const resources = {
       "view_google_maps": "View on Google Maps",
       "open_maps_app": "Open Maps App",
       "register_now": "Register Now",
+      "close": "Close",
       "login": "Login",
       "all": "All",
       "our_pillars": "Our Pillars",
@@ -512,7 +529,14 @@ const resources = {
         "formation": "Training",
         "formation_desc": "Specialized training programs for professional skill development.",
         "courses": "Support Courses",
-        "courses_desc": "Intensive support classes in core subjects to overcome learning difficulties and achieve academic excellence."
+        "courses_desc": "Intensive support classes in core subjects to overcome learning difficulties and achieve academic excellence.",
+        "details": {
+          "primary": ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year"],
+          "middle": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+          "high": ["1st Year", "2nd Year", "3rd Year"],
+          "formation": ["Computing", "Architecture", "Design", "Languages"],
+          "courses": ["History / Geo", "Mathematics", "Arabic", "Physics", "Philosophy"]
+        }
       },
       "why_us": {
         "title": "Why Choose Us?",

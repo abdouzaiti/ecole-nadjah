@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
 import { GlowCard } from '../components/GlowCard';
+import { useState, ReactNode } from 'react';
+import { ProgramModal } from '../components/ProgramModal';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -20,12 +22,104 @@ const stagger = {
   }
 };
 
+interface DetailedProgram {
+  id: string;
+  title: string;
+  items: string[];
+  icon: ReactNode;
+}
+
 export default function LandingPage() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
+  
+  const [selectedProgram, setSelectedProgram] = useState<DetailedProgram | null>(null);
+
+  const programs = [
+    { 
+      id: 'primary',
+      level: t('levels.primary'), 
+      desc: t('levels.primary_desc'),
+      icon: <GraduationCap size={48} className="text-blue-accent" />,
+      color: "bg-blue-accent/5",
+      images: [
+        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80",
+        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&q=80",
+        "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80"
+      ]
+    },
+    { 
+      id: 'middle',
+      level: t('levels.middle'), 
+      desc: t('levels.middle_desc'),
+      icon: <CheckCircle2 size={48} className="text-blue-accent" />,
+      color: "bg-navy/5",
+      images: [
+        "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=400&q=80",
+        "https://images.unsplash.com/photo-1544391682-1718ec277b0c?w=400&q=80",
+        "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80"
+      ]
+    },
+    { 
+      id: 'high',
+      level: t('levels.high'), 
+      desc: t('levels.high_desc'),
+      icon: <ShieldCheck size={48} className="text-blue-accent" />,
+      color: "bg-blue-accent/5",
+      images: [
+        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&q=80",
+        "https://images.unsplash.com/photo-1588072432836-e10032774350?w=400&q=80",
+        "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=80"
+      ]
+    },
+    { 
+      id: 'formation',
+      level: t('levels.formation'), 
+      desc: t('levels.formation_desc'),
+      icon: <Monitor size={48} className="text-blue-accent" />,
+      color: "bg-navy/5",
+      images: [
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&q=80",
+        "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80",
+        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&q=80"
+      ]
+    },
+    { 
+      id: 'courses',
+      level: t('levels.courses'), 
+      desc: t('levels.courses_desc'),
+      icon: <BookOpen size={48} className="text-blue-accent" />,
+      color: "bg-blue-accent/5",
+      images: [
+        "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=80",
+        "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=400&q=80",
+        "https://images.unsplash.com/photo-1522071823991-b960d996281a?w=400&q=80"
+      ]
+    },
+  ];
+
+  const handleLearnMore = (id: string, levelName: string, icon: ReactNode) => {
+    // Access details from i18n
+    const details = t(`levels.details.${id}`, { returnObjects: true }) as string[];
+    if (Array.isArray(details)) {
+      setSelectedProgram({
+        id,
+        title: levelName,
+        items: details,
+        icon
+      });
+    }
+  };
 
   return (
     <div className="overflow-x-hidden">
+      <ProgramModal 
+        isOpen={!!selectedProgram}
+        onClose={() => setSelectedProgram(null)}
+        title={selectedProgram?.title || ""}
+        items={selectedProgram?.items || []}
+        icon={selectedProgram?.icon}
+      />
       {/* Hero Section */}
       <section className="relative h-[80vh] flex items-center pt-20 overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
         <div className={cn(
@@ -113,63 +207,7 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-24 mt-16 pt-16">
-            {[
-              { 
-                level: t('levels.primary'), 
-                desc: t('levels.primary_desc'),
-                icon: <GraduationCap size={48} className="text-blue-accent" />,
-                color: "bg-blue-accent/5",
-                images: [
-                  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80",
-                  "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&q=80",
-                  "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80"
-                ]
-              },
-              { 
-                level: t('levels.middle'), 
-                desc: t('levels.middle_desc'),
-                icon: <CheckCircle2 size={48} className="text-blue-accent" />,
-                color: "bg-navy/5",
-                images: [
-                  "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=400&q=80",
-                  "https://images.unsplash.com/photo-1544391682-1718ec277b0c?w=400&q=80",
-                  "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80"
-                ]
-              },
-              { 
-                level: t('levels.high'), 
-                desc: t('levels.high_desc'),
-                icon: <ShieldCheck size={48} className="text-blue-accent" />,
-                color: "bg-blue-accent/5",
-                images: [
-                  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&q=80",
-                  "https://images.unsplash.com/photo-1588072432836-e10032774350?w=400&q=80",
-                  "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=80"
-                ]
-              },
-              { 
-                level: t('levels.formation'), 
-                desc: t('levels.formation_desc'),
-                icon: <Monitor size={48} className="text-blue-accent" />,
-                color: "bg-navy/5",
-                images: [
-                  "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&q=80",
-                  "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80",
-                  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&q=80"
-                ]
-              },
-              { 
-                level: t('levels.courses'), 
-                desc: t('levels.courses_desc'),
-                icon: <BookOpen size={48} className="text-blue-accent" />,
-                color: "bg-blue-accent/5",
-                images: [
-                  "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=80",
-                  "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=400&q=80",
-                  "https://images.unsplash.com/photo-1522071823991-b960d996281a?w=400&q=80"
-                ]
-              },
-            ].map((p, i) => (
+            {programs.map((p, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
@@ -216,7 +254,11 @@ export default function LandingPage() {
                     <h3 className="text-3xl font-serif mb-4 text-navy">{p.level}</h3>
                     <p className="text-navy/60 mb-8 leading-relaxed line-clamp-3 text-lg">{p.desc}</p>
                     
-                    <Button variant="ghost" className={cn("p-0 group-hover:text-blue-accent flex items-center gap-2 mt-auto w-fit", isAr && "flex-row-reverse ml-auto")}>
+                    <Button 
+                      onClick={() => handleLearnMore(p.id, p.level, p.icon)}
+                      variant="ghost" 
+                      className={cn("p-0 group-hover:text-blue-accent flex items-center gap-2 mt-auto w-fit", isAr && "flex-row-reverse ml-auto")}
+                    >
                       {t('learn_more')} 
                       <ArrowRight size={18} className={cn("transition-transform", isAr ? "group-hover:-translate-x-2 rotate-180" : "group-hover:translate-x-2")} />
                     </Button>
