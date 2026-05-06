@@ -19,6 +19,7 @@ import ReplaysPage from './pages/ReplaysPage';
 import SplashScreen from './SplashScreen';
 import { AnimatePresence } from 'motion/react';
 import { ChatBot } from './components/ChatBot';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
   const { isAuthenticated, user } = useAuth();
@@ -43,58 +44,62 @@ function AppRoutes() {
       ) : (
         <div key="main-app" className="min-h-screen bg-white flex flex-col relative">
           <Navbar />
-          <ChatBot />
+          <ErrorBoundary componentName="ChatBot" fallback={null}>
+            <ChatBot />
+          </ErrorBoundary>
           <main className="flex-grow pt-20">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegistrationPage />} />
-              
-              <Route 
-                path="/dashboard/admin" 
-                element={
-                  <ProtectedRoute role="ADMIN">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              <Route 
-                path="/dashboard/teacher" 
-                element={
-                  <ProtectedRoute role="TEACHER">
-                    <TeacherDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              <Route 
-                path="/dashboard/student" 
-                element={
-                  <ProtectedRoute role="STUDENT">
-                    <StudentDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              <Route 
-                path="/live/:id" 
-                element={
-                  <ProtectedRoute>
-                    <LiveClassPage />
-                  </ProtectedRoute>
-                } 
-              />
+            <ErrorBoundary componentName="Main Content">
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegistrationPage />} />
+                
+                <Route 
+                  path="/dashboard/admin" 
+                  element={
+                    <ProtectedRoute role="ADMIN">
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/dashboard/teacher" 
+                  element={
+                    <ProtectedRoute role="TEACHER">
+                      <TeacherDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/dashboard/student" 
+                  element={
+                    <ProtectedRoute role="STUDENT">
+                      <StudentDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/live/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <LiveClassPage />
+                    </ProtectedRoute>
+                  } 
+                />
 
-              <Route 
-                path="/replays" 
-                element={
-                  <ProtectedRoute>
-                    <ReplaysPage />
-                  </ProtectedRoute>
-                } 
-              />
-            </Routes>
+                <Route 
+                  path="/replays" 
+                  element={
+                    <ProtectedRoute>
+                      <ReplaysPage />
+                    </ProtectedRoute>
+                  } 
+                />
+              </Routes>
+            </ErrorBoundary>
           </main>
         </div>
       )}

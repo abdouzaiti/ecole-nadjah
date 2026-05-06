@@ -25,8 +25,27 @@ export const ChatBot: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Gemini
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  // Use a ref for the AI client to avoid re-initialization and handle missing keys
+  const aiClientRef = useRef<GoogleGenAI | null>(null);
+
+  const getAiClient = () => {
+    if (aiClientRef.current) return aiClientRef.current;
+    
+    // Check if the key is available
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey === 'undefined') {
+      console.warn('GEMINI_API_KEY is not defined. ChatBot functionality will be limited.');
+      return null;
+    }
+
+    try {
+      aiClientRef.current = new GoogleGenAI({ apiKey });
+      return aiClientRef.current;
+    } catch (err) {
+      console.error('Failed to initialize GoogleGenAI:', err);
+      return null;
+    }
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -43,6 +62,11 @@ export const ChatBot: React.FC = () => {
     setIsLoading(true);
 
     try {
+      const ai = getAiClient();
+      if (!ai) {
+        throw new Error('API key not configured');
+      }
+
       const systemInstruction = `
         You are a helpful and professional school assistant for École Nadjah (Nadjah School).
         Your goal is to help users understand the website and provide information about the school, programs, and inscriptions.
