@@ -37,13 +37,15 @@ const GlowCard: React.FC<GlowCardProps> = ({
 
   useEffect(() => {
     const syncPointer = (e: PointerEvent) => {
-      const { clientX: x, clientY: y } = e;
-      
       if (cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
         cardRef.current.style.setProperty('--x', x.toFixed(2));
-        cardRef.current.style.setProperty('--xp', (x / window.innerWidth).toFixed(2));
+        cardRef.current.style.setProperty('--xp', (e.clientX / window.innerWidth).toFixed(2));
         cardRef.current.style.setProperty('--y', y.toFixed(2));
-        cardRef.current.style.setProperty('--yp', (y / window.innerHeight).toFixed(2));
+        cardRef.current.style.setProperty('--yp', (e.clientY / window.innerHeight).toFixed(2));
       }
     };
 
@@ -75,7 +77,7 @@ const GlowCard: React.FC<GlowCardProps> = ({
       '--spotlight-size': 'calc(var(--size, 150) * 1px)',
       '--hue': 'calc(var(--base) + (var(--xp, 0) * var(--spread, 0)))',
       '--saturation': '80',
-      '--lightness': '30', // Matches a brighter version of the navy brand color
+      '--lightness': '30',
       '--border-spot-opacity': '1',
       '--bg-spot-opacity': '0.1', 
       backgroundImage: `radial-gradient(
@@ -85,11 +87,11 @@ const GlowCard: React.FC<GlowCardProps> = ({
         hsl(var(--hue, 215) calc(var(--saturation, 80) * 1%) calc(var(--lightness, 30) * 1%) / var(--bg-spot-opacity, 0.1)), transparent
       )`,
       backgroundColor: 'var(--backdrop, transparent)',
-      backgroundSize: 'calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)))',
+      backgroundSize: '100% 100%',
       backgroundPosition: '50% 50%',
-      backgroundAttachment: 'fixed',
       border: 'var(--border-size) solid var(--backup-border)',
       position: 'relative' as const,
+      willChange: 'background-image',
     };
 
     // Add width and height if provided
@@ -116,13 +118,13 @@ const GlowCard: React.FC<GlowCardProps> = ({
           inset: calc(var(--border-size) * -1);
           border: var(--border-size) solid transparent;
           border-radius: calc(var(--radius) * 1px);
-          background-attachment: fixed;
-          background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
+          background-size: 100% 100%;
           background-repeat: no-repeat;
           background-position: 50% 50%;
           mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
           mask-clip: padding-box, border-box;
           mask-composite: intersect;
+          will-change: mask, background-image;
         }
         
         [data-glow]::before,
