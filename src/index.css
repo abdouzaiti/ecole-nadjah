@@ -12,8 +12,19 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   body {
-    @apply bg-white text-navy antialiased;
+    @apply bg-white text-navy antialiased min-h-screen overflow-x-hidden;
+  }
+  
+  a, button {
+    @apply transition-all duration-300;
   }
   
   h1, h2, h3, h4, h5, h6 {

@@ -36,21 +36,28 @@ const GlowCard: React.FC<GlowCardProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let frameId: number;
     const syncPointer = (e: PointerEvent) => {
-      if (cardRef.current) {
-        const rect = cardRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        cardRef.current.style.setProperty('--x', x.toFixed(2));
-        cardRef.current.style.setProperty('--xp', (e.clientX / window.innerWidth).toFixed(2));
-        cardRef.current.style.setProperty('--y', y.toFixed(2));
-        cardRef.current.style.setProperty('--yp', (e.clientY / window.innerHeight).toFixed(2));
-      }
+      if (frameId) cancelAnimationFrame(frameId);
+      
+      frameId = requestAnimationFrame(() => {
+        if (cardRef.current) {
+          const x = e.clientX;
+          const y = e.clientY;
+          
+          cardRef.current.style.setProperty('--x', x.toFixed(2));
+          cardRef.current.style.setProperty('--xp', (e.clientX / window.innerWidth).toFixed(2));
+          cardRef.current.style.setProperty('--y', y.toFixed(2));
+          cardRef.current.style.setProperty('--yp', (e.clientY / window.innerHeight).toFixed(2));
+        }
+      });
     };
 
-    document.addEventListener('pointermove', syncPointer);
-    return () => document.removeEventListener('pointermove', syncPointer);
+    window.addEventListener('pointermove', syncPointer);
+    return () => {
+      window.removeEventListener('pointermove', syncPointer);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, []);
 
   const { base, spread } = glowColorMap[glowColor];
@@ -76,19 +83,20 @@ const GlowCard: React.FC<GlowCardProps> = ({
       '--border-size': 'calc(var(--border, 2) * 1px)',
       '--spotlight-size': 'calc(var(--size, 150) * 1px)',
       '--hue': 'calc(var(--base) + (var(--xp, 0) * var(--spread, 0)))',
-      '--saturation': '80',
-      '--lightness': '30',
+      '--saturation': '70',
+      '--lightness': '40',
       '--border-spot-opacity': '1',
-      '--bg-spot-opacity': '0.1', 
+      '--bg-spot-opacity': '0.15', 
       backgroundImage: `radial-gradient(
         var(--spotlight-size) var(--spotlight-size) at
         calc(var(--x, 0) * 1px)
         calc(var(--y, 0) * 1px),
-        hsl(var(--hue, 215) calc(var(--saturation, 80) * 1%) calc(var(--lightness, 30) * 1%) / var(--bg-spot-opacity, 0.1)), transparent
+        hsl(var(--hue, 215) calc(var(--saturation, 70) * 1%) calc(var(--lightness, 40) * 1%) / var(--bg-spot-opacity, 0.15)), transparent
       )`,
       backgroundColor: 'var(--backdrop, transparent)',
-      backgroundSize: '100% 100%',
+      backgroundSize: 'calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)))',
       backgroundPosition: '50% 50%',
+      backgroundAttachment: 'fixed',
       border: 'var(--border-size) solid var(--backup-border)',
       position: 'relative' as const,
       willChange: 'background-image',
@@ -118,7 +126,8 @@ const GlowCard: React.FC<GlowCardProps> = ({
           inset: calc(var(--border-size) * -1);
           border: var(--border-size) solid transparent;
           border-radius: calc(var(--radius) * 1px);
-          background-size: 100% 100%;
+          background-attachment: fixed;
+          background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
           background-repeat: no-repeat;
           background-position: 50% 50%;
           mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
@@ -151,7 +160,7 @@ const GlowCard: React.FC<GlowCardProps> = ({
         [data-glow] [data-glow-inner] {
           position: absolute;
           inset: 0;
-          will-change: filter;
+          will-change: filter, opacity;
           opacity: var(--outer, 1);
           border-radius: calc(var(--radius) * 1px);
           border-width: calc(var(--border-size) * 20);
@@ -159,6 +168,7 @@ const GlowCard: React.FC<GlowCardProps> = ({
           background: none;
           pointer-events: none;
           border: none;
+          transition: opacity 0.3s ease, filter 0.3s ease;
         }
         
         [data-glow] > [data-glow-inner]::before {
