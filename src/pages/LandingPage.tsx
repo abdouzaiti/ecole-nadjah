@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Users, Monitor, MapPin, Phone, M
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { GlowCard } from '../components/GlowCard';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -80,8 +81,13 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
+              className="h-full"
             >
-              <Card className={cn("flex items-center gap-4 py-8 border-gray-50", isAr ? "flex-row-reverse text-right" : "flex-row")}>
+              <GlowCard 
+                customSize 
+                glowColor="blue"
+                className={cn("flex items-center gap-4 py-8 px-6 h-full border-transparent", isAr ? "flex-row-reverse text-right" : "flex-row")}
+              >
                 <div className="w-12 h-12 rounded-full bg-navy/5 text-navy flex items-center justify-center shrink-0">
                   {stat.icon}
                 </div>
@@ -89,7 +95,7 @@ export default function LandingPage() {
                   <div className="text-3xl font-serif font-bold text-navy">{stat.value}</div>
                   <div className="text-sm font-medium text-navy/50 uppercase tracking-wider">{stat.label}</div>
                 </div>
-              </Card>
+              </GlowCard>
             </motion.div>
           ))}
         </div>
@@ -201,7 +207,12 @@ export default function LandingPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="p-10 pt-16 flex-grow bg-white rounded-3xl shadow-2xl -mt-24 border border-gray-100 relative z-30">
+                  
+                  <GlowCard 
+                    customSize 
+                    glowColor="blue"
+                    className="p-10 pt-16 flex-grow bg-white rounded-3xl -mt-24 relative z-30 shadow-2xl overflow-visible border-transparent"
+                  >
                     <h3 className="text-3xl font-serif mb-4 text-navy">{p.level}</h3>
                     <p className="text-navy/60 mb-8 leading-relaxed line-clamp-3 text-lg">{p.desc}</p>
                     
@@ -209,7 +220,7 @@ export default function LandingPage() {
                       {t('learn_more')} 
                       <ArrowRight size={18} className={cn("transition-transform", isAr ? "group-hover:-translate-x-2 rotate-180" : "group-hover:translate-x-2")} />
                     </Button>
-                  </div>
+                  </GlowCard>
                 </Card>
               </motion.div>
             ))}
@@ -247,7 +258,7 @@ export default function LandingPage() {
               
               <div className="grid grid-cols-2 gap-8">
                 <div>
-                  <div className="text-3xl font-serif font-bold text-navy mb-2">15+</div>
+                  <div className="text-3xl font-serif font-bold text-navy mb-2">10+</div>
                   <div className="text-sm font-medium text-navy/40 uppercase tracking-widest">{t('about.years_exp')}</div>
                 </div>
                 <div>
