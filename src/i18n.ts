@@ -234,6 +234,12 @@ const resources = {
         "logout": "خروج",
         "my_dashboard": "لوحة تحكمي"
       },
+      "chatbot": {
+        "name": "مساعد النجاح",
+        "welcome_msg": "مرحباً! أنا مساعد مدرسة النجاح. كيف يمكنني مساعدتك اليوم؟",
+        "placeholder": "اكتب رسالتك هنا...",
+        "error": "عذراً، حدث خطأ ما. يرجى المحاولة لاحقاً."
+      },
       "subjects": {
         "math": "الرياضيات",
         "physics": "الفيزياء",
@@ -476,6 +482,12 @@ const resources = {
         "logout": "Déconnexion",
         "my_dashboard": "Mon Tableau de Bord"
       },
+      "chatbot": {
+        "name": "Assistant Nadjah",
+        "welcome_msg": "Bonjour ! Je suis l'assistant de l'École Nadjah. Comment puis-je vous aider aujourd'hui ?",
+        "placeholder": "Écrivez votre message...",
+        "error": "Désolé, une erreur est survenue. Veuillez réessayer plus tard."
+      },
       "subjects": {
         "math": "Mathématiques",
         "physics": "Physique",
@@ -717,6 +729,12 @@ const resources = {
         "contact": "Contact",
         "logout": "Logout",
         "my_dashboard": "My Dashboard"
+      },
+      "chatbot": {
+        "name": "Nadjah Assistant",
+        "welcome_msg": "Hello! I am the Nadjah School assistant. How can I help you today?",
+        "placeholder": "Type your message...",
+        "error": "Sorry, something went wrong. Please try again later."
       },
       "subjects": {
         "math": "Mathematics",

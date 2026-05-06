@@ -18,6 +18,7 @@ import LiveClassPage from './pages/LiveClassPage';
 import ReplaysPage from './pages/ReplaysPage';
 import SplashScreen from './SplashScreen';
 import { AnimatePresence } from 'motion/react';
+import { ChatBot } from './components/ChatBot';
 
 const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
   const { isAuthenticated, user } = useAuth();
@@ -40,8 +41,9 @@ function AppRoutes() {
       {showSplash ? (
         <SplashScreen key="splash" onEnter={() => setShowSplash(false)} />
       ) : (
-        <div key="main-app" className="min-h-screen bg-white flex flex-col">
+        <div key="main-app" className="min-h-screen bg-white flex flex-col relative">
           <Navbar />
+          <ChatBot />
           <main className="flex-grow pt-20">
             <Routes>
               <Route path="/" element={<LandingPage />} />
