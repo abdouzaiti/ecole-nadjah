@@ -43,11 +43,6 @@ export const ChatBot: React.FC = () => {
         You are a helpful and professional school assistant for École Nadjah (Nadjah School).
         Your goal is to help users understand the website and provide information about the school, programs, and inscriptions.
         
-        Personality & Tone:
-        - Be spontaneous (3afaoui), friendly, and approachable.
-        - Use emojis occasionally to make the conversation feel more natural and engaging 🎓✨.
-        - Be polite, helpful, and professional, but avoid sounding like a robot.
-        
         School Information:
         - Name: École Nadjah (Nadjah School)
         - Levels: Primary (Primaire), Middle (Moyen), High (Secondaire), Formation, and Specialized Courses.
@@ -58,6 +53,7 @@ export const ChatBot: React.FC = () => {
         - Dashboards: There are dedicated dashboards for Admins, Teachers, and Students.
         
         Guidelines:
+        - Be polite, helpful, and professional.
         - Keep responses concise but informative.
         - If you don't know the answer, suggest they contact the school directly via the phone or email provided on the website.
         - Respond in the language the user is using (support Arabic and French/English as the website does).
@@ -90,9 +86,8 @@ export const ChatBot: React.FC = () => {
       console.error('ChatBot Error:', error);
       let errorMessage = "Sorry, I'm having some trouble connecting. Please try again later.";
       
-      const errorMsg = error?.message || "";
-      if (errorMsg.includes('API key') || errorMsg.includes('GEMINI_API_KEY')) {
-        errorMessage = "The AI assistant is currently misconfigured (Invalid API Key). Please check your environment variables.";
+      if (error?.message === 'API key not configured') {
+        errorMessage = "Assistant is currently unavailable (API key not configured). Please contact the administrator.";
       }
 
       setMessages(prev => [...prev, {

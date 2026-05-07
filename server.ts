@@ -20,14 +20,10 @@ async function startServer() {
   app.post("/api/chat", async (req, res) => {
     try {
       const { messages, systemInstruction } = req.body;
-      let apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY;
 
-      // Handle placeholder from .env.example or missing key
-      if (!apiKey || apiKey === "your_api_key_here" || apiKey === "MY_GEMINI_API_KEY") {
-        console.error("GEMINI_API_KEY is not configured or is still a placeholder.");
-        return res.status(500).json({ 
-          error: "GEMINI_API_KEY is not configured. If you are deploying to Vercel, add it to your Environment Variables. If you are in AI Studio, ensure your API key is configured in the Secrets panel." 
-        });
+      if (!apiKey) {
+        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
       }
 
       const ai = new GoogleGenAI({ apiKey });
