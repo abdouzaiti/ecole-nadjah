@@ -31,7 +31,6 @@ async function startServer() {
       }
 
       const ai = new GoogleGenAI({ apiKey });
-      
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: messages,
@@ -40,10 +39,6 @@ async function startServer() {
           temperature: 0.7,
         }
       });
-
-      if (!response.text) {
-        throw new Error("Empty response from AI model");
-      }
 
       res.json({ text: response.text });
     } catch (error: any) {
