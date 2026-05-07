@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, Loader2, Minus, Maximize2 } from 'lucide-react';
+import { GoogleGenAI } from '@google/genai';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
 
@@ -24,6 +25,28 @@ export const ChatBot: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Use a ref for the AI client to avoid re-initialization and handle missing keys
+  const aiClientRef = useRef<GoogleGenAI | null>(null);
+
+  const getAiClient = () => {
+    if (aiClientRef.current) return aiClientRef.current;
+    
+    // Check if the key is available
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey === 'undefined' || apiKey === 'null') {
+      console.warn('GEMINI_API_KEY is not defined. ChatBot functionality will be limited.');
+      return null;
+    }
+
+    try {
+      aiClientRef.current = new GoogleGenAI({ apiKey });
+      return aiClientRef.current;
+    } catch (err) {
+      console.error('Failed to initialize GoogleGenAI:', err);
+      return null;
+    }
+  };
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -39,6 +62,11 @@ export const ChatBot: React.FC = () => {
     setIsLoading(true);
 
     try {
+      const ai = getAiClient();
+      if (!ai) {
+        throw new Error('API key not configured');
+      }
+
       const systemInstruction = `
         You are a helpful and professional school assistant for École Nadjah (Nadjah School).
         Your goal is to help users understand the website and provide information about the school, programs, and inscriptions.
@@ -60,34 +88,27 @@ export const ChatBot: React.FC = () => {
         - The current language of the website is ${i18n.language}.
       `;
 
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: [...messages, userMessage],
+        config: {
           systemInstruction,
-        }),
+          temperature: 0.7,
+        }
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown server error' }));
-        throw new Error(errorData.error || 'Failed to get response');
-      }
-
-      const data = await response.json();
 
       const modelMessage: Message = {
         role: 'model',
-        parts: [{ text: data.text || "I'm sorry, I couldn't process that. Please try again." }]
+        parts: [{ text: response.text || "I'm sorry, I couldn't process that. Please try again." }]
       };
 
       setMessages(prev => [...prev, modelMessage]);
     } catch (error: any) {
       console.error('ChatBot Error:', error);
-      let errorMessage = error?.message || "Sorry, I'm having some trouble connecting. Please try again later.";
+      let errorMessage = "Sorry, I'm having some trouble connecting. Please try again later.";
       
-      if (error?.message?.includes('API key not configured')) {
-        errorMessage = "Assistant is currently unavailable (API key not configured). Please check your environment variables.";
+      if (error?.message === 'API key not configured') {
+        errorMessage = "Assistant is currently unavailable (API key not configured). Please contact the administrator.";
       }
 
       setMessages(prev => [...prev, {
