@@ -90,8 +90,9 @@ export const ChatBot: React.FC = () => {
       console.error('ChatBot Error:', error);
       let errorMessage = "Sorry, I'm having some trouble connecting. Please try again later.";
       
-      if (error?.message === 'API key not configured') {
-        errorMessage = "Assistant is currently unavailable (API key not configured). Please contact the administrator.";
+      const errorMsg = error?.message || "";
+      if (errorMsg.includes('API key') || errorMsg.includes('GEMINI_API_KEY')) {
+        errorMessage = "The AI assistant is currently misconfigured (Invalid API Key). Please check your environment variables.";
       }
 
       setMessages(prev => [...prev, {
