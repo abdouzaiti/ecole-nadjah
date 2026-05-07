@@ -70,7 +70,7 @@ export const ChatBot: React.FC = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ error: 'Unknown server error' }));
         throw new Error(errorData.error || 'Failed to get response');
       }
 
@@ -84,10 +84,10 @@ export const ChatBot: React.FC = () => {
       setMessages(prev => [...prev, modelMessage]);
     } catch (error: any) {
       console.error('ChatBot Error:', error);
-      let errorMessage = "Sorry, I'm having some trouble connecting. Please try again later.";
+      let errorMessage = error?.message || "Sorry, I'm having some trouble connecting. Please try again later.";
       
-      if (error?.message === 'API key not configured') {
-        errorMessage = "Assistant is currently unavailable (API key not configured). Please contact the administrator.";
+      if (error?.message?.includes('API key not configured')) {
+        errorMessage = "Assistant is currently unavailable (API key not configured). Please check your environment variables.";
       }
 
       setMessages(prev => [...prev, {

@@ -22,25 +22,48 @@ async function startServer() {
       const { messages, systemInstruction } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
 
-      if (!apiKey) {
-        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
+      if (!apiKey || apiKey === 'your_api_key_here') {
+        console.error("GEMINI_API_KEY is missing or using placeholder value.");
+        return res.status(500).json({ error: "API key not configured on the server." });
+      }
+
+      // Ensure messages start with user and follow user-model sequence
+      // Gemini expects the first message in multi-turn contents to be from 'user'
+      let formattedContents = messages;
+      if (Array.isArray(messages) && messages.length > 0 && messages[0].role === 'model') {
+        formattedContents = messages.slice(1);
+      }
+
+      if (formattedContents.length === 0) {
+        return res.status(400).json({ error: "No user messages provided." });
       }
 
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: messages,
+        contents: formattedContents,
         config: {
           systemInstruction: systemInstruction,
           temperature: 0.7,
         }
       });
 
+      if (!response.text) {
+        throw new Error("Empty response from AI model");
+      }
+
       res.json({ text: response.text });
     } catch (error: any) {
       console.error("Server Chat Error:", error);
-      res.status(500).json({ error: error.message || "Failed to get AI response" });
+      res.status(500).json({ 
+        error: error.message || "Failed to get AI response",
+        details: process.env.NODE_ENV !== 'production' ? error.stack : undefined 
+      });
     }
+  });
+
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", env: !!process.env.GEMINI_API_KEY });
   });
 
   // Vite middleware for development
