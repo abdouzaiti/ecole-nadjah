@@ -28,6 +28,8 @@ const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 
   return <>{children}</>;
 };
 
+import { BlueBackground } from './components/layout/BlueBackground';
+
 function AppRoutes() {
   const { i18n } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
@@ -42,7 +44,8 @@ function AppRoutes() {
       {showSplash ? (
         <SplashScreen key="splash" onEnter={() => setShowSplash(false)} />
       ) : (
-        <div key="main-app" className="min-h-screen bg-white flex flex-col relative">
+        <div key="main-app" className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
+          <BlueBackground />
           <Navbar />
           <ErrorBoundary componentName="ChatBot" fallback={null}>
             <ChatBot />

@@ -28,14 +28,14 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-4 bg-white">
+    <div className="min-h-[80vh] flex items-center justify-center p-4 bg-transparent transition-colors duration-500">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-lg"
       >
-        <Card className="p-10 bg-white premium-shadow relative overflow-hidden border-gray-100">
-          <div className="absolute top-0 left-0 w-full h-2 navy-gradient"></div>
+        <Card className="p-10 bg-white/60 backdrop-blur-xl border border-white/40 premium-shadow relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-blue-accent"></div>
           
           <div className="text-center mb-10">
             <img src="/logo.png" alt="Logo" className="w-20 h-20 mx-auto mb-4 object-contain" />
@@ -43,14 +43,14 @@ export default function LoginPage() {
             <p className="text-navy/50">{t('auth.access_secure')}</p>
           </div>
 
-          <div className={cn("flex gap-2 p-1 bg-gray-50 rounded-2xl mb-8 border border-gray-100", isAr && "flex-row-reverse")}>
+          <div className={cn("flex gap-2 p-1 bg-white/40 rounded-2xl mb-8 border border-white/20", isAr && "flex-row-reverse")}>
             {roles.map((role) => (
               <button
                 key={role.id}
                 onClick={() => setSelectedRole(role.id as UserRole)}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all font-medium text-sm ${
                   selectedRole === role.id 
-                    ? 'bg-white text-navy shadow-sm' 
+                    ? 'bg-white text-blue-accent shadow-md' 
                     : 'text-navy/40 hover:text-navy/60'
                 }`}
               >
@@ -96,7 +96,7 @@ export default function LoginPage() {
               <a href="#" className="text-navy hover:underline font-medium">{t('auth.forgot_password')}</a>
             </div>
 
-            <Button type="submit" variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold shadow-lg shadow-navy/20">
+            <Button type="submit" variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold shadow-lg shadow-blue-accent/20 bg-blue-accent hover:bg-blue-accent/90">
               {t('auth.login_button')}
             </Button>
           </form>

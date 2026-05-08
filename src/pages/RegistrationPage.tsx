@@ -18,9 +18,9 @@ export default function RegistrationPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center p-4 bg-white">
+      <div className="min-h-[80vh] flex items-center justify-center p-4 bg-transparent">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-          <Card className="max-w-md text-center p-12 bg-white premium-shadow border-none">
+          <Card className="max-w-md text-center p-12 bg-white/60 backdrop-blur-xl border border-white/40 premium-shadow">
             <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle size={48} />
             </div>
@@ -38,7 +38,7 @@ export default function RegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 bg-white">
+    <div className="min-h-screen py-12 bg-transparent">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-12">
           <img src="/logo.png" alt="Logo" className="w-24 h-24 mx-auto mb-6 object-contain" />
@@ -49,7 +49,7 @@ export default function RegistrationPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <Card className="p-8">
+            <Card className="p-8 bg-white/60 backdrop-blur-xl border border-white/40 shadow-xl">
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div>
                   <h3 className={cn("text-xl font-serif text-navy mb-6 flex items-center gap-2 font-bold", isAr && "flex-row-reverse")}>
@@ -58,24 +58,24 @@ export default function RegistrationPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.last_name')}</label>
-                      <input type="text" required placeholder={t('auth.registration.last_name_placeholder')} className={cn("w-full p-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-navy outline-none placeholder:text-navy/20", isAr && "text-right")} />
+                      <input type="text" required placeholder={t('auth.registration.last_name_placeholder')} className={cn("w-full p-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none placeholder:text-navy/20", isAr && "text-right")} />
                     </div>
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.first_name')}</label>
-                      <input type="text" required placeholder={t('auth.registration.first_name_placeholder')} className={cn("w-full p-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-navy outline-none placeholder:text-navy/20", isAr && "text-right")} />
+                      <input type="text" required placeholder={t('auth.registration.first_name_placeholder')} className={cn("w-full p-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none placeholder:text-navy/20", isAr && "text-right")} />
                     </div>
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.birth_date')}</label>
                       <div className="relative">
                         <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input type="date" placeholder={t('auth.registration.date_placeholder')} required className={cn("w-full py-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-navy outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                        <input type="date" placeholder={t('auth.registration.date_placeholder')} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                       </div>
                     </div>
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.desired_level')}</label>
                       <div className="relative">
                         <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <select defaultValue="" className={cn("w-full py-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-navy outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                        <select defaultValue="" className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                           <option value="" disabled>{t('auth.registration.select_level')}</option>
                           <option>{t('levels.primary')}</option>
                           <option>{t('levels.middle')}</option>
@@ -87,7 +87,7 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                <div className="h-px bg-gray-100"></div>
+                <div className="h-px bg-white/20"></div>
 
                 <div>
                   <h3 className={cn("text-xl font-serif text-navy mb-6 flex items-center gap-2 font-bold", isAr && "flex-row-reverse")}>
@@ -96,26 +96,26 @@ export default function RegistrationPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1 md:col-span-2">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.parent_name')}</label>
-                      <input type="text" required placeholder={t('auth.registration.parent_name_placeholder')} className={cn("w-full p-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-navy outline-none placeholder:text-navy/20", isAr && "text-right")} />
+                      <input type="text" required placeholder={t('auth.registration.parent_name_placeholder')} className={cn("w-full p-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none placeholder:text-navy/20", isAr && "text-right")} />
                     </div>
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.contact_email')}</label>
                       <div className="relative">
                         <Mail size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input type="email" required placeholder={t('auth.registration.email_placeholder')} className={cn("w-full py-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-navy outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                        <input type="email" required placeholder={t('auth.registration.email_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                       </div>
                     </div>
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.phone_number')}</label>
                       <div className="relative">
                         <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input type="tel" placeholder={t('auth.registration.phone_placeholder')} required className={cn("w-full py-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-navy outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                        <input type="tel" placeholder={t('auth.registration.phone_placeholder')} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <Button type="submit" variant="navy" className="w-full py-5 text-white font-bold uppercase tracking-[0.2em] shadow-xl shadow-navy/20">
+                <Button type="submit" variant="navy" className="w-full py-5 text-white font-bold uppercase tracking-[0.2em] shadow-xl shadow-blue-accent/20 bg-blue-accent hover:bg-blue-accent/90">
                   {t('auth.registration.submit_button')}
                 </Button>
               </form>
@@ -123,21 +123,21 @@ export default function RegistrationPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="bg-navy text-white p-8">
+            <Card className="bg-blue-accent/90 backdrop-blur-md text-white p-8 border-none ring-1 ring-white/20">
               <h4 className={cn("text-xl font-serif text-white mb-4 font-bold", isAr && "text-right")}>{t('auth.registration.important_title')}</h4>
               <ul className="space-y-4 text-sm text-white/70">
                 <li className={cn("flex gap-3", isAr && "flex-row-reverse text-right")}>
-                  <Info size={24} className="text-blue-accent shrink-0" />
-                  <span>{t('auth.registration.important_note_1')}</span>
+                  <Info size={24} className="text-white shrink-0" />
+                  <span className="text-white/90">{t('auth.registration.important_note_1')}</span>
                 </li>
                 <li className={cn("flex gap-3", isAr && "flex-row-reverse text-right")}>
-                  <CheckCircle size={20} className="text-blue-accent shrink-0" />
-                  <span>{t('auth.registration.important_note_2')}</span>
+                  <CheckCircle size={20} className="text-white shrink-0" />
+                  <span className="text-white/90">{t('auth.registration.important_note_2')}</span>
                 </li>
               </ul>
             </Card>
             
-            <Card className={cn("p-8 border-navy/10 border-2 dashed", isAr && "text-right")}>
+            <Card className={cn("p-8 bg-white/40 backdrop-blur-lg border-blue-accent/10 border-2 dashed", isAr && "text-right")}>
               <h4 className="text-lg font-serif text-navy mb-4 font-bold">{t('auth.registration.need_help')}</h4>
               <p className="text-sm text-navy/60 mb-6 font-sans">
                 {t('auth.registration.help_desc')}

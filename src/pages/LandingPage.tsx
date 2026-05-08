@@ -121,13 +121,13 @@ export default function LandingPage() {
         icon={selectedProgram?.icon}
       />
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center pt-20 overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+      <section className="relative min-h-[80vh] flex items-center pt-20 overflow-hidden bg-transparent">
         <div className={cn(
-          "absolute top-0 w-1/3 h-full bg-navy/5 -skew-x-12 translate-x-20 z-0",
+          "absolute top-0 w-1/3 h-full bg-blue-600/5 -skew-x-12 translate-x-20 z-0",
           isAr ? "left-0" : "right-0"
-        )} style={{ backgroundColor: '#ffffff' }}></div>
+        )}></div>
         <div className={cn(
-          "absolute bottom-0 w-64 h-64 bg-blue-accent/5 rounded-full blur-3xl z-0",
+          "absolute bottom-0 w-64 h-64 bg-blue-accent/10 rounded-full blur-3xl z-0",
           isAr ? "right-0 translate-x-1/2 translate-y-1/2" : "left-0 -translate-x-1/2 translate-y-1/2"
         )}></div>
         
@@ -148,10 +148,10 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/register">
-                <Button size="lg" variant="navy" className="w-full sm:w-auto px-10" style={{ backgroundColor: '#0d1585' }}>{t('register_now')}</Button>
+                <Button size="lg" variant="navy" className="w-full sm:w-auto px-10 bg-blue-accent hover:bg-blue-accent/90">{t('register_now')}</Button>
               </Link>
               <a href="#programs">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                <Button size="lg" variant="secondary" className="w-full sm:w-auto border-blue-accent/20 text-blue-accent hover:bg-blue-accent/5">
                    {t('discover_school')}
                 </Button>
               </a>
@@ -196,7 +196,8 @@ export default function LandingPage() {
       </section>
 
       {/* Programs Section */}
-      <section id="programs" className="py-24 bg-white">
+      <section id="programs" className="py-24 bg-transparent relative">
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] -z-10" />
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-serif text-navy mb-4">{t('nav.programs')}</h2>
@@ -271,7 +272,8 @@ export default function LandingPage() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 bg-cream overflow-hidden">
+      <section id="about" className="py-24 bg-transparent relative overflow-hidden">
+        <div className="absolute inset-0 bg-blue-50/30 backdrop-blur-sm -z-10" />
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className={cn("relative", isAr ? "order-last" : "")}>
@@ -328,35 +330,82 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-serif mt-6 mb-8 uppercase tracking-tight text-white">{t('why_us.subtitle')}</h2>
             <div className="space-y-8">
               {[
-                { title: t('digital_learning'), desc: t('digital_learning_desc'), icon: <Monitor className="text-blue-accent" /> },
+                { 
+                  title: t('digital_learning'), 
+                  desc: t('digital_learning_desc'), 
+                  icon: <Monitor className="text-blue-accent" />,
+                  link: "https://platform-nadjah.vercel.app"
+                },
                 { title: t('personalized_teaching'), desc: t('personalized_teaching_desc'), icon: <Users className="text-blue-accent" /> },
               ].map((item, i) => (
-                <div key={i} className={cn("flex gap-4", isAr ? "flex-row-reverse" : "flex-row")}>
-                  <div className="mt-1">{item.icon}</div>
-                  <div>
-                    <h4 className="text-xl font-serif text-white">{item.title}</h4>
-                    <p className="text-white/60">{item.desc}</p>
+                item.link ? (
+                  <a 
+                    key={i} 
+                    href={item.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={cn("flex gap-4 p-4 rounded-2xl hover:bg-white/5 transition-all group", isAr ? "flex-row-reverse" : "flex-row")}
+                  >
+                    <div className="mt-1 transition-transform group-hover:scale-110">{item.icon}</div>
+                    <div>
+                      <h4 className="text-xl font-serif text-white group-hover:text-blue-accent transition-colors">{item.title}</h4>
+                      <p className="text-white/60">{item.desc}</p>
+                    </div>
+                  </a>
+                ) : (
+                  <div key={i} className={cn("flex gap-4 p-4", isAr ? "flex-row-reverse" : "flex-row")}>
+                    <div className="mt-1">{item.icon}</div>
+                    <div>
+                      <h4 className="text-xl font-serif text-white">{item.title}</h4>
+                      <p className="text-white/60">{item.desc}</p>
+                    </div>
                   </div>
-                </div>
+                )
               ))}
             </div>
           </div>
             <div className={cn("relative", isAr ? "order-first lg:order-last" : "")}>
-              <div className={cn(
-                "rounded-3xl bg-white/5 backdrop-blur-sm p-12 border border-white/10 shadow-2xl flex items-center justify-center min-h-[400px]",
-                isAr ? "-rotate-3" : "rotate-3"
-              )}>
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-white/10 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl backdrop-blur-md border border-white/10">
-                      <img src="/logo.png" alt="Logo" className="w-16 h-16 object-contain" />
+              <motion.a 
+                href="https://platform-nadjah.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ y: -5 }}
+                className={cn(
+                  "block group rounded-3xl bg-white/5 backdrop-blur-md p-2 border border-white/10 shadow-2xl min-h-[400px] relative overflow-hidden transition-all hover:bg-white/10 hover:border-blue-accent/30",
+                  isAr ? "-rotate-3" : "rotate-3"
+                )}
+              >
+                  {/* Platform UI Mockup */}
+                  <div className="bg-navy/80 rounded-2xl w-full h-full flex flex-col overflow-hidden">
+                    <div className="bg-white/10 p-4 border-b border-white/5 flex items-center justify-between">
+                      <div className="flex gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-400" />
+                        <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                        <div className="w-2 h-2 rounded-full bg-green-400" />
+                      </div>
+                      <div className="px-3 py-1 bg-white/10 rounded-full text-[10px] text-white/50 font-mono">platform.nadjah.dz</div>
                     </div>
-                    <div className="space-y-2">
-                       <div className="h-2 w-32 bg-white/20 rounded-full mx-auto"></div>
-                       <div className="h-2 w-24 bg-white/10 rounded-full mx-auto"></div>
-                       <div className="h-2 w-40 bg-white/5 rounded-full mx-auto"></div>
+                    <div className="flex-grow p-6 flex flex-col gap-6">
+                      <div className="w-2/3 h-8 bg-linear-to-r from-blue-accent/40 to-transparent rounded-lg animate-pulse" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="aspect-video bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                          <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain opacity-20 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <div className="aspect-video bg-white/5 rounded-xl" />
+                      </div>
+                      <div className="space-y-3">
+                         <div className="h-2 w-full bg-white/10 rounded-full" />
+                         <div className="h-2 w-full bg-white/10 rounded-full" />
+                         <div className="h-2 w-2/3 bg-white/5 rounded-full" />
+                      </div>
+                      <div className="mt-auto flex justify-center">
+                         <div className="px-6 py-3 bg-blue-accent rounded-xl text-white font-bold text-sm shadow-xl shadow-blue-accent/20 group-hover:scale-110 transition-transform">
+                            {isAr ? "دخول المنصة" : "Enter Platform"}
+                         </div>
+                      </div>
                     </div>
                   </div>
-              </div>
+              </motion.a>
               <div className="absolute -top-10 -right-10 w-64 h-64 bg-blue-accent/10 blur-3xl rounded-full z-0"></div>
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-navy/20 blur-3xl rounded-full z-0"></div>
             </div>
@@ -452,16 +501,16 @@ export default function LandingPage() {
               </a>
             </div>
             
-            <GlowCard glowColor="blue" customSize className="bg-cream border-none p-10">
+            <GlowCard glowColor="blue" customSize className="bg-white/60 backdrop-blur-md border-white/20 p-10">
               <h3 className={cn("text-3xl font-serif mb-6 text-navy", isAr && "text-right")}>{t('form.title')}</h3>
               <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <input type="text" placeholder={t('form.name')} className={cn("bg-white border-none rounded-xl p-4 w-full focus:ring-2 focus:ring-navy outline-none", isAr && "text-right")} />
-                  <input type="email" placeholder={t('form.email')} className={cn("bg-white border-none rounded-xl p-4 w-full focus:ring-2 focus:ring-navy outline-none", isAr && "text-right")} />
+                  <input type="text" placeholder={t('form.name')} className={cn("bg-white/80 border-gray-200 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
+                  <input type="email" placeholder={t('form.email')} className={cn("bg-white/80 border-gray-200 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
                 </div>
-                <input type="text" placeholder={t('form.subject')} className={cn("bg-white border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-navy outline-none", isAr && "text-right")} />
-                <textarea placeholder={t('form.message')} rows={4} className={cn("bg-white border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-navy outline-none", isAr && "text-right")} />
-                <Button variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold" style={{ backgroundColor: '#230d8b' }}>{t('form.send')}</Button>
+                <input type="text" placeholder={t('form.subject')} className={cn("bg-white/80 border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
+                <textarea placeholder={t('form.message')} rows={4} className={cn("bg-white/80 border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
+                <Button variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold bg-blue-accent hover:bg-blue-accent/90">{t('form.send')}</Button>
               </form>
             </GlowCard>
           </div>
