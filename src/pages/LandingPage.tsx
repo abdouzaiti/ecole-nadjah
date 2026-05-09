@@ -197,7 +197,7 @@ export default function LandingPage() {
 
       {/* Programs Section */}
       <section id="programs" className="py-24 bg-transparent relative">
-        <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] -z-10" />
+        <div className="absolute inset-0 bg-white/60 -z-10" />
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-serif text-navy mb-4">{t('nav.programs')}</h2>
@@ -273,7 +273,7 @@ export default function LandingPage() {
 
       {/* About Section */}
       <section id="about" className="py-24 bg-transparent relative overflow-hidden">
-        <div className="absolute inset-0 bg-blue-50/30 backdrop-blur-sm -z-10" />
+        <div className="absolute inset-0 bg-blue-50/50 -z-10" />
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className={cn("relative", isAr ? "order-last" : "")}>
@@ -371,7 +371,7 @@ export default function LandingPage() {
                 rel="noopener noreferrer"
                 whileHover={{ y: -5 }}
                 className={cn(
-                  "block group rounded-3xl bg-white/5 backdrop-blur-md p-2 border border-white/10 shadow-2xl min-h-[400px] relative overflow-hidden transition-all hover:bg-white/10 hover:border-blue-accent/30",
+                  "block group rounded-3xl bg-white/10 p-2 border border-white/20 shadow-2xl min-h-[400px] relative overflow-hidden transition-all hover:bg-white/15 hover:border-blue-accent/30",
                   isAr ? "-rotate-3" : "rotate-3"
                 )}
               >
@@ -501,7 +501,7 @@ export default function LandingPage() {
               </a>
             </div>
             
-            <GlowCard glowColor="blue" customSize className="bg-white/60 backdrop-blur-md border-white/20 p-10">
+            <GlowCard glowColor="blue" customSize className="bg-white border-white/20 p-10">
               <h3 className={cn("text-3xl font-serif mb-6 text-navy", isAr && "text-right")}>{t('form.title')}</h3>
               <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">

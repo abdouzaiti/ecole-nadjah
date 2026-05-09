@@ -36,38 +36,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let frameId: number | null = null;
-    
-    const updatePointer = (clientX: number, clientY: number) => {
-      if (frameId) return;
-      
-      frameId = requestAnimationFrame(() => {
-        if (cardRef.current) {
-          cardRef.current.style.setProperty('--x', clientX.toFixed(2));
-          cardRef.current.style.setProperty('--xp', (clientX / window.innerWidth).toFixed(2));
-          cardRef.current.style.setProperty('--y', clientY.toFixed(2));
-          cardRef.current.style.setProperty('--yp', (clientY / window.innerHeight).toFixed(2));
-        }
-        frameId = null;
-      });
-    };
-
-    const handleMouseMove = (e: PointerEvent) => {
-      updatePointer(e.clientX, e.clientY);
-    };
-
-    window.addEventListener('pointermove', handleMouseMove, { passive: true });
-    
-    return () => {
-      window.removeEventListener('pointermove', handleMouseMove);
-      if (frameId) cancelAnimationFrame(frameId);
-    };
-  }, []);
-
-  const { base, spread } = glowColorMap[glowColor];
-
-  // Determine sizing
   const getSizeClasses = () => {
     if (customSize) {
       return ''; // Let className or inline styles handle sizing
@@ -77,28 +45,19 @@ const GlowCard: React.FC<GlowCardProps> = ({
 
   const getInlineStyles = () => {
     const baseStyles: React.CSSProperties & Record<string, string | number> = {
-      '--base': base,
-      '--spread': spread,
       '--radius': '14',
       '--border': '2',
-      '--backdrop': 'transparent',
-      '--backup-border': 'rgba(0, 0, 0, 0.05)',
-      '--size': '300',
-      '--outer': '1',
-      border: 'var(--border-size) solid var(--backup-border)',
+      border: '2px solid rgba(0, 0, 0, 0.05)',
       position: 'relative' as const,
     };
 
-    // Add width and height if provided
     if (width !== undefined) {
       const w = typeof width === 'number' ? `${width}px` : width;
       baseStyles.width = w;
-      baseStyles['width' as any] = w;
     }
     if (height !== undefined) {
       const h = typeof height === 'number' ? `${height}px` : height;
       baseStyles.height = h;
-      baseStyles['height' as any] = h;
     }
 
     return baseStyles;
@@ -106,18 +65,16 @@ const GlowCard: React.FC<GlowCardProps> = ({
 
   return (
     <div
-      ref={cardRef}
-      data-glow
       style={getInlineStyles()}
       className={cn(
-        "rounded-2xl relative shadow-[0_1rem_2rem_-1rem_black] bg-white transition-shadow duration-300",
+        "rounded-2xl relative shadow-lg bg-white/60 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:bg-white/80 border border-white/20 group",
         !customSize && "grid grid-rows-[1fr_auto] p-4 gap-4",
         !customSize && (!width || !height) && "aspect-[3/4]",
         !customSize && getSizeClasses(),
         className
       )}
     >
-      <div data-glow-inner></div>
+      <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-blue-500/10 pointer-events-none transition-all duration-500" />
       {children}
     </div>
   );
