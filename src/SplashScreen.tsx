@@ -37,7 +37,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
           animate={{ 
             opacity: phase === 'initial' ? 0 : 1,
             scale: phase === 'initial' ? 0.5 : (phase === 'raised' ? 0.35 : 1),
-            y: phase === 'raised' ? "-35vh" : 0
+            y: phase === 'raised' ? "-30vh" : 0
           }}
           transition={{ 
             opacity: { duration: 0.8 },
@@ -52,6 +52,29 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
           />
         </motion.div>
 
+        {/* School Name (Centered) */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ 
+              opacity: phase === 'initial' ? 0 : 1,
+              y: phase === 'raised' ? -40 : 180 
+            }}
+            transition={{ 
+              opacity: { duration: 0.8 },
+              y: { duration: 1.2, ease: [0.22, 1, 0.36, 1] }
+            }}
+            className="text-center"
+          >
+            <h1 className="text-4xl md:text-6xl font-serif font-extrabold text-navy tracking-[0.2em] drop-shadow-sm">
+              ÉCOLE NADJAH
+            </h1>
+            <p className="text-xl md:text-2xl font-serif font-extrabold text-navy tracking-[0.5em] mt-2">
+              AC
+            </p>
+          </motion.div>
+        </div>
+
         {/* Enter Button (Center) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <AnimatePresence>
@@ -59,14 +82,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
               <motion.div
                 className="pointer-events-auto"
                 initial={{ opacity: 0, scale: 0.9, y: 50 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
+                animate={{ opacity: 1, scale: 1, y: 150 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
               >
                 <Button
                   onClick={onEnter}
                   size="lg"
-                  className="bg-navy text-white hover:bg-navy/90 rounded-full px-12 py-8 text-2xl font-serif shadow-2xl flex items-center gap-4 group hover:scale-105 transition-all duration-300"
+                  className="bg-[#1a3190] text-white hover:bg-[#1a3190]/90 rounded-full px-12 py-8 text-2xl font-serif shadow-2xl flex items-center gap-4 group hover:scale-105 transition-all duration-300"
                 >
                   <span>Enter the Website</span>
                   <motion.div
