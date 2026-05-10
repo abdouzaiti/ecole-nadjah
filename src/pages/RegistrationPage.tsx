@@ -26,13 +26,17 @@ export default function RegistrationPage() {
     
     if (role === 'teacher') {
       const levelLabel = levels.find(l => l.key === data.level)?.label || data.level;
-      const subjectLabel = subjects.find(s => s.key === data.subject)?.label || data.subject;
+      const subjectsForContext = subjectsByContext();
+      const subjectLabel = subjectsForContext.find((s: any) => s.key === data.subject)?.label || data.subject;
+      const streamLabel = getStreams().find(s => s.key === selectedStream)?.label || "";
       
       message = `*Nouveau Dossier d'Enseignant - École Nadjah*\n\n` +
                 `👤 *Nom d'utilisateur:* ${data.username}\n` +
                 `📧 *Email:* ${data.email}\n` +
                 `📱 *Téléphone:* ${data.phone}\n` +
                 `📚 *Niveau d'enseignement:* ${levelLabel}\n` +
+                (selectedYear ? `📅 *Année:* ${selectedYear}\n` : "") +
+                (streamLabel ? `🧬 *الشعبة:* ${streamLabel}\n` : "") +
                 `🧪 *المادة:* ${subjectLabel}\n` +
                 `👨‍🏫 *Rappel:* Inscription en tant qu'enseignant.`;
     } else {
@@ -79,10 +83,6 @@ export default function RegistrationPage() {
   ];
 
   const subjectsByContext = () => {
-    if (role === 'teacher') {
-      return subjects;
-    }
-
     if (!selectedLevel) return [];
 
     if (selectedLevel === 'primary') {
@@ -381,13 +381,18 @@ export default function RegistrationPage() {
                     {role === 'teacher' && (
                       <>
                         <div className="space-y-1">
-                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{isAr ? "المستوى الدراسي" : "Niveau d'enseignement"}</label>
+                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.desired_level')}</label>
                           <div className="relative">
                             <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                             <select 
                               name="level" 
-                              defaultValue="" 
+                              value={selectedLevel} 
                               required 
+                              onChange={(e) => {
+                                setSelectedLevel(e.target.value);
+                                setSelectedYear('');
+                                setSelectedStream('');
+                              }}
                               className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
                             >
                               <option value="" disabled>{t('auth.registration.select_level')}</option>
@@ -396,13 +401,60 @@ export default function RegistrationPage() {
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        {selectedLevel && selectedLevel !== 'formation' && (
+                          <div className="space-y-1">
+                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
+                            <div className="relative">
+                              <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                              <select 
+                                name="year" 
+                                value={selectedYear}
+                                required 
+                                onChange={(e) => {
+                                  setSelectedYear(e.target.value);
+                                  setSelectedStream('');
+                                }}
+                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                              >
+                                <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
+                                {getYearsForLevel(selectedLevel).map(y => (
+                                  <option key={y} value={y}>{y}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        )}
+
+                        {selectedLevel === 'high' && (
+                          <div className="space-y-1 md:col-span-2">
+                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>
+                              {isAr ? "الشعبة / الجذع المشترك" : "Filière / Tronc Commun"}
+                            </label>
+                            <div className="relative">
+                              <ShieldCheck size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                              <select 
+                                name="stream"
+                                value={selectedStream}
+                                required
+                                onChange={(e) => setSelectedStream(e.target.value)}
+                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                              >
+                                <option value="" disabled>{isAr ? "اختر الشعبة..." : "Choisir la filière..."}</option>
+                                {getStreams().map(s => (
+                                  <option key={s.key} value={s.key}>{s.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-1 md:col-span-2">
                           <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
                           <div className="relative">
                             <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                             <select name="subject" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                               <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
-                              {subjects.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                              {subjectsByContext().map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
                             </select>
                           </div>
                         </div>
@@ -529,11 +581,11 @@ export default function RegistrationPage() {
               <p className="text-sm text-navy/60 mb-6 font-sans">
                 {t('auth.registration.help_desc')}
               </p>
-              <Link to="/#contact">
+              <a href="tel:0790356012" className="block w-full">
                  <Button variant="outline" size="sm" className="w-full">
                     {t('contact_us')}
                  </Button>
-              </Link>
+              </a>
             </Card>
           </div>
         </div>

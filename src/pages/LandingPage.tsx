@@ -444,16 +444,17 @@ export default function LandingPage() {
                   </div>
                   <div className={cn("flex flex-col gap-1", isAr && "text-right")}>
                     <a href="tel:0669812895" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">0669 81 28 95</a>
-                    <a 
-                      href="https://wa.me/213790356012" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-xl text-navy/70 hover:text-blue-accent transition-colors flex items-center gap-2 group/wa" 
-                      dir="ltr"
-                    >
-                      0790 35 60 12
-                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-bold opacity-0 group-hover/wa:opacity-100 transition-opacity">WhatsApp</span>
-                    </a>
+                    <div className="flex items-center gap-2 group/wa">
+                      <a href="tel:0790356012" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">0790 35 60 12</a>
+                      <a 
+                        href="https://wa.me/213790356012" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold opacity-0 group-hover/wa:opacity-100 transition-all hover:bg-green-600"
+                      >
+                        WhatsApp
+                      </a>
+                    </div>
                     <a href="tel:045416134" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">045 41 61 34</a>
                   </div>
                 </div>
