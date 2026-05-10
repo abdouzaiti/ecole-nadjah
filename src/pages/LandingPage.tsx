@@ -9,15 +9,15 @@ import { useState, ReactNode } from 'react';
 import { ProgramModal } from '../components/ProgramModal';
 
 const fadeIn = {
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, ease: "easeOut" }
+  transition: { duration: 0.4, ease: "easeOut" }
 };
 
 const stagger = {
   animate: {
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.05
     }
   }
 };
@@ -135,7 +135,7 @@ export default function LandingPage() {
           <motion.div 
             initial={{ opacity: 0, x: isAr ? 30 : -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.5 }}
             className={cn("max-w-3xl", isAr ? "text-right" : "text-left")}
           >
             <Badge variant="accent">{t('enrollment_open')}</Badge>
@@ -241,7 +241,7 @@ export default function LandingPage() {
                           }}
                           transition={{ type: "spring", stiffness: 180, damping: 15 }}
                         >
-                          <img src={img} alt="" className="w-full h-full object-cover" />
+                          <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
                         </motion.div>
                       ))}
                     </div>
@@ -282,6 +282,7 @@ export default function LandingPage() {
                   src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80" 
                   alt="Students at École Nadjah" 
                   className="w-full h-full object-cover aspect-square"
+                  loading="lazy"
                 />
               </div>
               <div className={cn(
@@ -389,7 +390,7 @@ export default function LandingPage() {
                       <div className="w-2/3 h-8 bg-linear-to-r from-blue-accent/40 to-transparent rounded-lg animate-pulse" />
                       <div className="grid grid-cols-2 gap-4">
                         <div className="aspect-video bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                          <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain opacity-20 group-hover:opacity-100 transition-opacity" />
+                          <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain opacity-20 group-hover:opacity-100 transition-opacity" loading="lazy" />
                         </div>
                         <div className="aspect-video bg-white/5 rounded-xl" />
                       </div>
@@ -530,7 +531,7 @@ export default function LandingPage() {
       <footer className="py-12 bg-navy text-white/40 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className={cn("flex items-center gap-4", isAr && "flex-row-reverse")}>
-             <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain invert brightness-0" />
+             <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain invert brightness-0" loading="lazy" />
              <span className="text-white font-serif font-bold text-lg">{t('school_name')}</span>
           </div>
           <div className={cn("text-sm", isAr && "font-serif")}>

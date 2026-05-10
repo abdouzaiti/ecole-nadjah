@@ -13,11 +13,11 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
   useEffect(() => {
     const sequence = async () => {
       // 1. Initial delay
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 100));
       setPhase('visible');
       
       // 2. Wait while logo is visible at center
-      await new Promise(r => setTimeout(r, 1200));
+      await new Promise(r => setTimeout(r, 600));
       setPhase('raised');
     };
 
@@ -27,7 +27,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
   return (
     <motion.div
       className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center overflow-hidden"
-      exit={{ opacity: 0, transition: { duration: 0.8, ease: "easeInOut" } }}
+      exit={{ opacity: 0, transition: { duration: 0.4, ease: "easeInOut" } }}
     >
       <div className="relative flex flex-col items-center justify-center w-full h-full">
         {/* Logo Animation */}
@@ -40,9 +40,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
             y: phase === 'raised' ? "-30vh" : 0
           }}
           transition={{ 
-            opacity: { duration: 0.8 },
-            scale: { duration: 1.2, ease: [0.22, 1, 0.36, 1] },
-            y: { duration: 1.2, ease: [0.22, 1, 0.36, 1] }
+            opacity: { duration: 0.4 },
+            scale: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+            y: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
           }}
         >
           <img 
@@ -61,8 +61,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
               y: phase === 'raised' ? -40 : 180 
             }}
             transition={{ 
-              opacity: { duration: 0.8 },
-              y: { duration: 1.2, ease: [0.22, 1, 0.36, 1] }
+              opacity: { duration: 0.4 },
+              y: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
             }}
             className="text-center"
           >
@@ -84,7 +84,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
                 initial={{ opacity: 0, scale: 0.9, y: 50 }}
                 animate={{ opacity: 1, scale: 1, y: 150 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+                transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
               >
                 <Button
                   onClick={onEnter}
