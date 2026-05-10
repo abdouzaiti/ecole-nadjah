@@ -9,6 +9,9 @@ import { cn } from '../lib/utils';
 export default function RegistrationPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [role, setRole] = useState<'student' | 'teacher'>('student');
+  const [selectedLevel, setSelectedLevel] = useState<string>('');
+  const [selectedStream, setSelectedStream] = useState<string>('');
+  const [selectedYear, setSelectedYear] = useState<string>('');
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
 
@@ -22,14 +25,21 @@ export default function RegistrationPage() {
     let message = "";
     
     if (role === 'teacher') {
+      const levelLabel = levels.find(l => l.key === data.level)?.label || data.level;
+      const subjectLabel = subjects.find(s => s.key === data.subject)?.label || data.subject;
+      
       message = `*Nouveau Dossier d'Enseignant - École Nadjah*\n\n` +
                 `👤 *Nom d'utilisateur:* ${data.username}\n` +
                 `📧 *Email:* ${data.email}\n` +
                 `📱 *Téléphone:* ${data.phone}\n` +
+                `📚 *Niveau d'enseignement:* ${levelLabel}\n` +
+                `🧪 *المادة:* ${subjectLabel}\n` +
                 `👨‍🏫 *Rappel:* Inscription en tant qu'enseignant.`;
     } else {
       const levelLabel = levels.find(l => l.key === data.level)?.label || data.level;
-      const subjectLabel = subjects.find(s => s.key === data.subject)?.label || data.subject;
+      const subjectsForContext = subjectsByContext();
+      const subjectLabel = subjectsForContext.find((s: any) => s.key === data.subject)?.label || data.subject;
+      const streamLabel = getStreams().find(s => s.key === selectedStream)?.label || "";
       
       message = `*Nouveau Dossier d'Élève - École Nadjah*\n\n` +
                 `👤 *Nom d'utilisateur:* ${data.username}\n` +
@@ -38,7 +48,8 @@ export default function RegistrationPage() {
                 `👨‍👩‍👧‍👦 *Téléphone Parent:* ${data.parentPhone}\n` +
                 `📚 *Niveau:* ${levelLabel}\n` +
                 `📅 *Année:* ${data.year}\n` +
-                `🧪 *Matière:* ${subjectLabel}`;
+                (streamLabel ? `🧬 *الشعبة:* ${streamLabel}\n` : "") +
+                `🧪 *المادة:* ${subjectLabel}`;
     }
 
     const encodedMessage = encodeURIComponent(message);
@@ -66,6 +77,193 @@ export default function RegistrationPage() {
     { key: 'french', label: t('subjects.french') },
     { key: 'english', label: t('subjects.english') },
   ];
+
+  const subjectsByContext = () => {
+    if (role === 'teacher') {
+      return subjects;
+    }
+
+    if (!selectedLevel) return [];
+
+    if (selectedLevel === 'primary') {
+      if (['1', '2'].includes(selectedYear)) {
+        return [
+          { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
+          { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
+          { key: 'islamic', label: isAr ? "التربية الإسلامية" : "Éducation Islamique" },
+          { key: 'civic', label: isAr ? "التربية المدنية" : "Éducation Civique" },
+          { key: 'scientific', label: isAr ? "التربية العلمية" : "Éducation Scientifique" },
+          { key: 'pe', label: isAr ? "التربية البدنية" : "Éducation Physique" },
+          { key: 'art', label: isAr ? "التربية الفنية" : "Éducation Artistique" },
+        ];
+      }
+      return [
+        { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
+        { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
+        { key: 'fr', label: isAr ? "اللغة الفرنسية" : "Français" },
+        { key: 'en', label: isAr ? "اللغة الإنجليزية" : "Anglais" },
+        { key: 'hist_geo', label: isAr ? "التاريخ والجغرافيا" : "Histoire/Géo" },
+        { key: 'islamic', label: isAr ? "التربية الإسلامية" : "Éducation Islamique" },
+        { key: 'civic', label: isAr ? "التربية المدنية" : "Éducation Civique" },
+        { key: 'scientific', label: isAr ? "التربية العلمية" : "Éducation Scientifique" },
+        { key: 'pe', label: isAr ? "التربية البدنية" : "Éducation Physique" },
+        { key: 'art', label: isAr ? "التربية الفنية" : "Éducation Artistique" },
+      ];
+    }
+
+    if (selectedLevel === 'middle') {
+      return [
+        { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
+        { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
+        { key: 'fr', label: isAr ? "اللغة الفرنسية" : "Français" },
+        { key: 'en', label: isAr ? "اللغة الإنجليزية" : "Anglais" },
+        { key: 'science', label: isAr ? "العلوم الطبيعية" : "Sciences Naturelles" },
+        { key: 'physics', label: isAr ? "العلوم الفيزيائية" : "Physique" },
+        { key: 'hist_geo', label: isAr ? "التاريخ والجغرافيا" : "Histoire/Géo" },
+        { key: 'islamic', label: isAr ? "التربية الإسلامية" : "Éducation Islamique" },
+        { key: 'civic', label: isAr ? "التربية المدنية" : "Éducation Civique" },
+        { key: 'pe', label: isAr ? "التربية البدنية" : "Éducation Physique" },
+        { key: 'it', label: isAr ? "المعلوماتية" : "Informatique" },
+        { key: 'art', label: isAr ? "التربية الفنية/الموسيقية" : "Arts/Musique" },
+      ];
+    }
+
+    if (selectedLevel === 'high') {
+      if (selectedYear === '1') {
+        if (selectedStream === 'science') {
+          return [
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
+            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
+            { key: 'tech', label: isAr ? "تكنولوجيا" : "Techno" },
+            { key: 'it', label: isAr ? "إعلام آلي" : "Informatique" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ];
+        }
+        if (selectedStream === 'arts') {
+          return [
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'fr', label: isAr ? "لغة فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "لغة إنجليزية" : "Anglais" },
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
+            { key: 'lang3', label: isAr ? "لغة حية ثالثة" : "Langue 3" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ];
+        }
+      } else if (['2', '3'].includes(selectedYear)) {
+        const branchSubjects: Record<string, any[]> = {
+          exp_science: [
+            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
+            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ],
+          math: [
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
+            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ],
+          tech_math: [
+            { key: 'tech', label: isAr ? "تكنولوجيا" : "Techno" },
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ],
+          mgt_eco: [
+            { key: 'mgt', label: isAr ? "تسيير محاسبي ومالي" : "Gestion/Finance" },
+            { key: 'eco', label: isAr ? "اقتصاد ومناجم" : "Eco" },
+            { key: 'law', label: isAr ? "قانون" : "Droit" },
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ],
+          arts_phil: [
+            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ],
+          languages: [
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
+            { key: 'fr', label: isAr ? "لغة فرنسية" : "Français" },
+            { key: 'en', label: isAr ? "لغة إنجليزية" : "Anglais" },
+            { key: 'lang3', label: isAr ? "لغة أجنبية ثالثة" : "Langue 3" },
+            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
+            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
+            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
+            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
+            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
+          ]
+        };
+        return branchSubjects[selectedStream] || [];
+      }
+    }
+
+    return subjects;
+  };
+
+  const getStreams = () => {
+    if (selectedLevel !== 'high') return [];
+    if (selectedYear === '1') {
+      return [
+        { key: 'science', label: isAr ? "جذع مشترك علوم وتكنولوجيا" : "Tronc Commun Sciences" },
+        { key: 'arts', label: isAr ? "جذع مشترك آداب" : "Tronc Commun Lettres" },
+      ];
+    }
+    return [
+      { key: 'exp_science', label: isAr ? "شعبة العلوم التجريبية" : "Sciences Expérimentales" },
+      { key: 'math', label: isAr ? "شعبة الرياضيات" : "Mathématiques" },
+      { key: 'tech_math', label: isAr ? "شعبة تقني رياضي" : "Technique Math" },
+      { key: 'mgt_eco', label: isAr ? "شعبة تسيير واقتصاد" : "Gestion & Économie" },
+      { key: 'arts_phil', label: isAr ? "شعبة آداب وفلسفة" : "Lettres & Philosophie" },
+      { key: 'languages', label: isAr ? "شعبة لغات أجنبية" : "Langues Étrangères" },
+    ];
+  };
+
+  const getYearsForLevel = (level: string) => {
+    switch (level) {
+      case 'primary': return [1, 2, 3, 4, 5];
+      case 'middle': return [1, 2, 3, 4];
+      case 'high': return [1, 2, 3];
+      default: return [1];
+    }
+  };
 
   if (isSuccess) {
     return (
@@ -169,6 +367,37 @@ export default function RegistrationPage() {
                       </div>
                     </div>
 
+                    {role === 'teacher' && (
+                      <>
+                        <div className="space-y-1">
+                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{isAr ? "المستوى الدراسي" : "Niveau d'enseignement"}</label>
+                          <div className="relative">
+                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                            <select 
+                              name="level" 
+                              defaultValue="" 
+                              required 
+                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                            >
+                              <option value="" disabled>{t('auth.registration.select_level')}</option>
+                              {levels.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
+                          <div className="relative">
+                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                            <select name="subject" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                              <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
+                              {subjects.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
                     {role === 'student' && (
                       <>
                         <div className="space-y-1 md:col-span-2">
@@ -183,7 +412,17 @@ export default function RegistrationPage() {
                           <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.desired_level')}</label>
                           <div className="relative">
                             <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select name="level" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                            <select 
+                              name="level" 
+                              defaultValue="" 
+                              required 
+                              onChange={(e) => {
+                                setSelectedLevel(e.target.value);
+                                setSelectedYear('');
+                                setSelectedStream('');
+                              }}
+                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                            >
                               <option value="" disabled>{t('auth.registration.select_level')}</option>
                               {levels.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
                             </select>
@@ -194,16 +433,46 @@ export default function RegistrationPage() {
                           <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
                           <div className="relative">
                             <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select name="year" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                            <select 
+                              name="year" 
+                              value={selectedYear}
+                              required 
+                              onChange={(e) => {
+                                setSelectedYear(e.target.value);
+                                setSelectedStream('');
+                              }}
+                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                            >
                               <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
-                              <option value="1">1</option>
-                              <option value="2">2</option>
-                              <option value="3">3</option>
-                              <option value="4">4</option>
-                              <option value="5">5</option>
+                              {getYearsForLevel(selectedLevel).map(y => (
+                                <option key={y} value={y}>{y}</option>
+                              ))}
                             </select>
                           </div>
                         </div>
+
+                        {selectedLevel === 'high' && (
+                          <div className="space-y-1 md:col-span-2">
+                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>
+                              {isAr ? "الشعبة / الجذع المشترك" : "Filière / Tronc Commun"}
+                            </label>
+                            <div className="relative">
+                              <ShieldCheck size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                              <select 
+                                name="stream"
+                                value={selectedStream}
+                                required
+                                onChange={(e) => setSelectedStream(e.target.value)}
+                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                              >
+                                <option value="" disabled>{isAr ? "اختر الشعبة..." : "Choisir la filière..."}</option>
+                                {getStreams().map(s => (
+                                  <option key={s.key} value={s.key}>{s.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        )}
 
                         <div className="space-y-1 md:col-span-2">
                           <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
@@ -211,7 +480,7 @@ export default function RegistrationPage() {
                             <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                             <select name="subject" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                               <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
-                              {subjects.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                              {subjectsByContext().map((s: any) => <option key={s.key} value={s.key}>{s.label}</option>)}
                             </select>
                           </div>
                         </div>

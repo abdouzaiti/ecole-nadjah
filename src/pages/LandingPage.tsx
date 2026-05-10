@@ -416,113 +416,100 @@ export default function LandingPage() {
       {/* Contact Section */}
       <section id="contact" className="py-24 bg-white text-navy">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <div className={isAr ? "text-right" : "text-left"}>
-              <h2 className="text-4xl font-serif text-navy mb-8">{t('contact_us')}</h2>
-              <div className="space-y-6">
-                <div className={cn("flex items-center gap-4 group", isAr && "flex-row-reverse")}>
+          <div className="max-w-3xl mx-auto">
+            <div className={cn("text-center mb-16", isAr ? "text-right" : "text-left")}>
+              <h2 className="text-4xl font-serif text-navy mb-8 text-center">{t('contact_us')}</h2>
+              <div className="space-y-8">
+                <div className={cn("flex items-center gap-6 group", isAr && "flex-row-reverse")}>
                   <a 
                     href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors shrink-0"
+                    className="w-16 h-16 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors shrink-0"
                   >
-                    <MapPin size={20} />
+                    <MapPin size={24} />
                   </a>
                   <a 
                     href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={cn("text-lg text-navy/70 hover:text-blue-accent transition-colors underline-offset-4 hover:underline", isAr && "font-serif")}
+                    className={cn("text-xl text-navy/70 hover:text-blue-accent transition-colors underline-offset-4 hover:underline", isAr && "font-serif")}
                   >
                     {t('school_name')}, {t('location')}
                   </a>
                 </div>
-                <div className={cn("flex items-start gap-4 group", isAr && "flex-row-reverse")}>
-                  <a href="tel:0669812895" className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner shrink-0 group-hover:bg-blue-accent/10 transition-colors">
-                    <Phone size={20} />
-                  </a>
-                  <div className={cn("flex flex-col", isAr && "text-right")}>
-                    <a href="tel:0669812895" className="text-lg text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">0669 81 28 95</a>
+                <div className={cn("flex items-start gap-6 group", isAr && "flex-row-reverse")}>
+                  <div className="w-16 h-16 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner shrink-0 group-hover:bg-blue-accent/10 transition-colors">
+                    <Phone size={24} />
+                  </div>
+                  <div className={cn("flex flex-col gap-1", isAr && "text-right")}>
+                    <a href="tel:0669812895" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">0669 81 28 95</a>
                     <a 
                       href="https://wa.me/213790356012" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-lg text-navy/70 hover:text-blue-accent transition-colors flex items-center gap-2 group/wa" 
+                      className="text-xl text-navy/70 hover:text-blue-accent transition-colors flex items-center gap-2 group/wa" 
                       dir="ltr"
                     >
                       0790 35 60 12
-                      <span className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-bold opacity-0 group-hover/wa:opacity-100 transition-opacity">WhatsApp</span>
+                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-bold opacity-0 group-hover/wa:opacity-100 transition-opacity">WhatsApp</span>
                     </a>
-                    <a href="tel:045416134" className="text-lg text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">045 41 61 34</a>
+                    <a href="tel:045416134" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">045 41 61 34</a>
                   </div>
                 </div>
-                <div className={cn("flex items-center gap-4 group", isAr && "flex-row-reverse")}>
+                <div className={cn("flex items-center gap-6 group", isAr && "flex-row-reverse")}>
                   <a 
                     href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com" 
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors"
+                    className="w-16 h-16 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors"
                   >
-                    <Mail size={20} />
+                    <Mail size={24} />
                   </a>
                   <a 
                     href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-lg text-navy/70 hover:text-blue-accent transition-colors"
+                    className="text-xl text-navy/70 hover:text-blue-accent transition-colors"
                   >
                     ecole.el.nadjah.mosta.27@gmail.com
                   </a>
                 </div>
               </div>
               
-            <a 
-              href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block mt-10 h-64 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center overflow-hidden hover:border-blue-accent/50 transition-all group relative"
-            >
-                <div className="absolute inset-0 z-0">
-                  <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1632.748!2d0.089!3d35.930!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1282036a050e3715%3A0xdc2a35b12a46b33f!2s%C3%A9cole%20el%20nadjah!5e1!3m2!1sfr!2sdz!4v1714821000000!5m2!1sfr!2sdz"
-                    className="w-full h-full border-0 pointer-events-none scale-150"
-                    style={{ filter: 'contrast(1.1) brightness(0.9)' }}
-                    title={t('school_name')}
-                  />
-                </div>
-                <div className="absolute inset-0 bg-navy/20 group-hover:bg-transparent transition-colors duration-500"></div>
-                
-                <div className="text-center group-hover:opacity-0 transition-opacity relative z-10 px-6 pointer-events-none">
-                  <div className="w-16 h-16 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
-                    <MapPin size={32} className="text-blue-accent" />
+              <a 
+                href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block mt-16 h-80 bg-gray-50 rounded-3xl border border-gray-100 flex items-center justify-center overflow-hidden hover:border-blue-accent/50 transition-all group relative shadow-2xl"
+              >
+                  <div className="absolute inset-0 z-0">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1632.748!2d0.089!3d35.930!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1282036a050e3715%3A0xdc2a35b12a46b33f!2s%C3%A9cole%20el%20nadjah!5e1!3m2!1sfr!2sdz!4v1714821000000!5m2!1sfr!2sdz"
+                      className="w-full h-full border-0 pointer-events-none scale-125"
+                      style={{ filter: 'contrast(1.1) brightness(0.9)' }}
+                      title={t('school_name')}
+                    />
                   </div>
-                  <div className="font-serif text-white font-bold uppercase tracking-widest text-xl drop-shadow-xl">
-                     {t('view_google_maps')}
+                  <div className="absolute inset-0 bg-navy/20 group-hover:bg-transparent transition-colors duration-500"></div>
+                  
+                  <div className="text-center group-hover:opacity-0 transition-opacity relative z-10 px-6 pointer-events-none">
+                    <div className="w-20 h-20 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+                      <MapPin size={40} className="text-blue-accent" />
+                    </div>
+                    <div className="font-serif text-white font-bold uppercase tracking-widest text-2xl drop-shadow-xl">
+                       {t('view_google_maps')}
+                    </div>
                   </div>
-                </div>
-                
-                <div className={cn(
-                  "absolute bottom-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-[10px] font-bold text-navy uppercase tracking-tighter z-10 transition-transform hover:scale-105",
-                  isAr ? "left-4" : "right-4"
-                )}>
-                  {t('open_maps_app')}
-                </div>
+                  
+                  <div className={cn(
+                    "absolute bottom-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-xs font-bold text-navy uppercase tracking-widest z-10 transition-transform hover:scale-105 shadow-lg",
+                    isAr ? "left-6" : "right-6"
+                  )}>
+                    {t('open_maps_app')}
+                  </div>
               </a>
             </div>
-            
-            <GlowCard glowColor="blue" customSize className="bg-white border-white/20 p-10">
-              <h3 className={cn("text-3xl font-serif mb-6 text-navy", isAr && "text-right")}>{t('form.title')}</h3>
-              <form className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <input type="text" placeholder={t('form.name')} className={cn("bg-white/80 border-gray-200 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
-                  <input type="email" placeholder={t('form.email')} className={cn("bg-white/80 border-gray-200 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
-                </div>
-                <input type="text" placeholder={t('form.subject')} className={cn("bg-white/80 border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
-                <textarea placeholder={t('form.message')} rows={4} className={cn("bg-white/80 border border-gray-100 rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-accent outline-none", isAr && "text-right")} />
-                <Button variant="navy" className="w-full py-4 text-white uppercase tracking-widest font-bold bg-blue-accent hover:bg-blue-accent/90">{t('form.send')}</Button>
-              </form>
-            </GlowCard>
           </div>
         </div>
       </section>
