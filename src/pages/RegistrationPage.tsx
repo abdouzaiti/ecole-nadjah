@@ -8,13 +8,64 @@ import { cn } from '../lib/utils';
 
 export default function RegistrationPage() {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [role, setRole] = useState<'student' | 'teacher'>('student');
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Constructing WhatsApp message
+    const whatsappNumber = "213790356012";
+    let message = "";
+    
+    if (role === 'teacher') {
+      message = `*Nouveau Dossier d'Enseignant - École Nadjah*\n\n` +
+                `👤 *Nom d'utilisateur:* ${data.username}\n` +
+                `📧 *Email:* ${data.email}\n` +
+                `📱 *Téléphone:* ${data.phone}\n` +
+                `👨‍🏫 *Rappel:* Inscription en tant qu'enseignant.`;
+    } else {
+      const levelLabel = levels.find(l => l.key === data.level)?.label || data.level;
+      const subjectLabel = subjects.find(s => s.key === data.subject)?.label || data.subject;
+      
+      message = `*Nouveau Dossier d'Élève - École Nadjah*\n\n` +
+                `👤 *Nom d'utilisateur:* ${data.username}\n` +
+                `📧 *Email:* ${data.email}\n` +
+                `📱 *Téléphone Élève:* ${data.phone}\n` +
+                `👨‍👩‍👧‍👦 *Téléphone Parent:* ${data.parentPhone}\n` +
+                `📚 *Niveau:* ${levelLabel}\n` +
+                `📅 *Année:* ${data.year}\n` +
+                `🧪 *Matière:* ${subjectLabel}`;
+    }
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
+    
     setIsSuccess(true);
   };
+
+  const levels = [
+    { key: 'primary', label: t('levels.primary') },
+    { key: 'middle', label: t('levels.middle') },
+    { key: 'high', label: t('levels.high') },
+    { key: 'formation', label: t('levels.formation') },
+  ];
+
+  const subjects = [
+    { key: 'math', label: t('subjects.math') },
+    { key: 'physics', label: t('subjects.physics') },
+    { key: 'philosophy', label: t('subjects.philosophy') },
+    { key: 'history', label: t('subjects.history') },
+    { key: 'arabic', label: t('subjects.arabic') },
+    { key: 'french', label: t('subjects.french') },
+    { key: 'english', label: t('subjects.english') },
+  ];
 
   if (isSuccess) {
     return (
@@ -25,8 +76,12 @@ export default function RegistrationPage() {
               <CheckCircle size={48} />
             </div>
             <h2 className="text-3xl font-serif text-navy mb-4 font-bold">{t('auth.registration.success_title')}</h2>
-            <p className="text-navy/60 mb-8 leading-relaxed font-sans">
+            <p className="text-navy/60 mb-8 leading-relaxed font-sans text-sm">
               {t('auth.registration.success_message')}
+              <br />
+              <span className="font-bold text-blue-accent mt-2 block">
+                Veuillez finaliser l'envoi de votre message sur WhatsApp si la fenêtre s'est ouverte.
+              </span>
             </p>
             <Link to="/">
               <Button variant="outline" className="w-full">{t('auth.registration.back_home')}</Button>
@@ -50,68 +105,118 @@ export default function RegistrationPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <Card className="p-8 bg-white/60 backdrop-blur-xl border border-white/40 shadow-xl">
+              <div className="mb-8 p-1 bg-navy/5 rounded-xl flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => setRole('student')}
+                  className={cn(
+                    "flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all",
+                    role === 'student' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60"
+                  )}
+                >
+                  <User size={18} />
+                  {t('auth.registration.i_am_student')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('teacher')}
+                  className={cn(
+                    "flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all",
+                    role === 'teacher' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60"
+                  )}
+                >
+                  <BookOpen size={18} />
+                  {t('auth.registration.i_am_teacher')}
+                </button>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div>
                   <h3 className={cn("text-xl font-serif text-navy mb-6 flex items-center gap-2 font-bold", isAr && "flex-row-reverse")}>
-                    <User size={20} className="text-blue-accent" /> {t('auth.registration.student_info')}
+                    {role === 'student' ? (
+                      <>
+                        <User size={20} className="text-blue-accent" /> {t('auth.registration.student_info')}
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck size={20} className="text-blue-accent" /> {t('auth.registration.teacher_info')}
+                      </>
+                    )}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.last_name')}</label>
-                      <input type="text" required placeholder={t('auth.registration.last_name_placeholder')} className={cn("w-full p-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none placeholder:text-navy/20", isAr && "text-right")} />
-                    </div>
-                    <div className="space-y-1">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.first_name')}</label>
-                      <input type="text" required placeholder={t('auth.registration.first_name_placeholder')} className={cn("w-full p-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none placeholder:text-navy/20", isAr && "text-right")} />
-                    </div>
-                    <div className="space-y-1">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.birth_date')}</label>
-                      <div className="relative">
-                        <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input type="date" placeholder={t('auth.registration.date_placeholder')} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.desired_level')}</label>
-                      <div className="relative">
-                        <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <select defaultValue="" className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
-                          <option value="" disabled>{t('auth.registration.select_level')}</option>
-                          <option>{t('levels.primary')}</option>
-                          <option>{t('levels.middle')}</option>
-                          <option>{t('levels.high')}</option>
-                          <option>{t('levels.formation')}</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-px bg-white/20"></div>
-
-                <div>
-                  <h3 className={cn("text-xl font-serif text-navy mb-6 flex items-center gap-2 font-bold", isAr && "flex-row-reverse")}>
-                    <ShieldCheck size={20} className="text-blue-accent" /> {t('auth.registration.parent_info')}
-                  </h3>
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1 md:col-span-2">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.parent_name')}</label>
-                      <input type="text" required placeholder={t('auth.registration.parent_name_placeholder')} className={cn("w-full p-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none placeholder:text-navy/20", isAr && "text-right")} />
+                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.username')}</label>
+                      <div className="relative">
+                        <User size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                        <input name="username" type="text" required placeholder={t('auth.registration.username_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                      </div>
                     </div>
+
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.contact_email')}</label>
                       <div className="relative">
                         <Mail size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input type="email" required placeholder={t('auth.registration.email_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                        <input name="email" type="email" required placeholder={t('auth.registration.email_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                       </div>
                     </div>
+
                     <div className="space-y-1">
                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.phone_number')}</label>
                       <div className="relative">
                         <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input type="tel" placeholder={t('auth.registration.phone_placeholder')} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                        <input name="phone" type="tel" placeholder={t('auth.registration.phone_placeholder')} dir="ltr" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                       </div>
                     </div>
+
+                    {role === 'student' && (
+                      <>
+                        <div className="space-y-1 md:col-span-2">
+                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.parent_phone')}</label>
+                          <div className="relative">
+                            <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                            <input name="parentPhone" type="tel" placeholder={t('auth.registration.phone_placeholder')} dir="ltr" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.desired_level')}</label>
+                          <div className="relative">
+                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                            <select name="level" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                              <option value="" disabled>{t('auth.registration.select_level')}</option>
+                              {levels.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
+                          <div className="relative">
+                            <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                            <select name="year" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                              <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
+                              <option value="1">1</option>
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1 md:col-span-2">
+                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
+                          <div className="relative">
+                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                            <select name="subject" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                              <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
+                              {subjects.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 

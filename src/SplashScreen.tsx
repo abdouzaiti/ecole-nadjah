@@ -89,7 +89,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
                 <Button
                   onClick={onEnter}
                   size="lg"
-                  className="bg-[#1a3190] text-white hover:bg-[#1a3190]/90 rounded-full px-12 py-8 text-2xl font-serif shadow-2xl flex items-center gap-4 group hover:scale-105 transition-all duration-300"
+                  className="bg-[#1a3190] text-white hover:bg-[#1a3190]/90 rounded-full px-12 py-8 text-2xl font-outfit shadow-2xl flex items-center gap-4 group hover:scale-105 transition-all duration-300"
                 >
                   <span>Enter the Website</span>
                   <motion.div
