@@ -235,6 +235,16 @@ export default function RegistrationPage() {
       }
     }
 
+    if (selectedLevel === 'formation') {
+      return [
+        { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
+        { key: 'fr', label: isAr ? "اللغة الفرنسية" : "Français" },
+        { key: 'es', label: isAr ? "اللغة الإسبانية" : "Espagnol" },
+        { key: 'de', label: isAr ? "اللغة الألمانية" : "Allemand" },
+        { key: 'en', label: isAr ? "اللغة الإنجليزية" : "Anglais" },
+      ];
+    }
+
     return subjects;
   };
 
@@ -261,6 +271,7 @@ export default function RegistrationPage() {
       case 'primary': return [1, 2, 3, 4, 5];
       case 'middle': return [1, 2, 3, 4];
       case 'high': return [1, 2, 3];
+      case 'formation': return [];
       default: return [1];
     }
   };
@@ -429,27 +440,29 @@ export default function RegistrationPage() {
                           </div>
                         </div>
 
-                        <div className="space-y-1">
-                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
-                          <div className="relative">
-                            <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select 
-                              name="year" 
-                              value={selectedYear}
-                              required 
-                              onChange={(e) => {
-                                setSelectedYear(e.target.value);
-                                setSelectedStream('');
-                              }}
-                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                            >
-                              <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
-                              {getYearsForLevel(selectedLevel).map(y => (
-                                <option key={y} value={y}>{y}</option>
-                              ))}
-                            </select>
+                        {selectedLevel && selectedLevel !== 'formation' && (
+                          <div className="space-y-1">
+                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
+                            <div className="relative">
+                              <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                              <select 
+                                name="year" 
+                                value={selectedYear}
+                                required 
+                                onChange={(e) => {
+                                  setSelectedYear(e.target.value);
+                                  setSelectedStream('');
+                                }}
+                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                              >
+                                <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
+                                {getYearsForLevel(selectedLevel).map(y => (
+                                  <option key={y} value={y}>{y}</option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         {selectedLevel === 'high' && (
                           <div className="space-y-1 md:col-span-2">
