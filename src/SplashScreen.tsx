@@ -10,8 +10,15 @@ interface SplashScreenProps {
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
   const [phase, setPhase] = useState<'initial' | 'visible' | 'raised'>('initial');
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     const sequence = async () => {
       // 1. Initial delay
       await new Promise(r => setTimeout(r, 100));
@@ -23,6 +30,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
     };
 
     sequence();
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   return (
@@ -44,8 +52,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
           initial={{ opacity: 0, scale: 0.5, y: 30 }}
           animate={{ 
             opacity: phase === 'initial' ? 0 : 1,
-            scale: phase === 'initial' ? 0.5 : (phase === 'raised' ? 0.4 : 1),
-            y: phase === 'raised' ? "-28vh" : 0
+            scale: phase === 'initial' ? 0.5 : (phase === 'raised' ? (isMobile ? 0.4 : 0.35) : 1),
+            y: phase === 'raised' ? (isMobile ? "-28vh" : "-35vh") : 0
           }}
           transition={{ 
             opacity: { duration: 0.5 },
@@ -66,7 +74,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
             initial={{ opacity: 0, y: "30vh" }}
             animate={{ 
               opacity: phase === 'initial' ? 0 : 1,
-              y: phase === 'raised' ? "-8vh" : "30vh" 
+              y: phase === 'raised' ? (isMobile ? "-8vh" : "2vh") : "30vh" 
             }}
             transition={{ 
               opacity: { duration: 0.6 },
@@ -110,8 +118,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
             {phase === 'raised' && (
               <motion.div
                 className="pointer-events-auto"
-                initial={{ opacity: 0, scale: 0.9, y: "24vh" }}
-                animate={{ opacity: 1, scale: 1, y: "24vh" }}
+                initial={{ opacity: 0, scale: 0.9, y: isMobile ? "24vh" : "30vh" }}
+                animate={{ opacity: 1, scale: 1, y: isMobile ? "24vh" : "30vh" }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
               >
