@@ -53,7 +53,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
           <img 
             src="/logo.png" 
             alt="Logo" 
-            className="w-72 md:w-96 h-auto drop-shadow-sm"
+            className="w-96 md:w-[32rem] h-auto drop-shadow-sm"
           />
         </motion.div>
 
