@@ -79,7 +79,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
                 initial={{ letterSpacing: "0.4em" }}
                 animate={{ letterSpacing: "0.15em" }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                className="text-5xl md:text-7xl font-packard font-extrabold text-white [text-shadow:_-2px_-2px_0_#1a3190,_2px_-2px_0_#1a3190,_-2px_2px_0_#1a3190,_2px_2px_0_#1a3190,_0_0_25px_rgba(26,49,144,0.8)] mb-2"
+                className="text-5xl md:text-7xl font-packard font-extrabold text-white [text-shadow:_-2px_-2px_0_#1a3190,_2px_-2px_0_#1a3190,_-2px_2px_0_#1a3190,_2px_2px_0_#1a3190] mb-2"
               >
                 ECOLE NADJAH
               </motion.h1>
