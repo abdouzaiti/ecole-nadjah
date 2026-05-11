@@ -17,7 +17,7 @@ import StudentDashboard from './pages/dashboards/StudentDashboard';
 import LiveClassPage from './pages/LiveClassPage';
 import ReplaysPage from './pages/ReplaysPage';
 import SplashScreen from './SplashScreen';
-import { AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ChatBot } from './components/ChatBot';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -58,7 +58,13 @@ function AppRoutes() {
       {showSplash ? (
         <SplashScreen key="splash" onEnter={() => setShowSplash(false)} />
       ) : (
-        <div key="main-app" className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
+        <motion.div 
+          key="main-app" 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden"
+        >
           <BlueBackground />
           <Navbar />
           <ErrorBoundary componentName="ChatBot" fallback={null}>
@@ -118,7 +124,7 @@ function AppRoutes() {
               </Routes>
             </ErrorBoundary>
           </main>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

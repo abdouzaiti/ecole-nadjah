@@ -201,7 +201,7 @@ export default function LandingPage() {
       {/* Stats Section */}
       <section className="relative z-20 mt-20 mb-24 max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {[
+            {[
             { label: t('stats.students'), value: "+500", icon: <Users size={24} /> },
             { label: t('stats.bac_success'), value: "98%", icon: <GraduationCap size={24} /> },
             { label: t('stats.teachers'), value: "+20", icon: <CheckCircle2 size={24} /> },
@@ -209,10 +209,9 @@ export default function LandingPage() {
           ].map((stat, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.05, duration: 0.4 }}
               className="h-full"
             >
               <GlowCard 
@@ -249,10 +248,9 @@ export default function LandingPage() {
             {programs.map((p, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.2 }}
-                viewport={{ once: true }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.05, duration: 0.4 }}
               >
                 <Card className={cn("p-0 group border-none bg-transparent relative shadow-none", isAr && "text-right flex flex-col h-full")}>
                   <div className={cn("h-[400px] flex items-center justify-center transition-colors duration-500 relative rounded-3xl bg-transparent")}>
@@ -272,12 +270,12 @@ export default function LandingPage() {
                           }}
                           whileHover={{
                             rotate: idx === 0 ? -25 : idx === 1 ? 0 : 25,
-                            x: idx === 0 ? -120 : idx === 1 ? 0 : 120,
-                            y: idx === 1 ? -110 : -70,
-                            scale: 1.35,
+                            x: idx === 0 ? -100 : idx === 1 ? 0 : 100,
+                            y: idx === 1 ? -80 : -40,
+                            scale: 1.25,
                             zIndex: 40
                           }}
-                          transition={{ type: "spring", stiffness: 180, damping: 15 }}
+                          transition={{ type: "spring", stiffness: 200, damping: 20, mass: 0.8 }}
                         >
                           <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
                         </motion.div>
@@ -313,7 +311,12 @@ export default function LandingPage() {
       <section id="about" className="py-24 bg-transparent relative overflow-hidden">
         <div className="absolute inset-0 bg-blue-50/50 -z-10" />
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+          >
             <div className={cn("relative", isAr ? "order-last" : "")}>
               <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl">
                 <img 
@@ -350,7 +353,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -363,7 +366,12 @@ export default function LandingPage() {
           <img src="/logo.png" alt="" className="w-[600px] h-[600px] object-contain invert brightness-0" />
         </div>
         
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+        >
           <div className={isAr ? "text-right" : "text-left"}>
             <Badge variant="accent">{t('why_us.title')}</Badge>
             <h2 className="text-4xl md:text-5xl font-serif mt-6 mb-8 uppercase tracking-tight text-white">{t('why_us.subtitle')}</h2>
@@ -448,7 +456,7 @@ export default function LandingPage() {
               <div className="absolute -top-10 -right-10 w-64 h-64 bg-blue-accent/10 blur-3xl rounded-full z-0"></div>
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-navy/20 blur-3xl rounded-full z-0"></div>
             </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Contact Section */}
