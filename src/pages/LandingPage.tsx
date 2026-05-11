@@ -56,7 +56,8 @@ export default function LandingPage() {
       color: "bg-navy/5",
       images: [
         "/cem/cem1.jpg",
-        "/cem/cem2.jpg"
+        "/cem/cem2.jpg",
+        "/cem/cem3.jpg"
       ]
     },
     { 
