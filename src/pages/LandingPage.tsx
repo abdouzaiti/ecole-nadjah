@@ -445,7 +445,19 @@ export default function LandingPage() {
                          <div className="h-2 w-full bg-white/10 rounded-full" />
                          <div className="h-2 w-2/3 bg-white/5 rounded-full" />
                       </div>
-                      <div className="mt-auto flex justify-center">
+                      <div className="mt-auto flex justify-center relative">
+                         <motion.div 
+                           initial={{ opacity: 0, y: 10 }}
+                           animate={{ opacity: 1, y: [0, -8, 0] }}
+                           transition={{ 
+                             opacity: { duration: 0.5 },
+                             y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                           }}
+                           className="absolute -top-10 bg-blue-accent text-white text-[10px] px-3 py-1 rounded-full font-bold whitespace-nowrap shadow-lg z-20"
+                         >
+                           {isAr ? "إضغط هنا للدخول" : "Click here to enter"}
+                           <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-accent rotate-45" />
+                         </motion.div>
                          <div className="px-6 py-3 bg-blue-accent rounded-xl text-white font-bold text-sm shadow-xl shadow-blue-accent/20 group-hover:scale-110 transition-transform">
                             {isAr ? "دخول المنصة" : "Enter Platform"}
                          </div>
