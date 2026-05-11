@@ -37,7 +37,21 @@ function AppRoutes() {
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = i18n.language;
-  }, [i18n.language]);
+    
+    // Lock scroll when splash is showing
+    if (showSplash) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100dvh';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+    };
+  }, [i18n.language, showSplash]);
 
   return (
     <AnimatePresence mode="wait">
