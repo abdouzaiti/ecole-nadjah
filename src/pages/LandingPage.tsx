@@ -43,9 +43,9 @@ export default function LandingPage() {
       icon: <GraduationCap size={48} className="text-blue-accent" />,
       color: "bg-blue-accent/5",
       images: [
-        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80",
-        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&q=80",
-        "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80"
+        "/primaire/primaire1.jpg",
+        "/primaire/primaire2.jpg",
+        "/primaire/primaire3.jpg"
       ]
     },
     { 
@@ -55,9 +55,8 @@ export default function LandingPage() {
       icon: <CheckCircle2 size={48} className="text-blue-accent" />,
       color: "bg-navy/5",
       images: [
-        "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=400&q=80",
-        "https://images.unsplash.com/photo-1544391682-1718ec277b0c?w=400&q=80",
-        "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80"
+        "/cem/cem1.jpg",
+        "/cem/cem2.jpg"
       ]
     },
     { 
@@ -67,9 +66,9 @@ export default function LandingPage() {
       icon: <ShieldCheck size={48} className="text-blue-accent" />,
       color: "bg-blue-accent/5",
       images: [
-        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&q=80",
-        "https://images.unsplash.com/photo-1588072432836-e10032774350?w=400&q=80",
-        "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&q=80"
+        "/lycee/lycee1.jpg",
+        "/lycee/lycee2.jpg",
+        "/lycee/lycee3.jpg"
       ]
     },
     { 
@@ -79,9 +78,9 @@ export default function LandingPage() {
       icon: <Monitor size={48} className="text-blue-accent" />,
       color: "bg-navy/5",
       images: [
-        "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&q=80",
-        "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80",
-        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&q=80"
+        "/formation/formation1.jpg",
+        "/formation/formation2.jpg",
+        "/formation/formation3.jpg"
       ]
     },
     { 
@@ -91,9 +90,9 @@ export default function LandingPage() {
       icon: <BookOpen size={48} className="text-blue-accent" />,
       color: "bg-blue-accent/5",
       images: [
-        "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=80",
-        "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=400&q=80",
-        "https://images.unsplash.com/photo-1522071823991-b960d996281a?w=400&q=80"
+        "/dawarat/dawra1.jpg",
+        "/dawarat/dawra2.jpg",
+        "/dawarat/dawra3.jpg"
       ]
     },
   ];
