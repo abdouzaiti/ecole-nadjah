@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from './components/ui';
 import { LogIn } from 'lucide-react';
+import { SVGFollower } from './components/SVGFollower';
 
 interface SplashScreenProps {
   onEnter: () => void;
@@ -29,7 +30,11 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
       className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center overflow-hidden"
       exit={{ opacity: 0, transition: { duration: 0.4, ease: "easeInOut" } }}
     >
-      <div className="relative flex flex-col items-center justify-center w-full h-full">
+      <div className="absolute inset-0 z-0">
+        <SVGFollower />
+      </div>
+
+      <div className="relative flex flex-col items-center justify-center w-full h-full pointer-events-none">
         {/* Logo Animation */}
         <motion.div
           className="relative z-20"
