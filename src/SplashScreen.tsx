@@ -30,6 +30,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
       className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center overflow-hidden"
       exit={{ opacity: 0, transition: { duration: 0.4, ease: "easeInOut" } }}
     >
+      {/* Background Enhancements */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(26,49,144,0.03)_0%,rgba(255,255,255,1)_100%)] z-0" />
+      
       <div className="absolute inset-0 z-0">
         <SVGFollower />
       </div>
@@ -41,42 +44,63 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
           initial={{ opacity: 0, scale: 0.5, y: 30 }}
           animate={{ 
             opacity: phase === 'initial' ? 0 : 1,
-            scale: phase === 'initial' ? 0.5 : (phase === 'raised' ? 0.35 : 1),
-            y: phase === 'raised' ? "-30vh" : 0
+            scale: phase === 'initial' ? 0.5 : (phase === 'raised' ? 0.3 : 1),
+            y: phase === 'raised' ? "-32vh" : 0
           }}
           transition={{ 
-            opacity: { duration: 0.4 },
-            scale: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-            y: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+            opacity: { duration: 0.5 },
+            scale: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+            y: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
           }}
         >
           <img 
             src="/logo.png" 
             alt="Logo" 
-            className="w-96 md:w-[32rem] h-auto drop-shadow-sm"
+            className="w-96 md:w-[32rem] h-auto drop-shadow-[0_10px_20px_rgba(0,0,0,0.05)]"
           />
         </motion.div>
 
         {/* School Name (Centered) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 200 }}
             animate={{ 
               opacity: phase === 'initial' ? 0 : 1,
-              y: phase === 'raised' ? -40 : 180 
+              y: phase === 'raised' ? -40 : 200 
             }}
             transition={{ 
-              opacity: { duration: 0.4 },
-              y: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+              opacity: { duration: 0.6 },
+              y: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
             }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-6xl font-serif font-extrabold text-navy tracking-[0.2em] drop-shadow-sm">
-              ÉCOLE NADJAH
-            </h1>
-            <p className="text-xl md:text-2xl font-serif font-extrabold text-navy tracking-[0.5em] mt-2">
-              AC
-            </p>
+            <div className="flex flex-col items-center max-w-2xl px-6">
+              <motion.h1 
+                initial={{ letterSpacing: "0.4em" }}
+                animate={{ letterSpacing: "0.15em" }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="text-5xl md:text-7xl font-packard font-extrabold text-white [text-shadow:_-2px_-2px_0_#1a3190,_2px_-2px_0_#1a3190,_-2px_2px_0_#1a3190,_2px_2px_0_#1a3190,_0_0_25px_rgba(26,49,144,0.8)] mb-2"
+              >
+                ECOLE NADJAH
+              </motion.h1>
+              
+              <div className="flex items-center gap-4 w-full mb-4">
+                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-[#1a3190]/20" />
+                <span className="text-sm md:text-base font-outfit uppercase tracking-[0.6em] text-[#1a3190]/60 font-medium">
+                  AC
+                </span>
+                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#1a3190]/20" />
+              </div>
+
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: phase === 'raised' ? 1 : 0 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="text-lg md:text-xl font-serif italic text-blue-900/40 tracking-wide"
+              >
+                L'excellence éducative au service de vos enfants
+              </motion.p>
+            </div>
           </motion.div>
         </div>
 
@@ -86,20 +110,22 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
             {phase === 'raised' && (
               <motion.div
                 className="pointer-events-auto"
-                initial={{ opacity: 0, scale: 0.9, y: 50 }}
-                animate={{ opacity: 1, scale: 1, y: 150 }}
+                initial={{ opacity: 0, scale: 0.9, y: 180 }}
+                animate={{ opacity: 1, scale: 1, y: 180 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
+                transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
               >
                 <Button
                   onClick={onEnter}
                   size="lg"
-                  className="bg-[#1a3190] text-white hover:bg-[#1a3190]/90 rounded-full px-12 py-8 text-2xl font-outfit shadow-2xl flex items-center gap-4 group hover:scale-105 transition-all duration-300"
+                  className="relative group overflow-hidden bg-gradient-to-br from-[#1a3190] via-[#1a3190] to-blue-800 text-white rounded-full px-12 py-8 text-2xl font-outfit shadow-[0_20px_50px_rgba(26,49,144,0.3)] flex items-center gap-4 transition-all duration-500 hover:shadow-[0_25px_60px_rgba(26,49,144,0.4)] hover:-translate-y-1 active:scale-95"
                 >
-                  <span>Enter the Website</span>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  <span className="relative z-10 font-bold tracking-wide">Discovery</span>
                   <motion.div
-                    animate={{ x: [0, 8, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
+                    className="relative z-10 bg-white/10 p-2 rounded-full"
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                   >
                     <LogIn className="w-6 h-6" />
                   </motion.div>

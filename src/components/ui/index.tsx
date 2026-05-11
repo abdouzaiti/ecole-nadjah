@@ -70,7 +70,7 @@ export function Card({ children, className, hoverEffect = true, ...props }: Card
   );
 }
 
-export function Badge({ children, variant = 'navy' }: { children: ReactNode, variant?: 'navy' | 'accent' | 'red' | 'green' }) {
+export function Badge({ children, variant = 'navy', className }: { children: ReactNode, variant?: 'navy' | 'accent' | 'red' | 'green', className?: string }) {
   const colors = {
     navy: 'bg-navy/10 text-navy',
     accent: 'bg-blue-accent/10 text-blue-accent',
@@ -79,7 +79,7 @@ export function Badge({ children, variant = 'navy' }: { children: ReactNode, var
   };
   
   return (
-    <span className={cn('px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider', colors[variant])}>
+    <span className={cn('px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider', colors[variant], className)}>
       {children}
     </span>
   );

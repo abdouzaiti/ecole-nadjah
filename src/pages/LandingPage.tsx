@@ -121,43 +121,81 @@ export default function LandingPage() {
         icon={selectedProgram?.icon}
       />
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center pt-20 overflow-hidden bg-transparent">
+      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-transparent">
+        {/* Abstract Background Decorations */}
         <div className={cn(
-          "absolute top-0 w-1/3 h-full bg-blue-600/5 -skew-x-12 translate-x-20 z-0",
+          "absolute top-0 w-[40%] h-full bg-linear-to-br from-blue-600/5 to-transparent -skew-x-12 translate-x-20 z-0",
           isAr ? "left-0" : "right-0"
         )}></div>
         <div className={cn(
-          "absolute bottom-0 w-64 h-64 bg-blue-accent/10 rounded-full blur-3xl z-0",
-          isAr ? "right-0 translate-x-1/2 translate-y-1/2" : "left-0 -translate-x-1/2 translate-y-1/2"
+          "absolute top-20 w-96 h-96 bg-[#1a3190]/5 rounded-full blur-[100px] z-0",
+          isAr ? "right-10" : "left-10"
+        )}></div>
+        <div className={cn(
+          "absolute bottom-20 w-80 h-80 bg-blue-400/10 rounded-full blur-[80px] z-0",
+          isAr ? "left-20" : "right-20"
         )}></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          <motion.div 
-            initial={{ opacity: 0, x: isAr ? 30 : -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className={cn("max-w-3xl", isAr ? "text-right" : "text-left")}
-          >
-            <Badge variant="accent">{t('enrollment_open')}</Badge>
-            <h1 className="text-5xl md:text-7xl font-serif text-navy mt-6 mb-6 leading-[1.1]">
+          <div className={cn("max-w-3xl", isAr ? "text-right ml-auto" : "text-left mr-auto")}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <Badge variant="accent" className="px-4 py-1.5 text-sm uppercase tracking-widest bg-[#1a3190]/10 text-[#1a3190] border-none">
+                {t('enrollment_open')}
+              </Badge>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="text-6xl md:text-8xl font-serif text-navy mt-8 mb-8 leading-[1.05] tracking-tight"
+            >
               {t('hero_title')} <br />
-              <span className="text-blue-accent italic">{t('hero_subtitle').split(' ')[0]}</span> {t('hero_subtitle').split(' ').slice(1).join(' ')}
-            </h1>
-            <p className={cn("text-xl text-navy/60 mb-10 font-sans max-w-xl", isAr && "mr-0 ml-auto")}>
+              <span className="text-blue-accent italic font-medium">{t('hero_subtitle').split(' ')[0]}</span> {t('hero_subtitle').split(' ').slice(1).join(' ')}
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+              className={cn("text-xl md:text-2xl text-navy/50 mb-12 font-sans max-w-2xl leading-relaxed", isAr && "mr-0 ml-auto")}
+            >
               {t('hero_description')}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            </motion.p>
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+              className={cn("flex flex-col sm:flex-row gap-6", isAr && "justify-end")}
+            >
               <Link to="/register">
-                <Button size="lg" variant="navy" className="w-full sm:w-auto px-10 bg-blue-accent hover:bg-blue-accent/90">{t('register_now')}</Button>
+                <Button size="lg" className="w-full sm:w-auto px-12 py-8 text-lg bg-gradient-to-r from-[#1a3190] to-blue-700 hover:to-blue-600 text-white rounded-full shadow-[0_15px_35px_rgba(26,49,144,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_45px_rgba(26,49,144,0.4)]">
+                  {t('register_now')}
+                </Button>
               </Link>
               <a href="#programs">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto border-blue-accent/20 text-blue-accent hover:bg-blue-accent/5">
+                <Button size="lg" variant="secondary" className="w-full sm:w-auto px-10 py-8 text-lg rounded-full border-2 border-[#1a3190]/20 text-[#1a3190] hover:bg-[#1a3190]/5 transition-all duration-300">
                    {t('discover_school')}
                 </Button>
               </a>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
+        
+        {/* Floating Scroll Indicator */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <div className="w-[1px] h-20 bg-gradient-to-b from-[#1a3190]/10 via-[#1a3190]/40 to-transparent" />
+        </motion.div>
       </section>
 
       {/* Stats Section */}
