@@ -20,6 +20,7 @@ import SplashScreen from './SplashScreen';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChatBot } from './components/ChatBot';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { BlueBackground } from './components/layout/BlueBackground';
 
 const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
   const { isAuthenticated, user } = useAuth();
@@ -27,8 +28,6 @@ const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 
   if (role && user?.role !== role) return <Navigate to="/" />;
   return <>{children}</>;
 };
-
-import { BlueBackground } from './components/layout/BlueBackground';
 
 function AppRoutes() {
   const { i18n } = useTranslation();
@@ -63,7 +62,7 @@ function AppRoutes() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden"
+          className="min-h-screen bg-white flex flex-col relative overflow-x-hidden"
         >
           <BlueBackground />
           <Navbar />
@@ -78,7 +77,7 @@ function AppRoutes() {
                 <Route path="/register" element={<RegistrationPage />} />
                 
                 <Route 
-                  path="/dashboard/admin" 
+                  path="/dashboard/admin/*" 
                   element={
                     <ProtectedRoute role="ADMIN">
                       <AdminDashboard />
