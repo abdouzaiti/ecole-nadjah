@@ -10,7 +10,7 @@ const resources = {
       "enrollment_open": "التسجيلات مفتوحة 2026-2027",
       "hero_title": "مدرسة النجاح :",
       "hero_subtitle": "التميز الرقمي",
-      "hero_description": "مرحباً بكم في المنصة الرسمية لمدرسة النجاح. منظومة تعليمية كاملة توفر دروساً مباشرة، وصولاً غير محدود لإعادة الدروس بجودة عالية، متابعة تربوية فورية وإدارة إدارية مبسطة لضمان النجاح.",
+      "hero_description": "مرحباً بكم في المنصة الرسمية لمدرسة النجاح. منظومة تعليمية كاملة توفر دروساً مباشرة، وصولاً غير محدود لإعادة الدروس بجودة عالية، متابعة تربوية فورية وخدمات إدارية متكاملة لضمان النجاح. وهي أول مدرسة تطلق نظاماً تعليمياً رقمياً متكاملاً عبر منصتها الخاصة.",
       "discover_school": "اكتشف المدرسة",
       "learn_more": "اعرف المزيد",
       "path_subtitle": "مسار تعليمي كامل، من الخطوة الأولى إلى الجامعة.",
@@ -60,8 +60,8 @@ const resources = {
       },
       "about": {
         "title": "قصتنا ومهمتنا",
-        "description1": "تعتبر مدرسة النجاح بمستغانم منبراً تعليمياً متميزاً يسعى لتوفير بيئة تعليمية محفزة تهدف إلى تنمية قدرات الطلاب الأكاديمية والشخصية.",
-        "description2": "نحن نؤمن بأن كل طفل لديه إمكانيات فريدة، ومهمتنا هي توجيههم نحو التميز من خلال مناهج تعليمية متطورة وفريق تربوي متخصص.",
+        "description1": "مدرسة النجاح بمستغانم ليست مجرد مؤسسة تعليمية، بل هي صرح أكاديمي رائد يجمع بين الأصالة التربوية والابتكار الرقمي، لتوفير تجربة تعليمية استثنائية لطلابنا.",
+        "description2": "نحن فخورون بكوننا أول مدرسة في المنطقة تمتلك منصة تعليمية رقمية متكاملة خاصة بها، مصممة بأحدث التقنيات لخدمة أبنائنا وتوفير متابعة ذكية وشاملة تضمن التميز والنجاح.",
         "years_exp": "سنة من الخبرة",
         "graduates": "خريج ناجح"
       },
@@ -269,7 +269,7 @@ const resources = {
       "enrollment_open": "Inscriptions Ouvertes 2026-2027",
       "hero_title": "ÉCOLE NADJAH :",
       "hero_subtitle": "L'Excellence Digitale",
-      "hero_description": "Bienvenue sur la plateforme officielle de l'ÉCOLE NADJAH. Un écosystème éducatif complet offrant des cours en direct, un accès illimité aux replays haute définition, un suivi pédagogique en temps réel et une gestion administrative simplifiée pour une réussite garantie.",
+      "hero_description": "Bienvenue sur la plateforme officielle de l'ÉCOLE NADJAH. Un écosystème éducatif complet offrant des cours en direct, un accès illimité aux replays HD, un suivi pédagogique instantané et une gestion administrative simplifiée pour une réussite garantie. Nous sommes la première école à lancer un système éducatif numérique intégré via sa propre plateforme.",
       "discover_school": "Découvrir l’École",
       "learn_more": "En savoir plus",
       "path_subtitle": "Un parcours éducatif complet, de la petite section à l'université.",
@@ -319,8 +319,8 @@ const resources = {
       },
       "about": {
         "title": "Notre Histoire & Mission",
-        "description1": "L'École Nadjah de Mostaganem est une institution éducative de premier plan qui s'efforce de fournir un environnement d'apprentissage stimulant visant à développer les capacités académiques et personnelles des élèves.",
-        "description2": "Nous croyons que chaque enfant a un potentiel unique, et notre mission est de les guider vers l'excellence grâce à des programmes éducatifs avancés et une équipe pédagogique spécialisée.",
+        "description1": "L'École Nadjah de Mostaganem n'est pas seulement une institution éducative, c'est un pôle académique pionnier alliant authenticité pédagogique et innovation numérique.",
+        "description2": "Nous sommes fiers d'être la première école de la région à disposer de sa propre plateforme numérique intégrée, conçue avec les technologies les plus avancées pour offrir à nos élèves un suivi intelligent et complet garantissant l'excellence.",
         "years_exp": "Ans d'Expérience",
         "graduates": "Diplômés Succès"
       },
@@ -528,7 +528,7 @@ const resources = {
       "enrollment_open": "Enrollment Open 2026-2027",
       "hero_title": "NADJAH SCHOOL:",
       "hero_subtitle": "Digital Excellence",
-      "hero_description": "Welcome to the official platform of NADJAH SCHOOL. A complete educational ecosystem offering live courses, unlimited access to HD replays, real-time pedagogical tracking, and simplified administrative management for guaranteed success.",
+      "hero_description": "Welcome to the official platform of NADJAH SCHOOL. A complete educational ecosystem providing live lessons, unlimited access to high-quality replays, immediate pedagogical follow-up, and simplified administrative management to ensure success. We are the first school to launch an integrated digital educational system via its own platform.",
       "discover_school": "Discover the School",
       "learn_more": "Learn More",
       "path_subtitle": "A complete educational journey, from the first step to university.",
@@ -578,8 +578,8 @@ const resources = {
       },
       "about": {
         "title": "Our Story & Mission",
-        "description1": "Nadjah School in Mostaganem is a premier educational institution striving to provide a stimulating learning environment aimed at developing students' academic and personal abilities.",
-        "description2": "We believe every child has unique potential, and our mission is to guide them toward excellence through advanced educational curricula and a specialized pedagogical team.",
+        "description1": "Nadjah School in Mostaganem is not just an educational institution; it is a pioneering academic hub that combines pedagogical authenticity with digital innovation.",
+        "description2": "We are proud to be the first school in the region to have its own integrated digital platform, designed with the most advanced technologies to provide our students with smart, comprehensive tracking that guarantees excellence.",
         "years_exp": "Years Experience",
         "graduates": "Successful Graduates"
       },
