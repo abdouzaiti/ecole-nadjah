@@ -121,8 +121,12 @@ export default function LandingPage() {
         icon={selectedProgram?.icon}
       />
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-transparent">
+      <section className="relative min-h-[90vh] flex items-center pt-24 pb-12 overflow-hidden bg-transparent">
         {/* Abstract Background Decorations */}
+        <div className="absolute inset-0 pointer-events-none opacity-20 z-0">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#1a3190_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+        </div>
+
         <div className={cn(
           "absolute top-0 w-[40%] h-full bg-linear-to-br from-blue-600/5 to-transparent -skew-x-12 translate-x-20 z-0",
           isAr ? "left-0" : "right-0"
@@ -199,8 +203,8 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="relative z-20 mt-20 mb-24 max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <section className="relative z-20 mt-12 mb-20 max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
             { label: t('stats.students'), value: "+500", icon: <Users size={24} /> },
             { label: t('stats.bac_success'), value: "98%", icon: <GraduationCap size={24} /> },
@@ -210,8 +214,9 @@ export default function LandingPage() {
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.05, duration: 0.4 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
               className="h-full"
             >
               <GlowCard 
@@ -233,24 +238,33 @@ export default function LandingPage() {
       </section>
 
       {/* Programs Section */}
-      <section id="programs" className="py-24 bg-transparent relative">
+      <section id="programs" className="py-20 bg-transparent relative overflow-hidden">
         <div className="absolute inset-0 bg-white/60 -z-10" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-50/20 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2" />
+        
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif text-navy mb-4">{t('nav.programs')}</h2>
-            <div className="h-1 w-20 bg-navy mx-auto"></div>
-            <p className={cn("mt-6 text-navy/60 max-w-2xl mx-auto italic text-lg", isAr && "font-serif")}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-serif text-navy mb-4 tracking-tight">{t('nav.programs')}</h2>
+            <div className="h-1.5 w-16 bg-blue-accent mx-auto rounded-full"></div>
+            <p className={cn("mt-6 text-navy/60 max-w-2xl mx-auto italic text-lg leading-relaxed", isAr && "font-serif")}>
               {t('path_subtitle')}
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-24 mt-16 pt-16">
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 mt-12">
             {programs.map((p, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.05, duration: 0.4 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
               >
                 <Card className={cn("p-0 group border-none bg-transparent relative shadow-none", isAr && "text-right flex flex-col h-full")}>
                   <div className={cn("h-[400px] flex items-center justify-center transition-colors duration-500 relative rounded-3xl bg-transparent")}>
@@ -308,13 +322,17 @@ export default function LandingPage() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 bg-transparent relative overflow-hidden">
-        <div className="absolute inset-0 bg-blue-50/50 -z-10" />
+      <section id="about" className="py-20 bg-linear-to-b from-transparent to-blue-50/30 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0">
+          <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(#1a3190_1px,transparent_1px)] [background-size:20px_20px]"></div>
+        </div>
+        
         <div className="max-w-7xl mx-auto px-4">
           <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
           >
             <div className={cn("relative", isAr ? "order-last" : "")}>
@@ -472,18 +490,33 @@ export default function LandingPage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 bg-white text-navy">
+      <section id="contact" className="py-20 bg-white text-navy relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-gray-50/50 to-transparent"></div>
+        
         <div className="max-w-7xl mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            <div className={cn("text-center mb-16", isAr ? "text-right" : "text-left")}>
-              <h2 className="text-4xl font-serif text-navy mb-8 text-center">{t('contact_us')}</h2>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className={cn("text-center mb-16", isAr ? "text-right" : "text-left")}
+            >
+              <h2 className="text-4xl md:text-5xl font-serif text-navy mb-8 text-center tracking-tight">{t('contact_us')}</h2>
+              <div className="h-1.5 w-16 bg-blue-accent mx-auto rounded-full mb-12"></div>
+              
               <div className="space-y-8">
-                <div className={cn("flex items-center gap-6 group", isAr && "flex-row-reverse")}>
+                <motion.div 
+                  initial={{ opacity: 0, x: isAr ? 20 : -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className={cn("flex items-center gap-6 group", isAr && "flex-row-reverse")}
+                >
                   <a 
                     href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-16 h-16 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors shrink-0"
+                    className="w-16 h-16 rounded-2xl bg-cream flex items-center justify-center text-navy shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:bg-blue-accent transition-all duration-300 group-hover:text-white shrink-0 group-hover:scale-110"
                   >
                     <MapPin size={24} />
                   </a>
@@ -491,37 +524,51 @@ export default function LandingPage() {
                     href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={cn("text-xl text-navy/70 hover:text-blue-accent transition-colors underline-offset-4 hover:underline", isAr && "font-serif")}
+                    className={cn("text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors underline-offset-4 hover:underline leading-tight", isAr && "font-serif")}
                   >
                     {t('school_name')}, {t('location')}
                   </a>
-                </div>
-                <div className={cn("flex items-start gap-6 group", isAr && "flex-row-reverse")}>
-                  <div className="w-16 h-16 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner shrink-0 group-hover:bg-blue-accent/10 transition-colors">
+                </motion.div>
+
+                <motion.div 
+                   initial={{ opacity: 0, x: isAr ? 20 : -20 }}
+                   whileInView={{ opacity: 1, x: 0 }}
+                   viewport={{ once: true }}
+                   transition={{ delay: 0.2 }}
+                   className={cn("flex items-start gap-6 group", isAr && "flex-row-reverse")}
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-cream flex items-center justify-center text-navy shadow-[0_8px_30px_rgb(0,0,0,0.04)] shrink-0 group-hover:bg-blue-accent transition-all duration-300 group-hover:text-white group-hover:scale-110">
                     <Phone size={24} />
                   </div>
-                  <div className={cn("flex flex-col gap-1", isAr && "text-right")}>
-                    <a href="tel:0669812895" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">0669 81 28 95</a>
+                  <div className={cn("flex flex-col gap-2", isAr && "text-right")}>
+                    <a href="tel:0669812895" className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors font-sans" dir="ltr">0669 81 28 95</a>
                     <div className="flex items-center gap-2 group/wa">
-                      <a href="tel:0790356012" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">0790 35 60 12</a>
+                      <a href="tel:0790356012" className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors font-sans" dir="ltr">0790 35 60 12</a>
                       <a 
                         href="https://wa.me/213790356012" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold opacity-0 group-hover/wa:opacity-100 transition-all hover:bg-green-600"
+                        className="text-[10px] bg-green-500 text-white px-3 py-1 rounded-full font-bold opacity-0 group-hover/wa:opacity-100 transition-all hover:bg-green-600 shadow-lg translate-y-2 group-hover/wa:translate-y-0"
                       >
                         WhatsApp
                       </a>
                     </div>
-                    <a href="tel:045416134" className="text-xl text-navy/70 hover:text-blue-accent transition-colors" dir="ltr">045 41 61 34</a>
+                    <a href="tel:045416134" className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors font-sans" dir="ltr">045 41 61 34</a>
                   </div>
-                </div>
-                <div className={cn("flex items-center gap-6 group", isAr && "flex-row-reverse")}>
+                </motion.div>
+
+                <motion.div 
+                   initial={{ opacity: 0, x: isAr ? 20 : -20 }}
+                   whileInView={{ opacity: 1, x: 0 }}
+                   viewport={{ once: true }}
+                   transition={{ delay: 0.3 }}
+                   className={cn("flex items-center gap-6 group", isAr && "flex-row-reverse")}
+                >
                   <a 
                     href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com" 
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-16 h-16 rounded-full bg-cream flex items-center justify-center text-navy shadow-inner group-hover:bg-blue-accent/10 transition-colors"
+                    className="w-16 h-16 rounded-2xl bg-cream flex items-center justify-center text-navy shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:bg-blue-accent transition-all duration-300 group-hover:text-white shrink-0 group-hover:scale-110"
                   >
                     <Mail size={24} />
                   </a>
@@ -529,46 +576,55 @@ export default function LandingPage() {
                     href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xl text-navy/70 hover:text-blue-accent transition-colors"
+                    className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors break-all"
                   >
                     ecole.el.nadjah.mosta.27@gmail.com
                   </a>
-                </div>
+                </motion.div>
               </div>
               
-              <a 
-                href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block mt-16 h-80 bg-gray-50 rounded-3xl border border-gray-100 flex items-center justify-center overflow-hidden hover:border-blue-accent/50 transition-all group relative shadow-2xl"
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="mt-16"
               >
-                  <div className="absolute inset-0 z-0">
-                    <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1632.748!2d0.089!3d35.930!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1282036a050e3715%3A0xdc2a35b12a46b33f!2s%C3%A9cole%20el%20nadjah!5e1!3m2!1sfr!2sdz!4v1714821000000!5m2!1sfr!2sdz"
-                      className="w-full h-full border-0 pointer-events-none scale-125"
-                      style={{ filter: 'contrast(1.1) brightness(0.9)' }}
-                      title={t('school_name')}
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-navy/20 group-hover:bg-transparent transition-colors duration-500"></div>
-                  
-                  <div className="text-center group-hover:opacity-0 transition-opacity relative z-10 px-6 pointer-events-none">
-                    <div className="w-20 h-20 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
-                      <MapPin size={40} className="text-blue-accent" />
+                <a 
+                  href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-96 bg-gray-50 rounded-[2.5rem] border border-gray-100 flex items-center justify-center overflow-hidden hover:border-blue-accent/30 transition-all group relative shadow-2xl"
+                >
+                    <div className="absolute inset-0 z-0 scale-110 group-hover:scale-125 transition-transform duration-1000">
+                      <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1632.748!2d0.089!3d35.930!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1282036a050e3715%3A0xdc2a35b12a46b33f!2s%C3%A9cole%20el%20nadjah!5e1!3m2!1sfr!2sdz!4v1714821000000!5m2!1sfr!2sdz"
+                        className="w-full h-full border-0 pointer-events-none"
+                        style={{ filter: 'contrast(1.1) brightness(0.9) saturate(0.8)' }}
+                        title={t('school_name')}
+                        loading="lazy"
+                      />
                     </div>
-                    <div className="font-serif text-white font-bold uppercase tracking-widest text-2xl drop-shadow-xl">
-                       {t('view_google_maps')}
+                    <div className="absolute inset-0 bg-navy/30 group-hover:bg-navy/10 transition-colors duration-500"></div>
+                    
+                    <div className="text-center group-hover:opacity-0 transition-opacity relative z-10 px-6 pointer-events-none">
+                      <div className="w-24 h-24 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_15px_35px_rgba(0,0,0,0.1)]">
+                        <MapPin size={48} className="text-blue-accent animate-bounce" />
+                      </div>
+                      <div className="font-serif text-white font-bold uppercase tracking-[0.2em] text-2xl drop-shadow-2xl">
+                         {t('view_google_maps')}
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className={cn(
-                    "absolute bottom-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-xs font-bold text-navy uppercase tracking-widest z-10 transition-transform hover:scale-105 shadow-lg",
-                    isAr ? "left-6" : "right-6"
-                  )}>
-                    {t('open_maps_app')}
-                  </div>
-              </a>
-            </div>
+                    
+                    <div className={cn(
+                      "absolute bottom-8 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-2xl text-xs font-bold text-navy uppercase tracking-widest z-10 transition-all hover:scale-105 shadow-xl border border-white/20",
+                      isAr ? "left-8" : "right-8"
+                    )}>
+                      {t('open_maps_app')}
+                    </div>
+                </a>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
