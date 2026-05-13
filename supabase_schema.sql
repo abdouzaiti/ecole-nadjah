@@ -34,8 +34,8 @@ CREATE TABLE year_subjects (
 );
 
 -- 5. Registration Requests (Account Access)
-CREATE TABLE registration_requests (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS registration_requests (
+    id UUID PRIMARY KEY,
     full_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT,
@@ -48,6 +48,50 @@ CREATE TABLE registration_requests (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- REPAIR SCRIPT (Run this in Supabase SQL Editor if you see column errors)
+DO $$ 
+BEGIN
+    -- Add level_id if missing
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='level_id') THEN
+        ALTER TABLE registration_requests ADD COLUMN level_id UUID REFERENCES levels(id);
+    ELSE
+        -- If it exists as TEXT, try to convert it to UUID if it's formatted as such
+        -- Safe check to avoid failing if it's not a UUID
+        BEGIN
+            ALTER TABLE registration_requests ALTER COLUMN level_id TYPE UUID USING level_id::UUID;
+            ALTER TABLE registration_requests ADD CONSTRAINT fk_reg_level FOREIGN KEY (level_id) REFERENCES levels(id);
+        EXCEPTION WHEN others THEN
+            RAISE NOTICE 'Could not convert level_id to UUID or add constraint';
+        END;
+    END IF;
+
+    -- Add subject_name if missing
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='subject_name') THEN
+        ALTER TABLE registration_requests ADD COLUMN subject_name TEXT;
+    END IF;
+
+    -- Add parent_phone if missing
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='parent_phone') THEN
+        ALTER TABLE registration_requests ADD COLUMN parent_phone TEXT;
+    END IF;
+
+    -- Handle moving target_year_id to year_id safely
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='target_year_id') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='year_id') THEN
+            ALTER TABLE registration_requests RENAME COLUMN target_year_id TO year_id;
+        ELSE
+            -- Both exist? migrate then drop
+            UPDATE registration_requests SET year_id = target_year_id WHERE year_id IS NULL AND target_year_id IS NOT NULL;
+            ALTER TABLE registration_requests DROP COLUMN target_year_id;
+        END IF;
+    END IF;
+
+    -- Ensure year_id exists
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='year_id') THEN
+        ALTER TABLE registration_requests ADD COLUMN year_id UUID REFERENCES years(id);
+    END IF;
+END $$;
 
 -- 6. Enrollment Requests (Existing students adding new subjects)
 CREATE TABLE enrollment_requests (

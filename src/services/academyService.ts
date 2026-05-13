@@ -83,7 +83,8 @@ export const academyService = {
       .from('registration_requests')
       .select(`
         *,
-        years (name)
+        years (name),
+        levels (name)
       `)
       .eq('status', 'PENDING');
 

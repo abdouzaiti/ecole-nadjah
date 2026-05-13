@@ -60,6 +60,7 @@ export default function RegistrationPage() {
     
     try {
       // 1. Sign up user in Supabase Auth
+      console.log('Attempting auth signUp for:', data.email);
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: data.email as string,
         password: data.password as string,
@@ -74,29 +75,48 @@ export default function RegistrationPage() {
       if (signUpError) {
         if (signUpError.message.includes('User already registered') || signUpError.status === 400) {
           setError(isAr ? "هذا الحساب موجود بالفعل. يرجى تسجيل الدخول." : "This email is already registered. Please login instead.");
+          setLoading(false);
           return;
         }
         throw signUpError;
       }
       if (!authData.user) throw new Error('Signup failed');
+      console.log('Auth signUp success, user ID:', authData.user.id);
 
       // 2. Insert into registration_requests for admin approval
+      // We build the object dynamically to avoid sending nulls for columns that might not exist yet
+      const requestPayload: any = {
+        id: authData.user.id,
+        full_name: data.username,
+        email: data.email,
+        phone: data.phone,
+        role: role.toUpperCase(),
+        status: 'PENDING'
+      };
+
+      if (selectedLevel) requestPayload.level_id = selectedLevel;
+      if (selectedYear) requestPayload.year_id = selectedYear;
+      if (data.subject) requestPayload.subject_name = data.subject;
+      if (data.parentPhone) requestPayload.parent_phone = data.parentPhone;
+
+      console.log('Inserting registration request:', requestPayload);
       const { error: requestError } = await supabase
         .from('registration_requests')
-        .insert([{
-          id: authData.user.id,
-          full_name: data.username,
-          email: data.email,
-          phone: data.phone,
-          parent_phone: data.parentPhone || null,
-          role: role.toUpperCase(),
-          level_id: selectedLevel || null,
-          year_id: selectedYear || null,
-          subject_name: data.subject || null,
-          status: 'PENDING'
-        }]);
+        .insert([requestPayload]);
 
-      if (requestError) throw requestError;
+      if (requestError) {
+        console.error('Error inserting into registration_requests:', requestError);
+        // If it fails with column not found, we advise the user but the account IS created
+        if (requestError.message.includes('column') || requestError.message.includes('cache')) {
+          setError(isAr ? "حدث خطأ في قاعدة البيانات (عمود مفقود). يرجى الاتصال بالمسؤول." : "Database schema error (missing columns). Please run the SQL migration.");
+        } else {
+          setError(requestError.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      console.log('Registration request inserted successfully');
 
       // WhatsApp message (Keeping it as requested for multi-channel notification)
       const whatsappNumber = "213790356012";

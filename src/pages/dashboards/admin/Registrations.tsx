@@ -141,14 +141,27 @@ export default function Registrations() {
                       className="hover:bg-gray-50/50 transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <div className="font-bold text-navy">
-                          {activeTab === 'ACCOUNTS' ? reg.full_name : (reg.student_id ? 'Student ID: ' + reg.student_id.slice(0, 8) : 'Unknown')}
+                        <div className="flex flex-col gap-1">
+                          <div className="font-bold text-navy">
+                            {activeTab === 'ACCOUNTS' ? reg.full_name : (reg.student_id ? 'Student' : 'Unknown')}
+                          </div>
+                          <div className="text-[10px] text-navy/40 font-mono">{reg.email || reg.id}</div>
+                          {activeTab === 'ACCOUNTS' && (
+                            <div className="mt-1">
+                              <Badge variant={reg.role === 'ADMIN' ? 'navy' : reg.role === 'TEACHER' ? 'accent' : 'green'}>
+                                {reg.role}
+                              </Badge>
+                            </div>
+                          )}
                         </div>
-                        <div className="text-[10px] text-navy/40 font-mono">{reg.email || reg.id}</div>
                       </td>
                       <td className="px-6 py-4">
                         {activeTab === 'ACCOUNTS' ? (
-                          <Badge variant="accent">{reg.years?.name || 'N/A'}</Badge>
+                          <div className="flex flex-col gap-1">
+                             <Badge variant="accent">{reg.levels?.name || reg.level_id || 'N/A'}</Badge>
+                             {reg.years?.name && <span className="text-[10px] text-navy/40">{reg.years.name}</span>}
+                             {reg.subject_name && <span className="text-[10px] text-blue-accent font-bold uppercase">{reg.subject_name}</span>}
+                          </div>
                         ) : (
                           <div className="flex flex-col">
                             <Badge variant="green">{reg.year_subjects?.subjects?.name}</Badge>
