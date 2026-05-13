@@ -19,12 +19,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check active sessions and sets the user
     const initializeAuth = async () => {
-      // Don't overwrite debug session
-      if (user?.id === 'debug-admin-id') {
-        setLoading(false);
-        return;
-      }
-
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
@@ -39,9 +33,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Skip if in debug mode
-      if (user?.id === 'debug-admin-id') return;
-
       if (session) {
         await fetchUserData(session.user.id, session.user.email || '');
       } else {
@@ -51,12 +42,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [user?.id]);
+  }, []);
 
   const fetchUserData = async (userId: string, email: string) => {
     try {
-      // Use centralized profiles table
-      const { data: profile, error: profileError } = await supabase
+      // 1. Try to fetch from modern profiles table
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -70,18 +61,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: (profile.role as UserRole) || 'GUEST',
           avatar: profile.avatar_url
         });
-      } else {
-        // Fallback if profile doesn't exist yet
-        setUser({
-          id: userId,
-          name: 'Pending User',
-          email: email,
-          role: 'GUEST'
-        });
+        return;
       }
+
+      // 2. Fallback: Check legacy tables for existing users
+      const { data: teacher } = await supabase.from('teachers').select('*').eq('id', userId).single();
+      if (teacher) {
+        setUser({ id: userId, name: teacher.name, email, role: 'TEACHER', avatar: teacher.avatar });
+        return;
+      }
+
+      const { data: student } = await supabase.from('students').select('*').eq('id', userId).single();
+      if (student) {
+        setUser({ id: userId, name: student.name, email, role: 'STUDENT', avatar: student.avatar });
+        return;
+      }
+
+      // 3. Fallback: Check admins table
+      const { data: admin } = await supabase.from('admins').select('name').eq('id', userId).single();
+      if (admin) {
+        setUser({ id: userId, name: admin.name, email, role: 'ADMIN' });
+        return;
+      }
+
+      // 4. Default to GUEST if no profile/legacy data found
+      setUser({
+        id: userId,
+        name: 'Pending User',
+        email: email,
+        role: 'GUEST'
+      });
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      setUser(null);
+      // Even on error, we might be a GUEST if the session is valid but tables are missing
+      setUser({
+        id: userId,
+        name: 'Guest User',
+        email: email,
+        role: 'GUEST'
+      });
     } finally {
       setLoading(false);
     }
@@ -93,13 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const debugAdminLogin = () => {
+    setLoading(true);
     setUser({
       id: 'debug-admin-id',
       name: 'Temporary Admin (Debug)',
       email: 'admin@debug.com',
       role: 'ADMIN'
     });
-    setLoading(false);
+    setTimeout(() => setLoading(false), 500);
   };
 
   return (

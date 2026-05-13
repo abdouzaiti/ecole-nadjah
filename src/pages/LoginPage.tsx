@@ -41,6 +41,7 @@ export default function LoginPage() {
 
       if (signInError) throw signInError;
       
+      setLoading(false);
     } catch (err: any) {
       console.error('Login error:', err);
       let errorMessage = err.message || 'Authentication failed';
