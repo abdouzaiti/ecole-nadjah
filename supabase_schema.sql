@@ -39,7 +39,7 @@ CREATE TABLE registration_requests (
     full_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT,
-    role TEXT CHECK (role IN ('STUDENT', 'TEACHER')),
+    role TEXT CHECK (role IN ('STUDENT', 'TEACHER', 'ADMIN')),
     target_year_id UUID REFERENCES years(id),
     status TEXT DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -135,4 +135,4 @@ CREATE TABLE admins (
 );
 
 ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
-CREATE POLICY admin_read_all ON admins FOR SELECT USING (EXISTS (SELECT 1 FROM admins WHERE id = auth.uid()));
+CREATE POLICY "Public profiles are viewable by everyone" ON admins FOR SELECT USING (true);
