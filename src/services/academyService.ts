@@ -130,15 +130,20 @@ export const academyService = {
       const tableName = request.role === 'TEACHER' ? 'teachers' : 
                         request.role === 'ADMIN' ? 'admins' : 'students';
       
+      const profileData: any = {
+        id: requestId, // Uses the same UUID from Auth
+        name: request.full_name,
+        email: request.email,
+        phone: request.phone,
+      };
+
+      if (request.role === 'STUDENT') {
+        profileData.year_id = request.year_id || null;
+      }
+      
       const { error: profileError } = await supabase
         .from(tableName)
-        .insert([{
-          id: requestId, // Uses the same UUID from Auth
-          name: request.full_name,
-          email: request.email,
-          phone: request.phone,
-          ...(request.role === 'STUDENT' ? { year_id: request.year_id || null } : {}),
-        }]);
+        .insert([profileData]);
 
       if (profileError) {
          console.error(`Error creating ${tableName} profile:`, profileError);

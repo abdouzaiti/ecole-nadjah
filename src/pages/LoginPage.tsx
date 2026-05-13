@@ -47,6 +47,10 @@ export default function LoginPage() {
       
       if (errorMessage.includes('fetch')) {
         errorMessage = isAr ? "فشل الاتصال بـ Supabase. يرجى التحقق من إعدادات المفاتيح (API Keys)." : "Failed to connect to Supabase. Please check your API Keys in settings.";
+      } else if (errorMessage.toLowerCase().includes('invalid login credentials')) {
+        errorMessage = isAr ? "بيانات الدخول غير صحيحة. تأكد من البريد الإلكتروني وكلمة المرور." : "Invalid email or password. Please try again.";
+      } else if (errorMessage.toLowerCase().includes('email not confirmed')) {
+        errorMessage = isAr ? "يرجى تأكيد بريدك الإلكتروني أولاً." : "Please confirm your email address before logging in.";
       }
       
       setError(errorMessage);

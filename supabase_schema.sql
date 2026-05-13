@@ -129,10 +129,12 @@ CREATE POLICY public_read_year_subjects ON year_subjects FOR SELECT TO authentic
 -- 11. Admins
 CREATE TABLE admins (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    full_name TEXT NOT NULL,
+    name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
+    phone TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public profiles are viewable by everyone" ON admins FOR SELECT USING (true);
+CREATE POLICY "Admins are viewable by everyone" ON admins FOR SELECT USING (true);
+CREATE POLICY "Admins can update themselves" ON admins FOR UPDATE USING (auth.uid() = id);

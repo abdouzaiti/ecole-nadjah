@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (adminData) {
         setUser({
           id: userId,
-          name: adminData.full_name,
+          name: adminData.name,
           email: email,
           role: 'ADMIN'
         });
