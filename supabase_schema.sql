@@ -39,8 +39,11 @@ CREATE TABLE registration_requests (
     full_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT,
+    parent_phone TEXT,
     role TEXT CHECK (role IN ('STUDENT', 'TEACHER', 'ADMIN')),
-    target_year_id UUID REFERENCES years(id),
+    level_id TEXT,
+    year_id UUID REFERENCES years(id),
+    subject_name TEXT,
     status TEXT DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

@@ -19,11 +19,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check active sessions and sets the user
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        await fetchUserData(session.user.id, session.user.email || '');
-      } else {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session retrieval error:', error);
+          if (error.message.includes('Refresh Token Not Found') || error.message.includes('invalid_grant')) {
+            console.warn('Session is invalid, forcing sign out...');
+            await supabase.auth.signOut();
+          }
+        }
+
+        if (session) {
+          await fetchUserData(session.user.id, session.user.email || '');
+        } else {
+          setUser(null);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Auth initialization caught error:', err);
         setUser(null);
         setLoading(false);
       }
@@ -33,6 +47,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change event:', event);
+      
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       if (session) {
         await fetchUserData(session.user.id, session.user.email || '');
       } else {
@@ -45,62 +67,122 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchUserData = async (userId: string, email: string) => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    
+    console.log('--- START fetchUserData ---');
+    console.log('User ID:', userId);
+    console.log('Email:', email);
+    
+    setLoading(true);
+    
+    // Failsafe timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn('fetchUserData failsafe timeout!');
+      setLoading(false);
+    }, 10000);
+
     try {
-      // 1. Try to fetch from modern profiles table
+      // 1. Try profiles table
+      console.log('Step 1: Profiles table check');
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-      if (profile) {
+      if (profile && profile.role && profile.role !== 'GUEST') {
+        console.log('Success: Found in profiles', profile.role);
         setUser({
           id: userId,
-          name: profile.name || 'User',
+          name: profile.name || email.split('@')[0],
           email: email,
-          role: (profile.role as UserRole) || 'GUEST',
+          role: profile.role as UserRole,
           avatar: profile.avatar_url
         });
         return;
       }
 
-      // 2. Fallback: Check legacy tables for existing users
-      const { data: teacher } = await supabase.from('teachers').select('*').eq('id', userId).single();
+      // 2. Fallback: Teachers
+      console.log('Step 2: Teachers table check');
+      const { data: teacher } = await supabase
+        .from('teachers')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      
       if (teacher) {
-        setUser({ id: userId, name: teacher.name, email, role: 'TEACHER', avatar: teacher.avatar });
+        console.log('Success: Found in teachers');
+        setUser({
+          id: userId,
+          name: teacher.name,
+          email: email,
+          role: 'TEACHER',
+          avatar: teacher.avatar
+        });
         return;
       }
 
-      const { data: student } = await supabase.from('students').select('*').eq('id', userId).single();
+      // 3. Fallback: Students
+      console.log('Step 3: Students table check');
+      const { data: student } = await supabase
+        .from('students')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      
       if (student) {
-        setUser({ id: userId, name: student.name, email, role: 'STUDENT', avatar: student.avatar });
+        console.log('Success: Found in students');
+        setUser({
+          id: userId,
+          name: student.name,
+          email: email,
+          role: 'STUDENT',
+          avatar: student.avatar
+        });
         return;
       }
 
-      // 3. Fallback: Check admins table
-      const { data: admin } = await supabase.from('admins').select('name').eq('id', userId).single();
+      // 4. Fallback: Admins
+      console.log('Step 4: Admins table check');
+      const { data: admin } = await supabase
+        .from('admins')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      
       if (admin) {
-        setUser({ id: userId, name: admin.name, email, role: 'ADMIN' });
+        console.log('Success: Found in admins');
+        setUser({
+          id: userId,
+          name: admin.name,
+          email: email,
+          role: 'ADMIN'
+        });
         return;
       }
 
-      // 4. Default to GUEST if no profile/legacy data found
+      // 5. Default GUEST
+      console.log('Final fallback: Guest');
       setUser({
         id: userId,
-        name: 'Pending User',
+        name: profile?.name || email.split('@')[0] || 'User',
         email: email,
         role: 'GUEST'
       });
     } catch (error) {
-      console.error('Error fetching user profile:', error);
-      // Even on error, we might be a GUEST if the session is valid but tables are missing
+      console.error('fetchUserData error:', error);
       setUser({
         id: userId,
-        name: 'Guest User',
+        name: 'User',
         email: email,
         role: 'GUEST'
       });
     } finally {
+      console.log('--- END fetchUserData ---');
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };

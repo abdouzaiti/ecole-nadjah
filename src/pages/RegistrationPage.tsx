@@ -12,11 +12,43 @@ export default function RegistrationPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [role, setRole] = useState<'student' | 'teacher' | 'admin'>('student');
+  const [dbLevels, setDbLevels] = useState<any[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string>('');
   const [selectedStream, setSelectedStream] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
   const { t, i18n } = useTranslation();
+
+  React.useEffect(() => {
+    const fetchLevels = async () => {
+      try {
+        const { data, error } = await supabase.from('levels').select('*, years(*)');
+        if (error) throw error;
+        setDbLevels(data || []);
+      } catch (err) {
+        console.error('Error fetching levels:', err);
+      }
+    };
+    fetchLevels();
+  }, []);
   const isAr = i18n.language === 'ar';
+
+  const getLevelKey = (id: string) => {
+    const level = dbLevels.find(l => l.id === id);
+    if (!level) return '';
+    const name = level.name.toLowerCase();
+    if (name.includes('prim')) return 'primary';
+    if (name.includes('moy') || name.includes('mid') || name.includes('middle')) return 'middle';
+    if (name.includes('lyc') || name.includes('high')) return 'high';
+    if (name.includes('form')) return 'formation';
+    return '';
+  };
+
+  const getYearName = (id: string) => {
+    const level = dbLevels.find(l => l.id === selectedLevel);
+    if (!level || !level.years) return '';
+    const year = level.years.find((y: any) => y.id === id);
+    return year ? year.name : '';
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,14 +84,14 @@ export default function RegistrationPage() {
       const { error: requestError } = await supabase
         .from('registration_requests')
         .insert([{
-          id: authData.user.id, // Link to auth user
+          id: authData.user.id,
           full_name: data.username,
           email: data.email,
           phone: data.phone,
           parent_phone: data.parentPhone || null,
           role: role.toUpperCase(),
-          level_id: data.level,
-          year_id: data.year || null,
+          level_id: selectedLevel || null,
+          year_id: selectedYear || null,
           subject_name: data.subject || null,
           status: 'PENDING'
         }]);
@@ -70,12 +102,18 @@ export default function RegistrationPage() {
       const whatsappNumber = "213790356012";
       let message = "";
       
+      const levelName = dbLevels.find(l => l.id === selectedLevel)?.name || '';
+      const yearName = getYearName(selectedYear);
+
       if (role === 'teacher') {
         message = `*Nouveau Dossier d'Enseignant - École Nadjah*\n\n` +
                   `👤 *Nom:* ${data.username}\n` +
                   `📧 *Email:* ${data.email}\n` +
                   `📱 *Téléphone:* ${data.phone}\n` +
-                  `👨‍🏫 *Role:* Enseignant`;
+                  `👨‍🏫 *Role:* Enseignant\n` +
+                  `📚 *Niveau:* ${levelName}\n` +
+                  `📅 *Année:* ${yearName}\n` +
+                  `📖 *Matière:* ${data.subject}`;
       } else if (role === 'admin') {
         message = `*Nouveau Dossier d'Administrateur - École Nadjah*\n\n` +
                   `👤 *Nom:* ${data.username}\n` +
@@ -87,7 +125,9 @@ export default function RegistrationPage() {
                   `👤 *Nom:* ${data.username}\n` +
                   `📧 *Email:* ${data.email}\n` +
                   `📱 *Téléphone:* ${data.phone}\n` +
-                  `👨‍👩‍👧‍👦 *Parent:* ${data.parentPhone}\n`;
+                  `👨‍👩‍👧‍👦 *Parent:* ${data.parentPhone}\n` +
+                  `📚 *Niveau:* ${levelName}\n` +
+                  `📅 *Année:* ${yearName}`;
       }
 
       const encodedMessage = encodeURIComponent(message);
@@ -121,10 +161,13 @@ export default function RegistrationPage() {
   ];
 
   const subjectsByContext = () => {
-    if (!selectedLevel) return [];
+    const levelKey = getLevelKey(selectedLevel);
+    if (!levelKey) return [];
+    
+    const yearName = getYearName(selectedYear);
 
-    if (selectedLevel === 'primary') {
-      if (['1', '2'].includes(selectedYear)) {
+    if (levelKey === 'primary') {
+      if (['1', '2'].includes(yearName)) {
         return [
           { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
           { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
@@ -149,7 +192,7 @@ export default function RegistrationPage() {
       ];
     }
 
-    if (selectedLevel === 'middle') {
+    if (levelKey === 'middle') {
       return [
         { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
         { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
@@ -166,8 +209,8 @@ export default function RegistrationPage() {
       ];
     }
 
-    if (selectedLevel === 'high') {
-      if (selectedYear === '1') {
+    if (levelKey === 'high') {
+      if (yearName === '1') {
         if (selectedStream === 'science') {
           return [
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
@@ -196,7 +239,7 @@ export default function RegistrationPage() {
             { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ];
         }
-      } else if (['2', '3'].includes(selectedYear)) {
+      } else if (['2', '3'].includes(yearName)) {
         const branchSubjects: Record<string, any[]> = {
           exp_science: [
             { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
@@ -475,7 +518,7 @@ export default function RegistrationPage() {
                               className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
                             >
                               <option value="" disabled>{t('auth.registration.select_level')}</option>
-                              {levels.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
+                              {dbLevels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                             </select>
                           </div>
                         </div>
@@ -496,8 +539,8 @@ export default function RegistrationPage() {
                                 className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
                               >
                                 <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
-                                {getYearsForLevel(selectedLevel).map(y => (
-                                  <option key={y} value={y}>{y}</option>
+                                {dbLevels.find(l => l.id === selectedLevel)?.years?.map((y: any) => (
+                                  <option key={y.id} value={y.id}>{y.name}</option>
                                 ))}
                               </select>
                             </div>
@@ -556,7 +599,7 @@ export default function RegistrationPage() {
                             <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                             <select 
                               name="level" 
-                              defaultValue="" 
+                              value={selectedLevel}
                               required 
                               onChange={(e) => {
                                 setSelectedLevel(e.target.value);
@@ -566,7 +609,7 @@ export default function RegistrationPage() {
                               className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
                             >
                               <option value="" disabled>{t('auth.registration.select_level')}</option>
-                              {levels.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
+                              {dbLevels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                             </select>
                           </div>
                         </div>
@@ -587,8 +630,8 @@ export default function RegistrationPage() {
                                 className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
                               >
                                 <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
-                                {getYearsForLevel(selectedLevel).map(y => (
-                                  <option key={y} value={y}>{y}</option>
+                                {dbLevels.find(l => l.id === selectedLevel)?.years?.map((y: any) => (
+                                  <option key={y.id} value={y.id}>{y.name}</option>
                                 ))}
                               </select>
                             </div>
