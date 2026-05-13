@@ -126,8 +126,9 @@ export const academyService = {
       
       if (updateError) throw updateError;
 
-      // 2. Move to target table (Teachers or Students)
-      const tableName = request.role === 'TEACHER' ? 'teachers' : 'students';
+      // 2. Move to target table (Teachers, Students, or Admins)
+      const tableName = request.role === 'TEACHER' ? 'teachers' : 
+                        request.role === 'ADMIN' ? 'admins' : 'students';
       
       const { error: profileError } = await supabase
         .from(tableName)
@@ -136,7 +137,7 @@ export const academyService = {
           name: request.full_name,
           email: request.email,
           phone: request.phone,
-          year_id: request.year_id || null, // For students
+          ...(request.role === 'STUDENT' ? { year_id: request.year_id || null } : {}),
         }]);
 
       if (profileError) {

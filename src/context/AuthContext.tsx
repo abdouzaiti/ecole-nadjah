@@ -81,29 +81,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Check for Admin (this usually comes from a dedicated table or metadata)
+      // Check for Admin
       const { data: adminData } = await supabase
-        .from('profiles')
+        .from('admins')
         .select('*')
         .eq('id', userId)
         .single();
 
-      if (adminData && adminData.role === 'ADMIN') {
+      if (adminData) {
         setUser({
           id: userId,
-          name: adminData.full_name || 'Admin',
+          name: adminData.full_name,
           email: email,
           role: 'ADMIN'
         });
-      } else {
-        // If logged in but no approved profile found in students/teachers, treat as guest/pending
-        setUser({
-          id: userId,
-          name: 'Pending User',
-          email: email,
-          role: 'GUEST'
-        });
+        return;
       }
+
+      // If logged in but no approved profile found in students/teachers/admins
+      setUser({
+        id: userId,
+        name: 'Pending User',
+        email: email,
+        role: 'GUEST'
+      });
     } catch (error) {
       console.error('Error fetching user data:', error);
       setUser(null);

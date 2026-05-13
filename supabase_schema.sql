@@ -125,3 +125,14 @@ CREATE POLICY public_read_subjects ON subjects FOR SELECT TO authenticated USING
 
 ALTER TABLE year_subjects ENABLE ROW LEVEL SECURITY;
 CREATE POLICY public_read_year_subjects ON year_subjects FOR SELECT TO authenticated USING (true);
+
+-- 11. Admins
+CREATE TABLE admins (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    full_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
+CREATE POLICY admin_read_all ON admins FOR SELECT USING (EXISTS (SELECT 1 FROM admins WHERE id = auth.uid()));

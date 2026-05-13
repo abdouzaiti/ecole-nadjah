@@ -11,7 +11,7 @@ export default function RegistrationPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [role, setRole] = useState<'student' | 'teacher'>('student');
+  const [role, setRole] = useState<'student' | 'teacher' | 'admin'>('student');
   const [selectedLevel, setSelectedLevel] = useState<string>('');
   const [selectedStream, setSelectedStream] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
@@ -39,7 +39,13 @@ export default function RegistrationPage() {
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        if (signUpError.message.includes('User already registered') || signUpError.status === 400) {
+          setError(isAr ? "هذا الحساب موجود بالفعل. يرجى تسجيل الدخول." : "This email is already registered. Please login instead.");
+          return;
+        }
+        throw signUpError;
+      }
       if (!authData.user) throw new Error('Signup failed');
 
       // 2. Insert into registration_requests for admin approval
@@ -70,6 +76,12 @@ export default function RegistrationPage() {
                   `📧 *Email:* ${data.email}\n` +
                   `📱 *Téléphone:* ${data.phone}\n` +
                   `👨‍🏫 *Role:* Enseignant`;
+      } else if (role === 'admin') {
+        message = `*Nouveau Dossier d'Administrateur - École Nadjah*\n\n` +
+                  `👤 *Nom:* ${data.username}\n` +
+                  `📧 *Email:* ${data.email}\n` +
+                  `📱 *Téléphone:* ${data.phone}\n` +
+                  `🛡️ *Role:* Admin`;
       } else {
         message = `*Nouveau Dossier d'Élève - École Nadjah*\n\n` +
                   `👤 *Nom:* ${data.username}\n` +
@@ -363,6 +375,17 @@ export default function RegistrationPage() {
                   <BookOpen size={18} />
                   {t('auth.registration.i_am_teacher')}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('admin')}
+                  className={cn(
+                    "flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all",
+                    role === 'admin' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60"
+                  )}
+                >
+                  <ShieldCheck size={18} />
+                  {t('auth.roles.admin') || 'Admin'}
+                </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -370,10 +393,17 @@ export default function RegistrationPage() {
                   <motion.div 
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 text-sm"
+                    className="p-4 bg-red-50 border border-red-100 rounded-xl flex flex-col gap-2 text-red-600 text-sm"
                   >
-                    <AlertCircle size={18} />
-                    {error}
+                    <div className="flex items-center gap-3">
+                      <AlertCircle size={18} />
+                      {error}
+                    </div>
+                    {error.includes('registered') && (
+                      <Link to="/login" className="text-blue-600 font-bold hover:underline px-7">
+                        {isAr ? "انتقل إلى صفحة تسجيل الدخول" : "Go to login page"} &rarr;
+                      </Link>
+                    )}
                   </motion.div>
                 )}
 
@@ -383,9 +413,13 @@ export default function RegistrationPage() {
                       <>
                         <User size={20} className="text-blue-accent" /> {t('auth.registration.student_info')}
                       </>
-                    ) : (
+                    ) : role === 'teacher' ? (
                       <>
                         <ShieldCheck size={20} className="text-blue-accent" /> {t('auth.registration.teacher_info')}
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck size={20} className="text-blue-accent" /> {t('auth.roles.admin') || 'Admin'}
                       </>
                     )}
                   </h3>
