@@ -126,15 +126,38 @@ CREATE POLICY public_read_subjects ON subjects FOR SELECT TO authenticated USING
 ALTER TABLE year_subjects ENABLE ROW LEVEL SECURITY;
 CREATE POLICY public_read_year_subjects ON year_subjects FOR SELECT TO authenticated USING (true);
 
--- 11. Admins
-CREATE TABLE admins (
+-- 11. Profiles (Centralized user data)
+CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    name TEXT,
+    email TEXT,
     phone TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    role TEXT CHECK (role IN ('STUDENT', 'TEACHER', 'ADMIN', 'GUEST')) DEFAULT 'GUEST',
+    avatar_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Admins are viewable by everyone" ON admins FOR SELECT USING (true);
-CREATE POLICY "Admins can update themselves" ON admins FOR UPDATE USING (auth.uid() = id);
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Profiles are viewable by authenticated users (to see teachers/admins)
+CREATE POLICY "Profiles are viewable by everyone" ON profiles
+    FOR SELECT TO authenticated USING (true);
+
+-- Users can only update their own profile
+CREATE POLICY "Users can update own profile" ON profiles
+    FOR UPDATE USING (auth.uid() = id);
+
+-- 12. Trigger for automatic profile creation
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, name, role)
+  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', 'GUEST');
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

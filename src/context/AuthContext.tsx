@@ -7,6 +7,7 @@ interface AuthContextType {
   loading: boolean;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
+  debugAdminLogin?: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,6 +19,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check active sessions and sets the user
     const initializeAuth = async () => {
+      // Don't overwrite debug session
+      if (user?.id === 'debug-admin-id') {
+        setLoading(false);
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
@@ -32,6 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Skip if in debug mode
+      if (user?.id === 'debug-admin-id') return;
+
       if (session) {
         await fetchUserData(session.user.id, session.user.email || '');
       } else {
@@ -41,75 +51,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [user?.id]);
 
   const fetchUserData = async (userId: string, email: string) => {
     try {
-      // First check if it's a teacher
-      const { data: teacherData } = await supabase
-        .from('teachers')
+      // Use centralized profiles table
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
-      if (teacherData) {
+      if (profile) {
         setUser({
           id: userId,
-          name: teacherData.name,
+          name: profile.name || 'User',
           email: email,
-          role: 'TEACHER',
-          avatar: teacherData.avatar
+          role: (profile.role as UserRole) || 'GUEST',
+          avatar: profile.avatar_url
         });
-        return;
-      }
-
-      // Then check if it's a student
-      const { data: studentData } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (studentData) {
+      } else {
+        // Fallback if profile doesn't exist yet
         setUser({
           id: userId,
-          name: studentData.name,
+          name: 'Pending User',
           email: email,
-          role: 'STUDENT',
-          avatar: studentData.avatar
+          role: 'GUEST'
         });
-        return;
       }
-
-      // Check for Admin
-      const { data: adminData } = await supabase
-        .from('admins')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (adminData) {
-        setUser({
-          id: userId,
-          name: adminData.name,
-          email: email,
-          role: 'ADMIN'
-        });
-        return;
-      }
-
-      // If logged in but no approved profile found in students/teachers/admins
-      setUser({
-        id: userId,
-        name: 'Pending User',
-        email: email,
-        role: 'GUEST'
-      });
     } catch (error) {
-      console.error('Error fetching user data from Supabase:', error);
-      if (error instanceof Error && error.message.includes('fetch')) {
-         console.warn('Network error: Please verify your Supabase URL and Key in the Settings menu.');
-      }
+      console.error('Error fetching user profile:', error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -121,8 +92,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const debugAdminLogin = () => {
+    setUser({
+      id: 'debug-admin-id',
+      name: 'Temporary Admin (Debug)',
+      email: 'admin@debug.com',
+      role: 'ADMIN'
+    });
+    setLoading(false);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, logout, isAuthenticated: !!user && user.role !== 'GUEST' }}>
+    <AuthContext.Provider value={{ user, loading, logout, isAuthenticated: !!user, debugAdminLogin }}>
       {children}
     </AuthContext.Provider>
   );

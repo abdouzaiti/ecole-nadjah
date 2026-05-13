@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { user } = useAuth();
+  const { user, debugAdminLogin } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
@@ -133,6 +133,19 @@ export default function LoginPage() {
             >
               {loading ? <Loader2 className="animate-spin mx-auto" /> : t('auth.login_button')}
             </Button>
+
+            {debugAdminLogin && (
+              <button 
+                type="button" 
+                onClick={() => {
+                  debugAdminLogin();
+                  navigate('/dashboard/admin');
+                }}
+                className="w-full text-xs text-navy/30 hover:text-navy/60 transition-colors pt-4 font-mono text-center block"
+              >
+                [ DEBUG: FORCE ADMIN ACCESS ]
+              </button>
+            )}
           </form>
 
           <p className={cn("text-center mt-8 text-navy/60 text-sm", isAr && "flex flex-row-reverse justify-center gap-2")}>
