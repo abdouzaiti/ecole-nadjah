@@ -386,13 +386,26 @@ export default function RegistrationPage() {
               <CheckCircle size={48} />
             </div>
             <h2 className="text-3xl font-serif text-navy mb-4 font-bold">{t('auth.registration.success_title')}</h2>
-            <p className="text-navy/60 mb-8 leading-relaxed font-sans text-sm">
-              {t('auth.registration.success_message')}
-              <br />
-              <span className="font-bold text-blue-accent mt-2 block">
-                Veuillez finaliser l'envoi de votre message sur WhatsApp si la fenêtre s'est ouverte.
-              </span>
-            </p>
+            <div className="space-y-4 text-navy/60 mb-8 leading-relaxed font-sans text-sm">
+              <p>
+                {isAr 
+                  ? "لقد تم استلام طلبك بنجاح. سنقوم بمراجعة حسابك والرد عليك في أقرب وقت ممكن عبر WhatsApp أو البريد الإلكتروني."
+                  : "Votre demande a été reçue avec succès. Nous allons examiner votre compte et vous répondrons dans les plus brefs délais via WhatsApp ou Email."
+                }
+              </p>
+              <div className="p-4 bg-blue-accent/5 rounded-xl text-blue-accent font-bold">
+                {isAr 
+                  ? "يرجى الانتظار حتى يقوم المدير بتفعيل حسابك."
+                  : "Veuillez patienter jusqu'à ce que l'administrateur active votre compte."
+                }
+              </div>
+              <p className="text-xs italic">
+                {isAr
+                  ? "يرجى التأكد من إرسال الرسالة إلى WhatsApp إذا تم فتح النافذة."
+                  : "Veuillez finaliser l'envoi de votre message sur WhatsApp si la fenêtre s'est ouverte."
+                }
+              </p>
+            </div>
             <Link to="/">
               <Button variant="outline" className="w-full">{t('auth.registration.back_home')}</Button>
             </Link>

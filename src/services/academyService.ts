@@ -140,8 +140,35 @@ export const academyService = {
       if (profileError) {
          console.error(`Error updating profile:`, profileError);
       }
+
+      // 3. Insert into legacy/role-specific tables
+      if (request.role === 'TEACHER') {
+        await supabase.from('teachers').insert([{
+          id: requestId,
+          name: request.full_name,
+          email: request.email,
+          phone: request.phone,
+          subject: request.subject_name
+        }].filter(Boolean));
+      } else if (request.role === 'STUDENT') {
+        await supabase.from('students').insert([{
+          id: requestId,
+          name: request.full_name,
+          email: request.email,
+          phone: request.phone,
+          parent_phone: request.parent_phone,
+          level_id: request.level_id,
+          year_id: request.year_id
+        }].filter(Boolean));
+      } else if (request.role === 'ADMIN') {
+        await supabase.from('admins').insert([{
+          id: requestId,
+          name: request.full_name,
+          email: request.email
+        }].filter(Boolean));
+      }
       
-      // 3. For students, handle bulk enrollment if selections provided
+      // 4. For students, handle bulk enrollment if selections provided
       if (selections?.yearSubjectIds && request.role === 'STUDENT') {
         const enrollments = selections.yearSubjectIds.map((id: string) => ({
           student_id: requestId,

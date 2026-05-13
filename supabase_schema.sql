@@ -174,7 +174,7 @@ ALTER TABLE year_subjects ENABLE ROW LEVEL SECURITY;
 CREATE POLICY public_read_year_subjects ON year_subjects FOR SELECT TO authenticated USING (true);
 
 -- 11. Profiles (Centralized user data)
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     name TEXT,
     email TEXT,
@@ -184,6 +184,49 @@ CREATE TABLE profiles (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- LEGACY/ROLE-SPECIFIC TABLES (Required by some components)
+CREATE TABLE IF NOT EXISTS teachers (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    email TEXT,
+    subject TEXT,
+    phone TEXT,
+    avatar TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS students (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    email TEXT,
+    level_id UUID REFERENCES levels(id),
+    year_id UUID REFERENCES years(id),
+    phone TEXT,
+    parent_phone TEXT,
+    avatar TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS admins (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    email TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RLS for registration_requests
+ALTER TABLE registration_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can create a registration request" ON registration_requests
+    FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can view registration requests" ON registration_requests
+    FOR SELECT TO authenticated USING (
+        EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'ADMIN')
+    );
+CREATE POLICY "Admins can update registration requests" ON registration_requests
+    FOR UPDATE TO authenticated USING (
+        EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'ADMIN')
+    );
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
