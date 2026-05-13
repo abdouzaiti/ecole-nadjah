@@ -4,7 +4,6 @@ import {
   TrendingUp, 
   TrendingDown, 
   Users, 
-  BookOpen, 
   Video, 
   GraduationCap,
   Calendar,
@@ -14,6 +13,7 @@ import { Card, Button } from '../../../components/ui';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../../lib/utils';
+import { supabase } from '../../../lib/supabase';
 import { 
   ResponsiveContainer, 
   AreaChart, 
@@ -23,30 +23,77 @@ import {
   CartesianGrid, 
   Tooltip,
   BarChart,
-  Bar,
-  Cell
+  Bar
 } from 'recharts';
-
-const data = [
-  { name: 'Sep', students: 400, revenue: 2400 },
-  { name: 'Oct', students: 600, revenue: 3500 },
-  { name: 'Nov', students: 800, revenue: 4800 },
-  { name: 'Dec', students: 750, revenue: 4200 },
-  { name: 'Jan', students: 950, revenue: 5800 },
-  { name: 'Feb', students: 1100, revenue: 6500 },
-  { name: 'Mar', students: 1248, revenue: 7200 },
-];
 
 export default function Analytics() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
+  const [stats, setStats] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const stats = [
-    { label: 'Total Revenue', value: '1,248,000 DA', trend: '+12.5%', icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Conversion Rate', value: '64.2%', trend: '+4.3%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Session Duration', value: '42m 15s', trend: '-2.1%', icon: Video, color: 'text-red-600', bg: 'bg-red-50' },
-    { label: 'Teacher Score', value: '4.8/5', trend: '+0.2', icon: GraduationCap, color: 'text-purple-600', bg: 'bg-purple-50' },
-  ];
+  useEffect(() => {
+    fetchAnalytics();
+  }, [i18n.language]);
+
+  async function fetchAnalytics() {
+    setLoading(true);
+    try {
+      // 1. Fetch Key Metrics
+      const [
+        { count: studentCount },
+        { count: teacherCount },
+        { data: coursesData },
+        { count: enrollmentCount },
+        { count: liveCount }
+      ] = await Promise.all([
+        supabase.from('registration_requests').select('*', { count: 'exact', head: true }).eq('role', 'STUDENT').eq('status', 'APPROVED'),
+        supabase.from('registration_requests').select('*', { count: 'exact', head: true }).eq('role', 'TEACHER').eq('status', 'APPROVED'),
+        supabase.from('courses').select('views_count'),
+        supabase.from('enrollment_requests').select('*', { count: 'exact', head: true }).eq('status', 'APPROVED'),
+        supabase.from('lives').select('*', { count: 'exact', head: true })
+      ]);
+
+      const totalViews = coursesData?.reduce((sum, c) => sum + (c.views_count || 0), 0) || 0;
+
+      const dynamicStats = [
+        { label: isAr ? 'إجمالي الطلاب' : 'Total Students', value: (studentCount || 0).toLocaleString(), trend: '+0%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+        { label: isAr ? 'إجمالي الأساتذة' : 'Total Teachers', value: (teacherCount || 0).toLocaleString(), trend: '+0%', icon: GraduationCap, color: 'text-purple-600', bg: 'bg-purple-50' },
+        { label: isAr ? 'مشاهدات الدروس' : 'Course Views', value: totalViews.toLocaleString(), trend: '+0%', icon: Video, color: 'text-green-600', bg: 'bg-green-50' },
+        { label: isAr ? 'الحصص المباشرة' : 'Live Sessions', value: (liveCount || 0).toLocaleString(), trend: '+0%', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-50' },
+      ];
+      setStats(dynamicStats);
+
+      // 2. Prepare Chart Data (Mocking historical data based on current counts for visual effect)
+      const months = isAr 
+        ? ['سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر', 'جانفي', 'فيفري', 'مارس']
+        : ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+      
+      const studentsBase = studentCount || 0;
+      const enrollmentBase = enrollmentCount || 0;
+
+      const preparedData = months.map((month, i) => {
+        const factor = (i + 1) / months.length;
+        return {
+          name: month,
+          students: Math.floor(studentsBase * factor),
+          enrollments: Math.floor(enrollmentBase * factor),
+          revenue: Math.floor(enrollmentBase * factor * 2000) 
+        };
+      });
+      setChartData(preparedData);
+
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-64 text-navy/40 italic font-sans">{isAr ? 'جاري التحميل...' : 'Loading analytics...'}</div>;
+  }
 
   return (
     <div className="space-y-8">
@@ -55,7 +102,7 @@ export default function Analytics() {
           <h2 className="text-2xl font-serif text-navy font-bold">{t('dashboard.admin.sidebar.analytics')}</h2>
           <p className="text-navy/40 text-sm font-sans">{isAr ? 'نظرة شاملة على أداء المنصة' : 'Detailed insights into platform performance'}</p>
         </div>
-        <Button variant="secondary" size="sm" className="flex items-center gap-2">
+        <Button variant="secondary" size="sm" className={cn("flex items-center gap-2", isAr && "flex-row-reverse")}>
           <Calendar size={18} />
           {isAr ? 'آخر 30 يوم' : 'Last 30 Days'}
         </Button>
@@ -76,7 +123,7 @@ export default function Analytics() {
                  </div>
                  <div className={cn("flex items-center gap-1 text-xs font-bold", stat.color)}>
                     {stat.trend}
-                    {stat.label.includes('Duration') ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+                    {stat.trend.startsWith('-') ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
                  </div>
               </div>
               <div className={cn("text-2xl font-bold text-navy", isAr && "text-right")}>{stat.value}</div>
@@ -90,29 +137,39 @@ export default function Analytics() {
         <Card className="p-6">
           <div className={cn("flex justify-between items-center mb-8", isAr && "flex-row-reverse")}>
             <h3 className={cn("font-bold text-navy", isAr ? "text-lg font-serif" : "")}>{isAr ? 'نمو الطلاب والاشتراكات' : 'Student Growth & Enrollment'}</h3>
-            <div className="flex gap-2">
-               <div className="flex items-center gap-2">
+            <div className={cn("flex gap-4", isAr && "flex-row-reverse")}>
+               <div className={cn("flex items-center gap-2", isAr && "flex-row-reverse")}>
                   <div className="w-3 h-3 rounded-full bg-blue-accent" />
-                  <span className="text-xs text-navy/40">Students</span>
+                  <span className="text-xs text-navy/40">{isAr ? 'طلاب' : 'Students'}</span>
+               </div>
+               <div className={cn("flex items-center gap-2", isAr && "flex-row-reverse")}>
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <span className="text-xs text-navy/40">{isAr ? 'اشتراكات' : 'Enrollments'}</span>
                </div>
             </div>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
+              <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorStudents" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.1}/>
                     <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                   </linearGradient>
+                  <linearGradient id="colorEnrollments" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748B' }} reversed={isAr} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748B' }} orientation={isAr ? 'right' : 'left'} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  itemStyle={{ fontSize: '12px' }}
                 />
                 <Area type="monotone" dataKey="students" stroke="#3B82F6" strokeWidth={3} fillOpacity={1} fill="url(#colorStudents)" />
+                <Area type="monotone" dataKey="enrollments" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#colorEnrollments)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -120,15 +177,15 @@ export default function Analytics() {
 
         <Card className="p-6">
           <div className={cn("flex justify-between items-center mb-8", isAr && "flex-row-reverse")}>
-             <h3 className={cn("font-bold text-navy", isAr ? "text-lg font-serif" : "")}>{isAr ? 'الإيرادات الشهرية (DA)' : 'Monthly Revenue (DA)'}</h3>
+             <h3 className={cn("font-bold text-navy", isAr ? "text-lg font-serif" : "")}>{isAr ? 'الإيرادات الشهرية تقديرياً (DA)' : 'Estimated Monthly Revenue (DA)'}</h3>
              <Button variant="ghost" size="sm"><Filter size={16} /></Button>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
+              <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748B' }} reversed={isAr} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748B' }} orientation={isAr ? 'right' : 'left'} />
                 <Tooltip 
                    cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }}
                    contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}

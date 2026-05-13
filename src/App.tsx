@@ -23,7 +23,16 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { BlueBackground } from './components/layout/BlueBackground';
 
 const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-accent border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) return <Navigate to="/login" />;
   if (role && user?.role !== role) return <Navigate to="/" />;
   return <>{children}</>;

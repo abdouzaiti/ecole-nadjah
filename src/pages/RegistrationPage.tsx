@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { Button, Card, Badge } from '../components/ui';
 import { motion } from 'motion/react';
-import { CheckCircle, Info, User, Mail, Phone, Calendar, BookOpen, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Info, User, Mail, Phone, Calendar, BookOpen, ShieldCheck, Lock, Loader2, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
+import { supabase } from '../lib/supabase';
 
 export default function RegistrationPage() {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [role, setRole] = useState<'student' | 'teacher'>('student');
   const [selectedLevel, setSelectedLevel] = useState<string>('');
   const [selectedStream, setSelectedStream] = useState<string>('');
@@ -15,54 +18,77 @@ export default function RegistrationPage() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
     
-    // Constructing WhatsApp message
-    const whatsappNumber = "213790356012";
-    let message = "";
-    
-    if (role === 'teacher') {
-      const levelLabel = levels.find(l => l.key === data.level)?.label || data.level;
-      const subjectsForContext = subjectsByContext();
-      const subjectLabel = subjectsForContext.find((s: any) => s.key === data.subject)?.label || data.subject;
-      const streamLabel = getStreams().find(s => s.key === selectedStream)?.label || "";
-      
-      message = `*Nouveau Dossier d'Enseignant - École Nadjah*\n\n` +
-                `👤 *Nom d'utilisateur:* ${data.username}\n` +
-                `📧 *Email:* ${data.email}\n` +
-                `📱 *Téléphone:* ${data.phone}\n` +
-                `📚 *Niveau d'enseignement:* ${levelLabel}\n` +
-                (selectedYear ? `📅 *Année:* ${selectedYear}\n` : "") +
-                (streamLabel ? `🧬 *الشعبة:* ${streamLabel}\n` : "") +
-                `🧪 *المادة:* ${subjectLabel}\n` +
-                `👨‍🏫 *Rappel:* Inscription en tant qu'enseignant.`;
-    } else {
-      const levelLabel = levels.find(l => l.key === data.level)?.label || data.level;
-      const subjectsForContext = subjectsByContext();
-      const subjectLabel = subjectsForContext.find((s: any) => s.key === data.subject)?.label || data.subject;
-      const streamLabel = getStreams().find(s => s.key === selectedStream)?.label || "";
-      
-      message = `*Nouveau Dossier d'Élève - École Nadjah*\n\n` +
-                `👤 *Nom d'utilisateur:* ${data.username}\n` +
-                `📧 *Email:* ${data.email}\n` +
-                `📱 *Téléphone Élève:* ${data.phone}\n` +
-                `👨‍👩‍👧‍👦 *Téléphone Parent:* ${data.parentPhone}\n` +
-                `📚 *Niveau:* ${levelLabel}\n` +
-                `📅 *Année:* ${data.year}\n` +
-                (streamLabel ? `🧬 *الشعبة:* ${streamLabel}\n` : "") +
-                `🧪 *المادة:* ${subjectLabel}`;
-    }
+    try {
+      // 1. Sign up user in Supabase Auth
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: data.email as string,
+        password: data.password as string,
+        options: {
+          data: {
+            full_name: data.username,
+            role: role.toUpperCase(),
+          }
+        }
+      });
 
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    
-    // Open WhatsApp
-    window.open(whatsappUrl, '_blank');
-    
-    setIsSuccess(true);
+      if (signUpError) throw signUpError;
+      if (!authData.user) throw new Error('Signup failed');
+
+      // 2. Insert into registration_requests for admin approval
+      const { error: requestError } = await supabase
+        .from('registration_requests')
+        .insert([{
+          id: authData.user.id, // Link to auth user
+          full_name: data.username,
+          email: data.email,
+          phone: data.phone,
+          parent_phone: data.parentPhone || null,
+          role: role.toUpperCase(),
+          level_id: data.level,
+          year_id: data.year || null,
+          subject_name: data.subject || null,
+          status: 'PENDING'
+        }]);
+
+      if (requestError) throw requestError;
+
+      // WhatsApp message (Keeping it as requested for multi-channel notification)
+      const whatsappNumber = "213790356012";
+      let message = "";
+      
+      if (role === 'teacher') {
+        message = `*Nouveau Dossier d'Enseignant - École Nadjah*\n\n` +
+                  `👤 *Nom:* ${data.username}\n` +
+                  `📧 *Email:* ${data.email}\n` +
+                  `📱 *Téléphone:* ${data.phone}\n` +
+                  `👨‍🏫 *Role:* Enseignant`;
+      } else {
+        message = `*Nouveau Dossier d'Élève - École Nadjah*\n\n` +
+                  `👤 *Nom:* ${data.username}\n` +
+                  `📧 *Email:* ${data.email}\n` +
+                  `📱 *Téléphone:* ${data.phone}\n` +
+                  `👨‍👩‍👧‍👦 *Parent:* ${data.parentPhone}\n`;
+      }
+
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      window.open(whatsappUrl, '_blank');
+      
+      setIsSuccess(true);
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const levels = [
@@ -340,6 +366,17 @@ export default function RegistrationPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-8">
+                {error && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 text-sm"
+                  >
+                    <AlertCircle size={18} />
+                    {error}
+                  </motion.div>
+                )}
+
                 <div>
                   <h3 className={cn("text-xl font-serif text-navy mb-6 flex items-center gap-2 font-bold", isAr && "flex-row-reverse")}>
                     {role === 'student' ? (
@@ -371,7 +408,15 @@ export default function RegistrationPage() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.phone_number')}</label>
+                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.password_placeholder')}</label>
+                      <div className="relative">
+                        <Lock size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                        <input name="password" type="password" required minLength={6} placeholder="••••••••" className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 md:col-span-2">
+                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.phone_number')}</label>
                       <div className="relative">
                         <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                         <input name="phone" type="tel" placeholder={t('auth.registration.phone_placeholder')} dir="ltr" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
@@ -554,8 +599,13 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                <Button type="submit" variant="navy" className="w-full py-5 text-white font-bold uppercase tracking-[0.2em] shadow-xl shadow-blue-accent/20 bg-blue-accent hover:bg-blue-accent/90">
-                  {t('auth.registration.submit_button')}
+                <Button 
+                  type="submit" 
+                  variant="navy" 
+                  disabled={loading}
+                  className="w-full py-5 text-white font-bold uppercase tracking-[0.2em] shadow-xl shadow-blue-accent/20 bg-blue-accent hover:bg-blue-accent/90"
+                >
+                  {loading ? <Loader2 className="animate-spin mx-auto" /> : t('auth.registration.submit_button')}
                 </Button>
               </form>
             </Card>

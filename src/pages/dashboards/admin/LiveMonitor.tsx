@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Video, 
   Search,
@@ -15,15 +15,29 @@ import { Card, Badge, Button } from '../../../components/ui';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../../lib/utils';
+import { academyService } from '../../../services/academyService';
 
 export default function LiveMonitor() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
+  const [activeSessions, setActiveSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [activeSessions] = useState([
-    { id: 1, teacher: 'Dr. Sarah Amine', subject: 'Mathématiques', level: '3AS', students: 84, duration: '45:12', status: 'LIVE' },
-    { id: 2, teacher: 'Pr. Ahmed K.', subject: 'Physique', level: '2AS', students: 56, duration: '12:05', status: 'LIVE' },
-  ]);
+  useEffect(() => {
+    fetchActiveSessions();
+  }, []);
+
+  async function fetchActiveSessions() {
+    setLoading(true);
+    try {
+      const data = await academyService.fetchLives();
+      setActiveSessions(data?.filter((l: any) => l.is_live) || []);
+    } catch (error) {
+      console.error('Error fetching live sessions:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -69,16 +83,16 @@ export default function LiveMonitor() {
                <div className="p-6 bg-white">
                   <div className={cn("flex justify-between items-start mb-6", isAr && "flex-row-reverse")}>
                      <div className={isAr ? "text-right" : ""}>
-                        <h3 className="font-bold text-navy">{session.teacher}</h3>
-                        <p className="text-blue-accent text-xs font-bold uppercase tracking-widest mt-0.5">{session.subject}</p>
+                        <h3 className="font-bold text-navy">{session.teacher?.name}</h3>
+                        <p className="text-blue-accent text-xs font-bold uppercase tracking-widest mt-0.5">{session.year_subject?.subjects?.name}</p>
                      </div>
-                     <Badge variant="accent">{session.level}</Badge>
+                     <Badge variant="accent">{session.year_subject?.years?.name}</Badge>
                   </div>
 
                   <div className={cn("flex items-center justify-between pt-4 border-t border-gray-50", isAr && "flex-row-reverse")}>
                      <div className={cn("flex items-center gap-2 text-navy/40", isAr && "flex-row-reverse")}>
                         <Users size={16} />
-                        <span className="text-xs font-bold">{session.students} {isAr ? 'تلميذ' : 'Students'}</span>
+                        <span className="text-xs font-bold">{session.viewer_count} {isAr ? 'تلميذ' : 'Students'}</span>
                      </div>
                      <button className="text-blue-accent hover:underline text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                         {isAr ? 'دخول للمراقبة' : 'Join Monitor'}

@@ -7,6 +7,7 @@ export interface User {
   role: UserRole;
   avatar?: string;
   level?: string; // For students
+  yearId?: string; // For students to fetch level subjects
   subject?: string; // For teachers
 }
 

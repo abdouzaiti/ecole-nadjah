@@ -16,51 +16,56 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../../lib/utils';
 import { supabase } from '../../../lib/supabase';
+import { academyService } from '../../../services/academyService';
 
 export default function Registrations() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any[]>([]);
-  const [filter, setFilter] = useState('ALL'); // ALL, PENDING, APPROVED, REJECTED
+  const [accountRequests, setAccountRequests] = useState<any[]>([]);
+  const [enrollmentRequests, setEnrollmentRequests] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'ACCOUNTS' | 'ENROLLMENTS'>('ACCOUNTS');
 
-  // Fetch registrations from Supabase
   useEffect(() => {
-    fetchRegistrations();
-  }, [filter]);
+    fetchData();
+  }, []);
 
-  async function fetchRegistrations() {
+  async function fetchData() {
     setLoading(true);
-    let query = supabase
-      .from('registration_requests')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (filter !== 'ALL') {
-      query = query.eq('status', filter);
+    try {
+      const [acc, enr] = await Promise.all([
+        academyService.fetchAccountRequests(),
+        academyService.fetchEnrollmentRequests()
+      ]);
+      setAccountRequests(acc || []);
+      setEnrollmentRequests(enr || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
     }
-
-    const { data: requests, error } = await query;
-    if (error) {
-      console.error('Error fetching registrations:', error);
-    } else {
-      setData(requests || []);
-    }
-    setLoading(false);
   }
 
-  const handleAction = async (id: string, status: 'APPROVED' | 'REJECTED') => {
-    const { error } = await supabase
-      .from('registration_requests')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) {
-      alert('Error updating status');
-    } else {
-      fetchRegistrations();
+  const handleApprove = async (id: string, type: 'ACCOUNT' | 'ENROLLMENT') => {
+    try {
+      await academyService.approveRequest(id, type);
+      await fetchData();
+    } catch (error) {
+      alert('Error approving request');
     }
   };
+
+  const handleReject = async (id: string, type: 'ACCOUNT' | 'ENROLLMENT') => {
+    try {
+      const table = type === 'ACCOUNT' ? 'registration_requests' : 'enrollment_requests';
+      await supabase.from(table).update({ status: 'REJECTED' }).eq('id', id);
+      await fetchData();
+    } catch (error) {
+      alert('Error rejecting request');
+    }
+  };
+
+  const currentData = activeTab === 'ACCOUNTS' ? accountRequests : enrollmentRequests;
 
   return (
     <div className="space-y-6">
@@ -70,46 +75,32 @@ export default function Registrations() {
             {t('dashboard.admin.sidebar.registrations')}
           </h2>
           <p className={cn("text-navy/50 text-sm", isAr && "text-right font-sans")}>
-            {t('dashboard.admin.registrations_subtitle') || 'Review and manage new student applications'}
+            {activeTab === 'ACCOUNTS' 
+              ? (isAr ? 'إدارة طلبات التسجيل الجديدة' : 'Manage new account registrations')
+              : (isAr ? 'إدارة طلبات إضافة المواد' : 'Manage subject enrollment requests')}
           </p>
-        </div>
-        
-        <div className={cn("flex items-center gap-3 w-full md:w-auto", isAr && "flex-row-reverse")}>
-          <div className="relative flex-grow md:w-64">
-            <Search className={cn("absolute top-1/2 -translate-y-1/2 text-navy/30", isAr ? "right-3" : "left-3")} size={18} />
-            <input 
-              type="text" 
-              placeholder={t('dashboard.search_placeholder')}
-              className={cn(
-                "w-full py-2 bg-gray-50 border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-accent/20 outline-none text-sm transition-all",
-                isAr ? "pr-10 pl-4 text-right font-serif" : "pl-10 pr-4 text-left"
-              )}
-            />
-          </div>
-          <Button variant="secondary" size="sm" className="shrink-0 h-10 w-10 p-0 rounded-xl border-gray-100">
-            <Filter size={18} />
-          </Button>
         </div>
       </div>
 
-      <div className={cn("flex gap-2 overflow-x-auto pb-2", isAr && "flex-row-reverse")}>
-        {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={cn(
-              "px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap",
-              filter === f 
-                ? "bg-navy text-white shadow-lg shadow-navy/20" 
-                : "bg-gray-50 text-navy/40 hover:bg-gray-100"
-            )}
-          >
-            {f === 'ALL' ? (isAr ? 'الكل' : 'ALL') : 
-             f === 'PENDING' ? (isAr ? 'قيد الانتظار' : 'PENDING') :
-             f === 'APPROVED' ? (isAr ? 'مقبول' : 'APPROVED') :
-             (isAr ? 'مرفوض' : 'REJECTED')}
-          </button>
-        ))}
+      <div className={cn("flex gap-2", isAr && "flex-row-reverse")}>
+        <button
+          onClick={() => setActiveTab('ACCOUNTS')}
+          className={cn(
+            "px-6 py-2 rounded-xl text-sm font-bold transition-all",
+            activeTab === 'ACCOUNTS' ? "bg-navy text-white" : "bg-gray-50 text-navy/40"
+          )}
+        >
+          {isAr ? 'حسابات جديدة' : 'New Accounts'}
+        </button>
+        <button
+          onClick={() => setActiveTab('ENROLLMENTS')}
+          className={cn(
+            "px-6 py-2 rounded-xl text-sm font-bold transition-all",
+            activeTab === 'ENROLLMENTS' ? "bg-navy text-white" : "bg-gray-50 text-navy/40"
+          )}
+        >
+          {isAr ? 'طلبات المواد' : 'Subject Requests'}
+        </button>
       </div>
 
       <Card className="p-0 overflow-hidden border-none shadow-xl">
@@ -117,10 +108,13 @@ export default function Registrations() {
           <table className={cn("w-full", isAr ? "text-right" : "text-left")}>
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">{isAr ? 'الطالب / ولي الأمر' : 'Student / Parent'}</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">{t('dashboard.admin.table.level')}</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">
+                  {activeTab === 'ACCOUNTS' ? (isAr ? 'الاسم' : 'Name') : (isAr ? 'الطالب' : 'Student')}
+                </th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">
+                  {activeTab === 'ACCOUNTS' ? (isAr ? 'المستوى' : 'Level') : (isAr ? 'المادة' : 'Subject')}
+                </th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">{isAr ? 'التاريخ' : 'Date'}</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">{t('dashboard.admin.table.status')}</th>
                 <th className={cn("px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40", isAr ? "text-left" : "text-right")}>{t('dashboard.admin.table.actions')}</th>
               </tr>
             </thead>
@@ -128,76 +122,58 @@ export default function Registrations() {
               <AnimatePresence mode="popLayout">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-navy/30 italic">
-                      {isAr ? 'جاري التحميل...' : 'Loading registrations...'}
+                    <td colSpan={4} className="px-6 py-12 text-center text-navy/30 italic font-sans">
+                      {isAr ? 'جاري التحميل...' : 'Loading requests...'}
                     </td>
                   </tr>
-                ) : data.length === 0 ? (
+                ) : currentData.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-navy/30 italic">
-                      {isAr ? 'لا توجد طلبات حالياً' : 'No registration requests found'}
+                    <td colSpan={4} className="px-6 py-12 text-center text-navy/30 italic font-sans">
+                      {isAr ? 'لا توجد طلبات' : 'No pending requests'}
                     </td>
                   </tr>
                 ) : (
-                  data.map((reg, idx) => (
+                  currentData.map((reg, idx) => (
                     <motion.tr 
                       key={reg.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
                       className="hover:bg-gray-50/50 transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                           <div className="w-10 h-10 rounded-full bg-blue-accent/10 flex items-center justify-center text-blue-accent font-bold text-xs">
-                             {reg.student_name?.charAt(0)}
-                           </div>
-                           <div>
-                              <div className="font-bold text-navy truncate max-w-[150px]">{reg.student_name}</div>
-                              <div className="text-[10px] text-navy/40 flex items-center gap-1">
-                                <Mail size={10} /> {reg.email}
-                              </div>
-                           </div>
+                        <div className="font-bold text-navy">
+                          {activeTab === 'ACCOUNTS' ? reg.full_name : (reg.student_id ? 'Student ID: ' + reg.student_id.slice(0, 8) : 'Unknown')}
                         </div>
+                        <div className="text-[10px] text-navy/40 font-mono">{reg.email || reg.id}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge variant="accent">{reg.level}</Badge>
-                        <div className="text-[10px] text-navy/30 mt-1 font-mono">{reg.year}</div>
+                        {activeTab === 'ACCOUNTS' ? (
+                          <Badge variant="accent">{reg.years?.name || 'N/A'}</Badge>
+                        ) : (
+                          <div className="flex flex-col">
+                            <Badge variant="green">{reg.year_subjects?.subjects?.name}</Badge>
+                            <span className="text-[10px] text-navy/40 mt-1">{reg.year_subjects?.years?.name}</span>
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-navy/60 font-mono">
                           {new Date(reg.created_at).toLocaleDateString(isAr ? 'ar-DZ' : 'en-US')}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <Badge variant={
-                          reg.status === 'APPROVED' ? 'green' : 
-                          reg.status === 'REJECTED' ? 'red' : 
-                          'navy'
-                        }>
-                          {reg.status}
-                        </Badge>
-                      </td>
                       <td className={cn("px-6 py-4", isAr ? "text-left" : "text-right")}>
                          <div className={cn("flex items-center gap-1", isAr ? "justify-start" : "justify-end")}>
-                            {reg.status === 'PENDING' && (
-                              <>
-                                <button 
-                                  onClick={() => handleAction(reg.id, 'APPROVED')}
-                                  className="p-2 hover:bg-green-50 text-green-500 rounded-lg transition-all hover:scale-110 active:scale-95"
-                                >
-                                  <Check size={18} />
-                                </button>
-                                <button 
-                                  onClick={() => handleAction(reg.id, 'REJECTED')}
-                                  className="p-2 hover:bg-red-50 text-red-400 rounded-lg transition-all hover:scale-110 active:scale-95"
-                                >
-                                  <X size={18} />
-                                </button>
-                              </>
-                            )}
-                            <button className="p-2 hover:bg-gray-100 text-navy/40 rounded-lg transition-colors">
-                              <Eye size={18} />
+                            <button 
+                              onClick={() => handleApprove(reg.id, activeTab === 'ACCOUNTS' ? 'ACCOUNT' : 'ENROLLMENT')}
+                              className="p-2 hover:bg-green-50 text-green-500 rounded-lg transition-all"
+                            >
+                              <Check size={18} />
+                            </button>
+                            <button 
+                              onClick={() => handleReject(reg.id, activeTab === 'ACCOUNTS' ? 'ACCOUNT' : 'ENROLLMENT')}
+                              className="p-2 hover:bg-red-50 text-red-400 rounded-lg transition-all"
+                            >
+                              <X size={18} />
                             </button>
                          </div>
                       </td>
