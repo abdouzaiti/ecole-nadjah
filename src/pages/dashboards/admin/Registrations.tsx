@@ -112,7 +112,7 @@ export default function Registrations() {
                   {activeTab === 'ACCOUNTS' ? (isAr ? 'الاسم' : 'Name') : (isAr ? 'الطالب' : 'Student')}
                 </th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">
-                  {activeTab === 'ACCOUNTS' ? (isAr ? 'المستوى' : 'Level') : (isAr ? 'المادة' : 'Subject')}
+                  {activeTab === 'ACCOUNTS' ? (isAr ? 'المستوى و المادة' : 'Level & Subject') : (isAr ? 'المادة' : 'Subject')}
                 </th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40">{isAr ? 'التاريخ' : 'Date'}</th>
                 <th className={cn("px-6 py-4 text-xs font-bold uppercase tracking-wider text-navy/40", isAr ? "text-left" : "text-right")}>{t('dashboard.admin.table.actions')}</th>

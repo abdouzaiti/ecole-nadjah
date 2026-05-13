@@ -36,10 +36,16 @@ export default function RegistrationPage() {
     const level = dbLevels.find(l => l.id === id);
     if (!level) return '';
     const name = level.name.toLowerCase();
+    // English/French keywords
     if (name.includes('prim')) return 'primary';
     if (name.includes('moy') || name.includes('mid') || name.includes('middle')) return 'middle';
     if (name.includes('lyc') || name.includes('high')) return 'high';
     if (name.includes('form')) return 'formation';
+    // Arabic keywords
+    if (name.includes('ابتدائ') || name.includes('إبتدائ')) return 'primary';
+    if (name.includes('متوسط')) return 'middle';
+    if (name.includes('ثانوي')) return 'high';
+    if (name.includes('تكوين')) return 'formation';
     return '';
   };
 
@@ -147,7 +153,8 @@ export default function RegistrationPage() {
                   `📱 *Téléphone:* ${data.phone}\n` +
                   `👨‍👩‍👧‍👦 *Parent:* ${data.parentPhone}\n` +
                   `📚 *Niveau:* ${levelName}\n` +
-                  `📅 *Année:* ${yearName}`;
+                  `📅 *Année:* ${yearName}\n` +
+                  `📖 *Matière:* ${data.subject}`;
       }
 
       const encodedMessage = encodeURIComponent(message);

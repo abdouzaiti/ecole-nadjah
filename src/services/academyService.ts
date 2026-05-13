@@ -142,16 +142,23 @@ export const academyService = {
       }
 
       // 3. Insert into legacy/role-specific tables
+      const clearObject = (obj: any) => {
+        const newObj = { ...obj };
+        Object.keys(newObj).forEach(key => (newObj[key] === undefined || newObj[key] === null) && delete newObj[key]);
+        return newObj;
+      };
+
       if (request.role === 'TEACHER') {
-        await supabase.from('teachers').insert([{
+        const teacherData = clearObject({
           id: requestId,
           name: request.full_name,
           email: request.email,
           phone: request.phone,
           subject: request.subject_name
-        }].filter(Boolean));
+        });
+        await supabase.from('teachers').insert([teacherData]);
       } else if (request.role === 'STUDENT') {
-        await supabase.from('students').insert([{
+        const studentData = clearObject({
           id: requestId,
           name: request.full_name,
           email: request.email,
@@ -159,13 +166,15 @@ export const academyService = {
           parent_phone: request.parent_phone,
           level_id: request.level_id,
           year_id: request.year_id
-        }].filter(Boolean));
+        });
+        await supabase.from('students').insert([studentData]);
       } else if (request.role === 'ADMIN') {
-        await supabase.from('admins').insert([{
+        const adminData = clearObject({
           id: requestId,
           name: request.full_name,
           email: request.email
-        }].filter(Boolean));
+        });
+        await supabase.from('admins').insert([adminData]);
       }
       
       // 4. For students, handle bulk enrollment if selections provided
