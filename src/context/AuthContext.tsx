@@ -106,7 +106,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: 'GUEST'
       });
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Error fetching user data from Supabase:', error);
+      if (error instanceof Error && error.message.includes('fetch')) {
+         console.warn('Network error: Please verify your Supabase URL and Key in the Settings menu.');
+      }
       setUser(null);
     } finally {
       setLoading(false);

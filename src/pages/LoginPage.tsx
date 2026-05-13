@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button, Card } from '../components/ui';
@@ -19,11 +19,14 @@ export default function LoginPage() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user && user.role !== 'GUEST') {
       navigate(`/dashboard/${user.role.toLowerCase()}`);
+    } else if (user && user.role === 'GUEST') {
+      setError(isAr ? "حسابك قيد المراجعة. يرجى الانتظار حتى يتم قبول طلبك من طرف الإدارة." : "Your account is pending approval. Please wait for an admin to verify your credentials.");
+      setLoading(false);
     }
-  }, [user, navigate]);
+  }, [user, navigate, isAr]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,10 +41,15 @@ export default function LoginPage() {
 
       if (signInError) throw signInError;
       
-      // AuthContext will handle the redirect via useEffect
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err.message || 'Authentication failed');
+      let errorMessage = err.message || 'Authentication failed';
+      
+      if (errorMessage.includes('fetch')) {
+        errorMessage = isAr ? "فشل الاتصال بـ Supabase. يرجى التحقق من إعدادات المفاتيح (API Keys)." : "Failed to connect to Supabase. Please check your API Keys in settings.";
+      }
+      
+      setError(errorMessage);
       setLoading(false);
     }
   };
