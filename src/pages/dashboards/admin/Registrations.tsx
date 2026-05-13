@@ -9,7 +9,8 @@ import {
   MoreVertical,
   Mail,
   Phone,
-  Calendar
+  Calendar,
+  BookOpen
 } from 'lucide-react';
 import { Card, Badge, Button } from '../../../components/ui';
 import { motion, AnimatePresence } from 'motion/react';
@@ -157,10 +158,28 @@ export default function Registrations() {
                       </td>
                       <td className="px-6 py-4">
                         {activeTab === 'ACCOUNTS' ? (
-                          <div className="flex flex-col gap-1">
-                             <Badge variant="accent">{reg.levels?.name || reg.level_id || 'N/A'}</Badge>
-                             {reg.years?.name && <span className="text-[10px] text-navy/40">{reg.years.name}</span>}
-                             {reg.subject_name && <span className="text-[10px] text-blue-accent font-bold uppercase">{reg.subject_name}</span>}
+                          <div className={cn("flex flex-col gap-1.5", isAr && "items-end")}>
+                             <div className="flex items-center gap-2">
+                               <Badge variant="accent">
+                                 {reg.levels?.name || (reg.role === 'ADMIN' ? (isAr ? 'مدير' : 'Admin') : (isAr ? 'مستوى غير محدد' : 'Level N/A'))}
+                               </Badge>
+                               {reg.years?.name && (
+                                 <Badge variant="navy" className="text-[10px] opacity-70">
+                                   {reg.years.name}
+                                 </Badge>
+                               )}
+                             </div>
+                             {reg.subject_name && (
+                               <div className="flex items-center gap-1 text-blue-accent font-bold text-xs uppercase bg-blue-accent/5 px-2 py-1 rounded-md w-fit">
+                                 <BookOpen size={12} />
+                                 {reg.subject_name}
+                               </div>
+                             )}
+                             {!reg.levels?.name && !reg.subject_name && reg.role !== 'ADMIN' && (
+                               <span className="text-[10px] text-navy/40 italic">
+                                 {isAr ? 'لا توجد تفاصيل' : 'No details provided'}
+                               </span>
+                             )}
                           </div>
                         ) : (
                           <div className="flex flex-col">

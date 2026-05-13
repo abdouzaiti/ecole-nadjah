@@ -12,25 +12,49 @@ export default function RegistrationPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [role, setRole] = useState<'student' | 'teacher' | 'admin'>('student');
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === 'ar';
+
   const [dbLevels, setDbLevels] = useState<any[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string>('');
   const [selectedStream, setSelectedStream] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
-  const { t, i18n } = useTranslation();
 
   React.useEffect(() => {
+    // Initial standard levels
+    const standardLevels = [
+      { id: 'primary', name: isAr ? 'ابتدائي' : 'Primaire', years: [{ id: '1', name: '1' }, { id: '2', name: '2' }, { id: '3', name: '3' }, { id: '4', name: '4' }, { id: '5', name: '5' }] },
+      { id: 'middle', name: isAr ? 'متوسط' : 'Moyen', years: [{ id: '1', name: '1' }, { id: '2', name: '2' }, { id: '3', name: '3' }, { id: '4', name: '4' }] },
+      { id: 'high', name: isAr ? 'ثانوي' : 'Secondaire', years: [{ id: '1', name: '1' }, { id: '2', name: '2' }, { id: '3', name: '3' }] },
+      { id: 'formation', name: isAr ? 'تكوين' : 'Formation', years: [] }
+    ];
+    setDbLevels(standardLevels);
+
     const fetchLevels = async () => {
       try {
-        const { data, error } = await supabase.from('levels').select('*, years(*)');
-        if (error) throw error;
-        setDbLevels(data || []);
+        console.log('Fetching levels from database...');
+        const { data, error } = await supabase
+          .from('levels')
+          .select('*, years(*)')
+          .order('name');
+        
+        if (error) {
+          console.error('Supabase error fetching levels:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          console.log('Successfully fetched levels:', data.length);
+          setDbLevels(data);
+        } else {
+          console.warn('No levels found in database, using hardcoded fallbacks');
+        }
       } catch (err) {
         console.error('Error fetching levels:', err);
       }
     };
     fetchLevels();
-  }, []);
-  const isAr = i18n.language === 'ar';
+  }, [isAr]);
 
   const getLevelKey = (id: string) => {
     const level = dbLevels.find(l => l.id === id);
@@ -39,7 +63,7 @@ export default function RegistrationPage() {
     // English/French keywords
     if (name.includes('prim')) return 'primary';
     if (name.includes('moy') || name.includes('mid') || name.includes('middle')) return 'middle';
-    if (name.includes('lyc') || name.includes('high')) return 'high';
+    if (name.includes('lyc') || name.includes('high') || name.includes('second')) return 'high';
     if (name.includes('form')) return 'formation';
     // Arabic keywords
     if (name.includes('ابتدائ') || name.includes('إبتدائ')) return 'primary';
@@ -102,7 +126,14 @@ export default function RegistrationPage() {
 
       if (selectedLevel) requestPayload.level_id = selectedLevel;
       if (selectedYear) requestPayload.year_id = selectedYear;
-      if (data.subject) requestPayload.subject_name = data.subject;
+      
+      // Look up subject label instead of key for better readability in dashboard
+      if (data.subject) {
+        const subjects = subjectsByContext();
+        const subjectObj = subjects.find(s => s.key === data.subject);
+        requestPayload.subject_name = subjectObj ? subjectObj.label : data.subject;
+      }
+      
       if (data.parentPhone) requestPayload.parent_phone = data.parentPhone;
 
       console.log('Inserting registration request:', requestPayload);
@@ -563,7 +594,7 @@ export default function RegistrationPage() {
                           </div>
                         </div>
 
-                        {selectedLevel && selectedLevel !== 'formation' && (
+                        {getLevelKey(selectedLevel) && getLevelKey(selectedLevel) !== 'formation' && (
                           <div className="space-y-1">
                             <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
                             <div className="relative">
@@ -587,7 +618,7 @@ export default function RegistrationPage() {
                           </div>
                         )}
 
-                        {selectedLevel === 'high' && (
+                        {getLevelKey(selectedLevel) === 'high' && (
                           <div className="space-y-1 md:col-span-2">
                             <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>
                               {isAr ? "الشعبة / الجذع المشترك" : "Filière / Tronc Commun"}
@@ -614,7 +645,11 @@ export default function RegistrationPage() {
                           <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
                           <div className="relative">
                             <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select name="subject" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                            <select 
+                              name="subject" 
+                              required 
+                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                            >
                               <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
                               {subjectsByContext().map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
                             </select>
@@ -654,7 +689,7 @@ export default function RegistrationPage() {
                           </div>
                         </div>
 
-                        {selectedLevel && selectedLevel !== 'formation' && (
+                        {getLevelKey(selectedLevel) && getLevelKey(selectedLevel) !== 'formation' && (
                           <div className="space-y-1">
                             <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
                             <div className="relative">
@@ -678,7 +713,7 @@ export default function RegistrationPage() {
                           </div>
                         )}
 
-                        {selectedLevel === 'high' && (
+                        {getLevelKey(selectedLevel) === 'high' && (
                           <div className="space-y-1 md:col-span-2">
                             <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>
                               {isAr ? "الشعبة / الجذع المشترك" : "Filière / Tronc Commun"}
@@ -705,7 +740,11 @@ export default function RegistrationPage() {
                           <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
                           <div className="relative">
                             <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select name="subject" defaultValue="" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                            <select 
+                              name="subject" 
+                              required 
+                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
+                            >
                               <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
                               {subjectsByContext().map((s: any) => <option key={s.key} value={s.key}>{s.label}</option>)}
                             </select>

@@ -228,6 +228,57 @@ CREATE POLICY "Admins can update registration requests" ON registration_requests
         EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'ADMIN')
     );
 
+-- Seed reference data if empty (Idempotent)
+DO $$
+DECLARE
+    prim_id UUID;
+    moy_id UUID;
+    sec_id UUID;
+BEGIN
+    -- Only insert if the table is empty
+    IF NOT EXISTS (SELECT 1 FROM levels) THEN
+        -- Insert Levels
+        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'ابتدائي (Primaire)') RETURNING id INTO prim_id;
+        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'متوسط (Moyen)') RETURNING id INTO moy_id;
+        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'ثانوي (Secondaire)') RETURNING id INTO sec_id;
+        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'تكوين (Formation)');
+
+        -- Insert Years for Primaire
+        INSERT INTO years (level_id, name) VALUES 
+            (prim_id, '1'), (prim_id, '2'), (prim_id, '3'), (prim_id, '4'), (prim_id, '5');
+            
+        -- Insert Years for Moyen
+        INSERT INTO years (level_id, name) VALUES 
+            (moy_id, '1'), (moy_id, '2'), (moy_id, '3'), (moy_id, '4');
+            
+        -- Insert Years for Secondaire
+        INSERT INTO years (level_id, name) VALUES 
+            (sec_id, '1'), (sec_id, '2'), (sec_id, '3');
+    END IF;
+END $$;
+
+CREATE POLICY "Anyone can select levels" ON levels FOR SELECT TO public USING (true);
+CREATE POLICY "Anyone can select years" ON years FOR SELECT TO public USING (true);
+CREATE POLICY "Anyone can select subjects" ON subjects FOR SELECT TO public USING (true);
+CREATE POLICY "Anyone can select year_subjects" ON year_subjects FOR SELECT TO public USING (true);
+
+-- Ensure registration_requests has all columns
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='level_id') THEN
+        ALTER TABLE registration_requests ADD COLUMN level_id UUID REFERENCES levels(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='year_id') THEN
+        ALTER TABLE registration_requests ADD COLUMN year_id UUID REFERENCES years(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='subject_name') THEN
+        ALTER TABLE registration_requests ADD COLUMN subject_name TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='parent_phone') THEN
+        ALTER TABLE registration_requests ADD COLUMN parent_phone TEXT;
+    END IF;
+END $$;
+
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- Profiles are viewable by authenticated users (to see teachers/admins)
