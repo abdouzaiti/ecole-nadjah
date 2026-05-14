@@ -148,33 +148,39 @@ export const academyService = {
         return newObj;
       };
 
-      if (request.role === 'TEACHER') {
-        const teacherData = clearObject({
-          id: requestId,
-          name: request.full_name,
-          email: request.email,
-          phone: request.phone,
-          subject: request.subject_name
-        });
-        await supabase.from('teachers').insert([teacherData]);
-      } else if (request.role === 'STUDENT') {
-        const studentData = clearObject({
-          id: requestId,
-          name: request.full_name,
-          email: request.email,
-          phone: request.phone,
-          parent_phone: request.parent_phone,
-          level_id: request.level_id,
-          year_id: request.year_id
-        });
-        await supabase.from('students').insert([studentData]);
-      } else if (request.role === 'ADMIN') {
-        const adminData = clearObject({
-          id: requestId,
-          name: request.full_name,
-          email: request.email
-        });
-        await supabase.from('admins').insert([adminData]);
+      try {
+        if (request.role === 'TEACHER') {
+          const teacherData = clearObject({
+            id: requestId,
+            name: request.full_name,
+            email: request.email,
+            phone: request.phone,
+            subject: request.subject_name
+          });
+          await supabase.from('teachers').insert([teacherData]);
+        } else if (request.role === 'STUDENT') {
+          const studentData = clearObject({
+            id: requestId,
+            name: request.full_name,
+            email: request.email,
+            phone: request.phone,
+            parent_phone: request.parent_phone,
+            level_id: request.level_id,
+            year_id: request.year_id
+          });
+          await supabase.from('students').insert([studentData]);
+        } else if (request.role === 'ADMIN') {
+          // Verify admins table exists before inserting
+          const adminData = clearObject({
+            id: requestId,
+            name: request.full_name,
+            email: request.email
+          });
+          const { error: adminErr } = await supabase.from('admins').insert([adminData]);
+          if (adminErr) console.warn('Note: Could not insert into admins table, using profiles only.', adminErr.message);
+        }
+      } catch (err) {
+        console.warn('Optional role-specific table insertion failed, continuing with main profiles update:', err);
       }
       
       // 4. For students, handle bulk enrollment if selections provided

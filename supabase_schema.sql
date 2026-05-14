@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS student_enrollments (
     UNIQUE(student_id, year_subject_id)
 );
 
--- 11. Profiles
+-- 11. Profiles (Centralized user data)
 CREATE TABLE IF NOT EXISTS profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     name TEXT,
@@ -85,6 +85,36 @@ CREATE TABLE IF NOT EXISTS profiles (
     avatar_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- LEGACY/ROLE-SPECIFIC TABLES
+CREATE TABLE IF NOT EXISTS teachers (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    email TEXT,
+    subject TEXT,
+    phone TEXT,
+    avatar TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS students (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    email TEXT,
+    level_id UUID REFERENCES levels(id),
+    year_id UUID REFERENCES years(id),
+    phone TEXT,
+    parent_phone TEXT,
+    avatar TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS admins (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    email TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- RLS Enable
