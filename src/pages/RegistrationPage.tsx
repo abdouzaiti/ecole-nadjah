@@ -21,33 +21,27 @@ export default function RegistrationPage() {
   const [selectedYear, setSelectedYear] = useState<string>('');
 
   React.useEffect(() => {
-    // Initial standard levels
+    // Initial standard levels using the same UUIDs as the database schema for stability
     const standardLevels = [
-      { id: 'primary', name: isAr ? 'ابتدائي' : 'Primaire', years: [{ id: '1', name: '1' }, { id: '2', name: '2' }, { id: '3', name: '3' }, { id: '4', name: '4' }, { id: '5', name: '5' }] },
-      { id: 'middle', name: isAr ? 'متوسط' : 'Moyen', years: [{ id: '1', name: '1' }, { id: '2', name: '2' }, { id: '3', name: '3' }, { id: '4', name: '4' }] },
-      { id: 'high', name: isAr ? 'ثانوي' : 'Secondaire', years: [{ id: '1', name: '1' }, { id: '2', name: '2' }, { id: '3', name: '3' }] },
-      { id: 'formation', name: isAr ? 'تكوين' : 'Formation', years: [] }
+      { id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', name: isAr ? 'ابتدائي' : 'Primaire', years: [{ id: 'y1', name: '1' }, { id: 'y2', name: '2' }, { id: 'y3', name: '3' }, { id: 'y4', name: '4' }, { id: 'y5', name: '5' }] },
+      { id: 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', name: isAr ? 'متوسط' : 'Moyen', years: [{ id: 'y1', name: '1' }, { id: 'y2', name: '2' }, { id: 'y3', name: '3' }, { id: 'y4', name: '4' }] },
+      { id: 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', name: isAr ? 'ثانوي' : 'Secondaire', years: [{ id: 'y1', name: '1' }, { id: 'y2', name: '2' }, { id: 'y3', name: '3' }] },
+      { id: 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a', name: isAr ? 'تكوين' : 'Formation', years: [] }
     ];
     setDbLevels(standardLevels);
 
     const fetchLevels = async () => {
       try {
         console.log('Fetching levels from database...');
-        const { data, error } = await supabase
+        const { data, error: fetchErr } = await supabase
           .from('levels')
-          .select('*, years(*)')
-          .order('name');
+          .select('*, years(*)');
         
-        if (error) {
-          console.error('Supabase error fetching levels:', error);
-          return;
-        }
+        if (fetchErr) throw fetchErr;
 
         if (data && data.length > 0) {
           console.log('Successfully fetched levels:', data.length);
           setDbLevels(data);
-        } else {
-          console.warn('No levels found in database, using hardcoded fallbacks');
         }
       } catch (err) {
         console.error('Error fetching levels:', err);
@@ -57,6 +51,11 @@ export default function RegistrationPage() {
   }, [isAr]);
 
   const getLevelKey = (id: string) => {
+    if (id === 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d') return 'primary';
+    if (id === 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e') return 'middle';
+    if (id === 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f') return 'high';
+    if (id === 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a') return 'formation';
+    
     const level = dbLevels.find(l => l.id === id);
     if (!level) return '';
     const name = level.name.toLowerCase();
@@ -123,7 +122,7 @@ export default function RegistrationPage() {
         status: 'PENDING'
       };
 
-      // Only send IDs if they look like valid UUIDs
+      // Ensure UUID format for foreign keys
       const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
       if (selectedLevel && isUUID(selectedLevel)) {
@@ -134,29 +133,30 @@ export default function RegistrationPage() {
         requestPayload.year_id = selectedYear;
       }
       
-      // If we don't have UUIDs (e.g. using fallbacks), we store the names in subject_name or similar
-      // or just rely on the fact that the user is created and admin can fix it.
-      
       if (data.subject) {
-        const subjects = subjectsByContext();
-        const subjectObj = subjects.find(s => s.key === data.subject);
-        requestPayload.subject_name = subjectObj ? subjectObj.label : data.subject;
+        const subjectsList = subjectsByContext();
+        const subjectObj = subjectsList.find((s: any) => s.key === data.subject);
+        requestPayload.subject_name = subjectObj ? subjectObj.label : (data.subject as string);
       }
       
       if (data.parentPhone) requestPayload.parent_phone = data.parentPhone;
 
-      console.log('Inserting registration request with payload:', requestPayload);
+      console.log('Inserting registration request:', requestPayload);
+      
+      // Try to insert - we use upsert to handle case where user might have been created but request failed previously
       const { error: requestError } = await supabase
         .from('registration_requests')
-        .insert([requestPayload]);
+        .upsert([requestPayload], { onConflict: 'id' });
 
       if (requestError) {
-        console.error('Error inserting into registration_requests:', requestError);
-        // If it fails with column not found, we advise the user but the account IS created
-        if (requestError.message.includes('column') || requestError.message.includes('cache')) {
-          setError(isAr ? "حدث خطأ في قاعدة البيانات (عمود مفقود). يرجى الاتصال بالمسؤول." : "Database schema error (missing columns). Please run the SQL migration.");
+        console.error('Registration table error:', requestError);
+        // Provide very specific feedback for common issues
+        if (requestError.code === '42703') { // Column not found
+          setError(isAr ? "خطأ في بنية قاعدة البيانات (عمود مفقود)" : "Database schema error: Missing columns in registration_requests.");
+        } else if (requestError.code === '23503') { // FK violation
+          setError(isAr ? "خطأ في المراجعة (المستوى أو السنة غير موجودة)" : "Referential error: Level or Year ID not found in database.");
         } else {
-          setError(requestError.message);
+          setError(`DB Error: ${requestError.message}`);
         }
         setLoading(false);
         return;
