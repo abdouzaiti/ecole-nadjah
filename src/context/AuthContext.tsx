@@ -81,17 +81,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Failsafe timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
       console.warn('fetchUserData failsafe timeout!');
-      setLoading(false);
-    }, 10000);
+      if (loading) setLoading(false);
+    }, 8000);
 
     try {
       // 1. Try profiles table
       console.log('Step 1: Profiles table check');
-      const { data: profile } = await supabase
+      const { data: profile, error: profileErr } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
+
+      if (profileErr) {
+        console.error('Database error checking profiles:', profileErr.message);
+      }
 
       if (profile && profile.role && profile.role !== 'GUEST') {
         console.log('Success: Found in profiles', profile.role);
@@ -105,66 +109,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // 2. Fallback: Teachers
-      console.log('Step 2: Teachers table check');
-      const { data: teacher } = await supabase
-        .from('teachers')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
+      // 2. Fallbacks (Secondary check in specific tables if profile is missing or guest)
+      console.log('Step 2: Role-specific fallbacks check');
       
-      if (teacher) {
+      const [teacherRes, studentRes, adminRes] = await Promise.all([
+        supabase.from('teachers').select('*').eq('id', userId).maybeSingle(),
+        supabase.from('students').select('*').eq('id', userId).maybeSingle(),
+        supabase.from('admins').select('*').eq('id', userId).maybeSingle()
+      ]);
+
+      if (teacherRes.data) {
         console.log('Success: Found in teachers');
-        setUser({
-          id: userId,
-          name: teacher.name,
-          email: email,
-          role: 'TEACHER',
-          avatar: teacher.avatar
-        });
+        setUser({ id: userId, name: teacherRes.data.name, email, role: 'TEACHER', avatar: teacherRes.data.avatar });
         return;
       }
-
-      // 3. Fallback: Students
-      console.log('Step 3: Students table check');
-      const { data: student } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-      
-      if (student) {
+      if (studentRes.data) {
         console.log('Success: Found in students');
-        setUser({
-          id: userId,
-          name: student.name,
-          email: email,
-          role: 'STUDENT',
-          avatar: student.avatar
-        });
+        setUser({ id: userId, name: studentRes.data.name, email, role: 'STUDENT', avatar: studentRes.data.avatar });
         return;
       }
-
-      // 4. Fallback: Admins
-      console.log('Step 4: Admins table check');
-      const { data: admin } = await supabase
-        .from('admins')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-      
-      if (admin) {
+      if (adminRes.data) {
         console.log('Success: Found in admins');
-        setUser({
-          id: userId,
-          name: admin.name,
-          email: email,
-          role: 'ADMIN'
-        });
+        setUser({ id: userId, name: adminRes.data.name, email, role: 'ADMIN' });
         return;
       }
 
-      // 5. Default GUEST
+      // 3. Final Default: GUEST (Use existing profile data if available)
       console.log('Final fallback: Guest');
       setUser({
         id: userId,
@@ -172,8 +142,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: email,
         role: 'GUEST'
       });
-    } catch (error) {
-      console.error('fetchUserData error:', error);
+    } catch (error: any) {
+      console.error('fetchUserData caught unexpected error:', error);
       setUser({
         id: userId,
         name: 'User',
