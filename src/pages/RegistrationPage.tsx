@@ -23,9 +23,9 @@ export default function RegistrationPage() {
   React.useEffect(() => {
     // Initial standard levels using the same UUIDs as the database schema for stability
     const standardLevels = [
-      { id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', name: isAr ? 'ابتدائي' : 'Primaire', years: [{ id: 'y1', name: '1' }, { id: 'y2', name: '2' }, { id: 'y3', name: '3' }, { id: 'y4', name: '4' }, { id: 'y5', name: '5' }] },
-      { id: 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', name: isAr ? 'متوسط' : 'Moyen', years: [{ id: 'y1', name: '1' }, { id: 'y2', name: '2' }, { id: 'y3', name: '3' }, { id: 'y4', name: '4' }] },
-      { id: 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', name: isAr ? 'ثانوي' : 'Secondaire', years: [{ id: 'y1', name: '1' }, { id: 'y2', name: '2' }, { id: 'y3', name: '3' }] },
+      { id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', name: isAr ? 'ابتدائي' : 'Primaire', years: [{ id: 'y1', name: '1 AP' }, { id: 'y2', name: '2 AP' }, { id: 'y3', name: '3 AP' }, { id: 'y4', name: '4 AP' }, { id: 'y5', name: '5 AP' }] },
+      { id: 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', name: isAr ? 'متوسط' : 'Moyen', years: [{ id: 'y1', name: '1 AM' }, { id: 'y2', name: '2 AM' }, { id: 'y3', name: '3 AM' }, { id: 'y4', name: '4 AM' }] },
+      { id: 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', name: isAr ? 'ثانوي' : 'Secondaire', years: [{ id: 'y1', name: '1 AS' }, { id: 'y2', name: '2 AS' }, { id: 'y3', name: '3 AS' }] },
       { id: 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a', name: isAr ? 'تكوين' : 'Formation', years: [] }
     ];
     setDbLevels(standardLevels);
@@ -41,7 +41,19 @@ export default function RegistrationPage() {
 
         if (data && data.length > 0) {
           console.log('Successfully fetched levels:', data.length);
-          setDbLevels(data);
+          // Standardize display names for fetched years if they are just simple digits
+          const processedData = data.map(l => {
+            const key = getLevelKey(l.id);
+            const suffix = key === 'primary' ? 'AP' : key === 'middle' ? 'AM' : key === 'high' ? 'AS' : '';
+            return {
+              ...l,
+              years: l.years ? l.years.sort((a: any, b: any) => a.name.localeCompare(b.name)).map((y: any) => ({
+                ...y,
+                name: y.name.length <= 2 ? `${y.name} ${suffix}`.trim() : y.name
+              })) : []
+            };
+          });
+          setDbLevels(processedData);
         }
       } catch (err) {
         console.error('Error fetching levels:', err);
@@ -76,7 +88,9 @@ export default function RegistrationPage() {
     const level = dbLevels.find(l => l.id === selectedLevel);
     if (!level || !level.years) return '';
     const year = level.years.find((y: any) => y.id === id);
-    return year ? year.name : '';
+    if (!year) return '';
+    // Extract digit for logic if multiple characters exist
+    return year.name.split(' ')[0] || year.name;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -225,6 +239,7 @@ export default function RegistrationPage() {
     { key: 'arabic', label: t('subjects.arabic') },
     { key: 'french', label: t('subjects.french') },
     { key: 'english', label: t('subjects.english') },
+    { key: 'science', label: t('subjects.science') },
   ];
 
   const subjectsByContext = () => {
@@ -265,28 +280,31 @@ export default function RegistrationPage() {
         { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
         { key: 'fr', label: isAr ? "اللغة الفرنسية" : "Français" },
         { key: 'en', label: isAr ? "اللغة الإنجليزية" : "Anglais" },
-        { key: 'science', label: isAr ? "العلوم الطبيعية" : "Sciences Naturelles" },
-        { key: 'physics', label: isAr ? "العلوم الفيزيائية" : "Physique" },
+        { key: 'science', label: isAr ? "علوم الطبيعة والحياة" : "Sciences Naturelles" },
+        { key: 'physics', label: isAr ? "العلوم الفيزيائية والتكنولوجيا" : "Physique/Techno" },
         { key: 'hist_geo', label: isAr ? "التاريخ والجغرافيا" : "Histoire/Géo" },
         { key: 'islamic', label: isAr ? "التربية الإسلامية" : "Éducation Islamique" },
         { key: 'civic', label: isAr ? "التربية المدنية" : "Éducation Civique" },
-        { key: 'pe', label: isAr ? "التربية البدنية" : "Éducation Physique" },
-        { key: 'it', label: isAr ? "المعلوماتية" : "Informatique" },
+        { key: 'pe', label: isAr ? "التربية البدنية والرياضية" : "Éducation Physique" },
+        { key: 'it', label: isAr ? "إعلام آلي" : "Informatique" },
         { key: 'art', label: isAr ? "التربية الفنية/الموسيقية" : "Arts/Musique" },
       ];
     }
 
     if (levelKey === 'high') {
+      if (!selectedYear) return [];
+      
       if (yearName === '1') {
+        if (!selectedStream) return [];
         if (selectedStream === 'science') {
           return [
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
             { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
             { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
+            { key: 'tech', label: isAr ? "تكنولوجيا" : "Techno" },
             { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
             { key: 'fr', label: isAr ? "فرنسية" : "Français" },
             { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
-            { key: 'tech', label: isAr ? "تكنولوجيا" : "Techno" },
             { key: 'it', label: isAr ? "إعلام آلي" : "Informatique" },
             { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
             { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
@@ -299,18 +317,19 @@ export default function RegistrationPage() {
             { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
             { key: 'fr', label: isAr ? "لغة فرنسية" : "Français" },
             { key: 'en', label: isAr ? "لغة إنجليزية" : "Anglais" },
+            { key: 'phil', label: isAr ? "فلسفة" : "Philosophie" },
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
             { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
-            { key: 'lang3', label: isAr ? "لغة حية ثالثة" : "Langue 3" },
             { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
             { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ];
         }
       } else if (['2', '3'].includes(yearName)) {
+        if (!selectedStream) return [];
         const branchSubjects: Record<string, any[]> = {
           exp_science: [
-            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
-            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
+            { key: 'science', label: isAr ? "علوم الطبيعة والحياة" : "SVT" },
+            { key: 'physics', label: isAr ? "علوم فيزيائية" : "Physique" },
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
             { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
             { key: 'fr', label: isAr ? "فرنسية" : "Français" },
@@ -318,7 +337,6 @@ export default function RegistrationPage() {
             { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
             { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
             { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ],
           math: [
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
@@ -330,32 +348,25 @@ export default function RegistrationPage() {
             { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
             { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
             { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ],
           tech_math: [
-            { key: 'tech', label: isAr ? "تكنولوجيا" : "Techno" },
+            { key: 'tech_gm', label: isAr ? "تكنولوجيا - هندسة ميكانيكية" : "Génie Mécanique" },
+            { key: 'tech_ge', label: isAr ? "تكنولوجيا - هندسة كهربائية" : "Génie Électrique" },
+            { key: 'tech_gc', label: isAr ? "تكنولوجيا - هندسة مدنية" : "Génie Civil" },
+            { key: 'tech_gp', label: isAr ? "تكنولوجيا - هندسة الطرائق" : "Génie des Procédés" },
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
             { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
             { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
             { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ],
           mgt_eco: [
             { key: 'mgt', label: isAr ? "تسيير محاسبي ومالي" : "Gestion/Finance" },
-            { key: 'eco', label: isAr ? "اقتصاد ومناجم" : "Eco" },
+            { key: 'eco', label: isAr ? "اقتصاد ومناجم" : "Économie" },
             { key: 'law', label: isAr ? "قانون" : "Droit" },
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
             { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
             { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
             { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ],
           arts_phil: [
             { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
@@ -365,31 +376,35 @@ export default function RegistrationPage() {
             { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
             { key: 'math', label: isAr ? "رياضيات" : "Maths" },
             { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ],
           languages: [
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
             { key: 'fr', label: isAr ? "لغة فرنسية" : "Français" },
             { key: 'en', label: isAr ? "لغة إنجليزية" : "Anglais" },
-            { key: 'lang3', label: isAr ? "لغة أجنبية ثالثة" : "Langue 3" },
+            { key: 'lang3_es', label: isAr ? "إسبانية" : "Espagnol" },
+            { key: 'lang3_de', label: isAr ? "ألمانية" : "Allemand" },
+            { key: 'lang3_it', label: isAr ? "إيطالية" : "Italien" },
+            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
             { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
             { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
           ]
         };
         return branchSubjects[selectedStream] || [];
       }
     }
 
-    if (selectedLevel === 'formation') {
+    if (levelKey === 'formation') {
       return [
-        { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
-        { key: 'fr', label: isAr ? "اللغة الفرنسية" : "Français" },
-        { key: 'es', label: isAr ? "اللغة الإسبانية" : "Espagnol" },
-        { key: 'de', label: isAr ? "اللغة الألمانية" : "Allemand" },
-        { key: 'en', label: isAr ? "اللغة الإنجليزية" : "Anglais" },
+        { key: 'en_bus', label: isAr ? "إنجليزية للأعمال" : "English for Business" },
+        { key: 'fr_bus', label: isAr ? "فرنسية للأعمال" : "Français des Affaires" },
+        { key: 'it_office', label: isAr ? "إعلام آلي (Bureautique)" : "Informatique Bureautique" },
+        { key: 'it_dev', label: isAr ? "تطوير الويب" : "Développement Web" },
+        { key: 'it_ds', label: isAr ? "التصميم الغرافيكي" : "Design Graphique" },
+        { key: 'marketing', label: isAr ? "التسويق الرقمي" : "Marketing Digital" },
+        { key: 'comm', label: isAr ? "فنون التواصل" : "Communication" },
+        { key: 'en_general', label: isAr ? "اللغة الإنجليزية (عامة)" : "Anglais Général" },
+        { key: 'fr_general', label: isAr ? "اللغة الفرنسية (عامة)" : "Français Général" },
+        { key: 'es_general', label: isAr ? "اللغة الإسبانية" : "Espagnol" },
+        { key: 'de_general', label: isAr ? "اللغة الألمانية" : "Allemand" },
       ];
     }
 
@@ -397,8 +412,11 @@ export default function RegistrationPage() {
   };
 
   const getStreams = () => {
-    if (selectedLevel !== 'high') return [];
-    if (selectedYear === '1') {
+    const levelKey = getLevelKey(selectedLevel);
+    if (levelKey !== 'high') return [];
+    
+    const yearName = getYearName(selectedYear);
+    if (yearName === '1') {
       return [
         { key: 'science', label: isAr ? "جذع مشترك علوم وتكنولوجيا" : "Tronc Commun Sciences" },
         { key: 'arts', label: isAr ? "جذع مشترك آداب" : "Tronc Commun Lettres" },

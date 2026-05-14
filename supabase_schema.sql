@@ -147,30 +147,36 @@ INSERT INTO levels (id, name) VALUES
 ('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', 'متوسط (Moyen)'),
 ('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', 'ثانوي (Secondaire)'),
 ('d4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a', 'تكوين (Formation)')
-ON CONFLICT (name) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- Years for Primary
+-- Years for Primary (1 AP - 5 AP)
 INSERT INTO years (level_id, name) VALUES 
-('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '1'),
-('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '2'),
-('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '3'),
-('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '4'),
-('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '5')
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '1 AP'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '2 AP'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '3 AP'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '4 AP'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '5 AP')
 ON CONFLICT DO NOTHING;
 
--- Years for Moyen
+-- Years for Moyen (1 AM - 4 AM)
 INSERT INTO years (level_id, name) VALUES 
-('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '1'),
-('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '2'),
-('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '3'),
-('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '4')
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '1 AM'),
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '2 AM'),
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '3 AM'),
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '4 AM')
 ON CONFLICT DO NOTHING;
 
--- Years for Secondaire
+-- Years for Secondaire (1 AS - 3 AS)
 INSERT INTO years (level_id, name) VALUES 
-('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '1'),
-('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '2'),
-('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '3')
+('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '1 AS'),
+('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '2 AS'),
+('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '3 AS')
+ON CONFLICT DO NOTHING;
+
+-- Years for Formation (Level 1 - Level 3)
+INSERT INTO years (level_id, name) VALUES 
+('d4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a', 'Niveau 1'),
+('d4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a', 'Niveau 2')
 ON CONFLICT DO NOTHING;
 
 -- TRIGGER FOR PROFILES
