@@ -1,15 +1,18 @@
 -- Ecole Nadjah Database Schema
 -- Run this in the Supabase SQL Editor
 
+-- 0. Enable Extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- 1. Levels (Primary, CEM, Lycee, etc.)
-CREATE TABLE levels (
+CREATE TABLE IF NOT EXISTS levels (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 2. Years (1AP - 3AS)
-CREATE TABLE years (
+CREATE TABLE IF NOT EXISTS years (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     level_id UUID REFERENCES levels(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
@@ -18,14 +21,14 @@ CREATE TABLE years (
 );
 
 -- 3. Subjects
-CREATE TABLE subjects (
+CREATE TABLE IF NOT EXISTS subjects (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 4. Year-Subject Linking (Which subjects are available for each year)
-CREATE TABLE year_subjects (
+CREATE TABLE IF NOT EXISTS year_subjects (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     year_id UUID REFERENCES years(id) ON DELETE CASCADE,
     subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
@@ -41,7 +44,7 @@ CREATE TABLE IF NOT EXISTS registration_requests (
     phone TEXT,
     parent_phone TEXT,
     role TEXT CHECK (role IN ('STUDENT', 'TEACHER', 'ADMIN')),
-    level_id TEXT,
+    level_id UUID REFERENCES levels(id),
     year_id UUID REFERENCES years(id),
     subject_name TEXT,
     status TEXT DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
@@ -49,52 +52,12 @@ CREATE TABLE IF NOT EXISTS registration_requests (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- REPAIR SCRIPT (Run this in Supabase SQL Editor if you see column errors)
-DO $$ 
-BEGIN
-    -- Add level_id if missing
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='level_id') THEN
-        ALTER TABLE registration_requests ADD COLUMN level_id UUID REFERENCES levels(id);
-    ELSE
-        -- If it exists as TEXT, try to convert it to UUID if it's formatted as such
-        -- Safe check to avoid failing if it's not a UUID
-        BEGIN
-            ALTER TABLE registration_requests ALTER COLUMN level_id TYPE UUID USING level_id::UUID;
-            ALTER TABLE registration_requests ADD CONSTRAINT fk_reg_level FOREIGN KEY (level_id) REFERENCES levels(id);
-        EXCEPTION WHEN others THEN
-            RAISE NOTICE 'Could not convert level_id to UUID or add constraint';
-        END;
-    END IF;
+-- Ensure Correct Columns exist if table was already there
+ALTER TABLE registration_requests ADD COLUMN IF NOT EXISTS parent_phone TEXT;
+ALTER TABLE registration_requests ADD COLUMN IF NOT EXISTS subject_name TEXT;
 
-    -- Add subject_name if missing
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='subject_name') THEN
-        ALTER TABLE registration_requests ADD COLUMN subject_name TEXT;
-    END IF;
-
-    -- Add parent_phone if missing
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='parent_phone') THEN
-        ALTER TABLE registration_requests ADD COLUMN parent_phone TEXT;
-    END IF;
-
-    -- Handle moving target_year_id to year_id safely
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='target_year_id') THEN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='year_id') THEN
-            ALTER TABLE registration_requests RENAME COLUMN target_year_id TO year_id;
-        ELSE
-            -- Both exist? migrate then drop
-            UPDATE registration_requests SET year_id = target_year_id WHERE year_id IS NULL AND target_year_id IS NOT NULL;
-            ALTER TABLE registration_requests DROP COLUMN target_year_id;
-        END IF;
-    END IF;
-
-    -- Ensure year_id exists
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='year_id') THEN
-        ALTER TABLE registration_requests ADD COLUMN year_id UUID REFERENCES years(id);
-    END IF;
-END $$;
-
--- 6. Enrollment Requests (Existing students adding new subjects)
-CREATE TABLE enrollment_requests (
+-- 6. Enrollment Requests
+CREATE TABLE IF NOT EXISTS enrollment_requests (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     year_subject_id UUID REFERENCES year_subjects(id) ON DELETE CASCADE,
@@ -102,8 +65,8 @@ CREATE TABLE enrollment_requests (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 7. Student Enrollments (Many-to-Many)
-CREATE TABLE student_enrollments (
+-- 7. Student Enrollments
+CREATE TABLE IF NOT EXISTS student_enrollments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     year_subject_id UUID REFERENCES year_subjects(id) ON DELETE CASCADE,
@@ -112,68 +75,7 @@ CREATE TABLE student_enrollments (
     UNIQUE(student_id, year_subject_id)
 );
 
--- 8. Teacher Assignments
-CREATE TABLE teacher_assignments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    year_subject_id UUID REFERENCES year_subjects(id) ON DELETE CASCADE,
-    assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(teacher_id, year_subject_id)
-);
-
--- 9. Courses (Recorded/Replay content)
-CREATE TABLE courses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    year_subject_id UUID REFERENCES year_subjects(id) ON DELETE CASCADE,
-    teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    description TEXT,
-    thumbnail_url TEXT,
-    video_url TEXT,
-    duration TEXT,
-    views_count INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 10. Live Sessions
-CREATE TABLE lives (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    year_subject_id UUID REFERENCES year_subjects(id) ON DELETE CASCADE,
-    teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    start_time TIMESTAMP WITH TIME ZONE NOT NULL,
-    stream_url TEXT,
-    is_live BOOLEAN DEFAULT false,
-    viewer_count INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- RLS POLICIES --
-
--- Students can only see their own enrollments
-ALTER TABLE student_enrollments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY student_view_own_enrollments ON student_enrollments
-    FOR SELECT USING (auth.uid() = student_id);
-
--- Teachers can only see their own assignments
-ALTER TABLE teacher_assignments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY teacher_view_own_assignments ON teacher_assignments
-    FOR SELECT USING (auth.uid() = teacher_id);
-
--- General lookup tables (Read-only for all authenticated users)
-ALTER TABLE levels ENABLE ROW LEVEL SECURITY;
-CREATE POLICY public_read_levels ON levels FOR SELECT TO authenticated USING (true);
-
-ALTER TABLE years ENABLE ROW LEVEL SECURITY;
-CREATE POLICY public_read_years ON years FOR SELECT TO authenticated USING (true);
-
-ALTER TABLE subjects ENABLE ROW LEVEL SECURITY;
-CREATE POLICY public_read_subjects ON subjects FOR SELECT TO authenticated USING (true);
-
-ALTER TABLE year_subjects ENABLE ROW LEVEL SECURITY;
-CREATE POLICY public_read_year_subjects ON year_subjects FOR SELECT TO authenticated USING (true);
-
--- 11. Profiles (Centralized user data)
+-- 11. Profiles
 CREATE TABLE IF NOT EXISTS profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     name TEXT,
@@ -185,111 +87,63 @@ CREATE TABLE IF NOT EXISTS profiles (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- LEGACY/ROLE-SPECIFIC TABLES (Required by some components)
-CREATE TABLE IF NOT EXISTS teachers (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    email TEXT,
-    subject TEXT,
-    phone TEXT,
-    avatar TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS students (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    email TEXT,
-    level_id UUID REFERENCES levels(id),
-    year_id UUID REFERENCES years(id),
-    phone TEXT,
-    parent_phone TEXT,
-    avatar TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS admins (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    email TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- RLS for registration_requests
+-- RLS Enable
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE levels ENABLE ROW LEVEL SECURITY;
+ALTER TABLE years ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subjects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE registration_requests ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can create a registration request" ON registration_requests
-    FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins can view registration requests" ON registration_requests
-    FOR SELECT TO authenticated USING (
-        EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'ADMIN')
-    );
-CREATE POLICY "Admins can update registration requests" ON registration_requests
-    FOR UPDATE TO authenticated USING (
-        EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'ADMIN')
-    );
 
--- Seed reference data if empty (Idempotent)
-DO $$
-DECLARE
-    prim_id UUID;
-    moy_id UUID;
-    sec_id UUID;
-BEGIN
-    -- Only insert if the table is empty
-    IF NOT EXISTS (SELECT 1 FROM levels) THEN
-        -- Insert Levels
-        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'ابتدائي (Primaire)') RETURNING id INTO prim_id;
-        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'متوسط (Moyen)') RETURNING id INTO moy_id;
-        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'ثانوي (Secondaire)') RETURNING id INTO sec_id;
-        INSERT INTO levels (id, name) VALUES (uuid_generate_v4(), 'تكوين (Formation)');
+-- DROP AND RECREATE POLICIES (Explicitly)
+DROP POLICY IF EXISTS "Profiles are viewable by everyone" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Anyone can create a registration request" ON registration_requests;
+DROP POLICY IF EXISTS "Admins can view registration requests" ON registration_requests;
+DROP POLICY IF EXISTS "Admins can update registration requests" ON registration_requests;
+DROP POLICY IF EXISTS "Anyone can select levels" ON levels;
+DROP POLICY IF EXISTS "Anyone can select years" ON years;
 
-        -- Insert Years for Primaire
-        INSERT INTO years (level_id, name) VALUES 
-            (prim_id, '1'), (prim_id, '2'), (prim_id, '3'), (prim_id, '4'), (prim_id, '5');
-            
-        -- Insert Years for Moyen
-        INSERT INTO years (level_id, name) VALUES 
-            (moy_id, '1'), (moy_id, '2'), (moy_id, '3'), (moy_id, '4');
-            
-        -- Insert Years for Secondaire
-        INSERT INTO years (level_id, name) VALUES 
-            (sec_id, '1'), (sec_id, '2'), (sec_id, '3');
-    END IF;
-END $$;
-
+CREATE POLICY "Profiles are viewable by everyone" ON profiles FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Anyone can create a registration request" ON registration_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can view registration requests" ON registration_requests FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'ADMIN'));
+CREATE POLICY "Admins can update registration requests" ON registration_requests FOR UPDATE TO authenticated USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'ADMIN'));
 CREATE POLICY "Anyone can select levels" ON levels FOR SELECT TO public USING (true);
 CREATE POLICY "Anyone can select years" ON years FOR SELECT TO public USING (true);
-CREATE POLICY "Anyone can select subjects" ON subjects FOR SELECT TO public USING (true);
-CREATE POLICY "Anyone can select year_subjects" ON year_subjects FOR SELECT TO public USING (true);
 
--- Ensure registration_requests has all columns
-DO $$ 
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='level_id') THEN
-        ALTER TABLE registration_requests ADD COLUMN level_id UUID REFERENCES levels(id);
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='year_id') THEN
-        ALTER TABLE registration_requests ADD COLUMN year_id UUID REFERENCES years(id);
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='subject_name') THEN
-        ALTER TABLE registration_requests ADD COLUMN subject_name TEXT;
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='registration_requests' AND column_name='parent_phone') THEN
-        ALTER TABLE registration_requests ADD COLUMN parent_phone TEXT;
-    END IF;
-END $$;
+-- SEEDING DATA (Hardcoded UUIDs for stability)
+INSERT INTO levels (id, name) VALUES 
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', 'ابتدائي (Primaire)'),
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', 'متوسط (Moyen)'),
+('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', 'ثانوي (Secondaire)'),
+('d4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a', 'تكوين (Formation)')
+ON CONFLICT (name) DO NOTHING;
 
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+-- Years for Primary
+INSERT INTO years (level_id, name) VALUES 
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '1'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '2'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '3'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '4'),
+('a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', '5')
+ON CONFLICT DO NOTHING;
 
--- Profiles are viewable by authenticated users (to see teachers/admins)
-CREATE POLICY "Profiles are viewable by everyone" ON profiles
-    FOR SELECT TO authenticated USING (true);
+-- Years for Moyen
+INSERT INTO years (level_id, name) VALUES 
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '1'),
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '2'),
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '3'),
+('b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', '4')
+ON CONFLICT DO NOTHING;
 
--- Users can only update their own profile
-CREATE POLICY "Users can update own profile" ON profiles
-    FOR UPDATE USING (auth.uid() = id);
+-- Years for Secondaire
+INSERT INTO years (level_id, name) VALUES 
+('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '1'),
+('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '2'),
+('c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', '3')
+ON CONFLICT DO NOTHING;
 
--- 12. Trigger for automatic profile creation
+-- TRIGGER FOR PROFILES
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
@@ -299,6 +153,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_auth_user_created
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

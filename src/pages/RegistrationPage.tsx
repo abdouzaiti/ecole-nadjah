@@ -114,7 +114,6 @@ export default function RegistrationPage() {
       console.log('Auth signUp success, user ID:', authData.user.id);
 
       // 2. Insert into registration_requests for admin approval
-      // We build the object dynamically to avoid sending nulls for columns that might not exist yet
       const requestPayload: any = {
         id: authData.user.id,
         full_name: data.username,
@@ -124,10 +123,20 @@ export default function RegistrationPage() {
         status: 'PENDING'
       };
 
-      if (selectedLevel) requestPayload.level_id = selectedLevel;
-      if (selectedYear) requestPayload.year_id = selectedYear;
+      // Only send IDs if they look like valid UUIDs
+      const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+      if (selectedLevel && isUUID(selectedLevel)) {
+        requestPayload.level_id = selectedLevel;
+      }
       
-      // Look up subject label instead of key for better readability in dashboard
+      if (selectedYear && isUUID(selectedYear)) {
+        requestPayload.year_id = selectedYear;
+      }
+      
+      // If we don't have UUIDs (e.g. using fallbacks), we store the names in subject_name or similar
+      // or just rely on the fact that the user is created and admin can fix it.
+      
       if (data.subject) {
         const subjects = subjectsByContext();
         const subjectObj = subjects.find(s => s.key === data.subject);
@@ -136,7 +145,7 @@ export default function RegistrationPage() {
       
       if (data.parentPhone) requestPayload.parent_phone = data.parentPhone;
 
-      console.log('Inserting registration request:', requestPayload);
+      console.log('Inserting registration request with payload:', requestPayload);
       const { error: requestError } = await supabase
         .from('registration_requests')
         .insert([requestPayload]);
