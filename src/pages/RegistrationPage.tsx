@@ -8,486 +8,80 @@ import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
 
 export default function RegistrationPage() {
-  const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [role, setRole] = useState<'student' | 'teacher' | 'admin'>('student');
+  const [role, setRole] = useState<'student' | 'teacher'>('student');
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
 
-  const [dbLevels, setDbLevels] = useState<any[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string>('');
-  const [selectedStream, setSelectedStream] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
+  const [selectedStream, setSelectedStream] = useState<string>('');
+  const [selectedSubject, setSelectedSubject] = useState<string>('');
 
-  React.useEffect(() => {
-    // Initial standard levels using the same UUIDs as the database schema for stability
-    const standardLevels = [
-      { id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', name: isAr ? 'ابتدائي' : 'Primaire', years: [{ id: 'y1', name: '1 AP' }, { id: 'y2', name: '2 AP' }, { id: 'y3', name: '3 AP' }, { id: 'y4', name: '4 AP' }, { id: 'y5', name: '5 AP' }] },
-      { id: 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e', name: isAr ? 'متوسط' : 'Moyen', years: [{ id: 'y1', name: '1 AM' }, { id: 'y2', name: '2 AM' }, { id: 'y3', name: '3 AM' }, { id: 'y4', name: '4 AM' }] },
-      { id: 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f', name: isAr ? 'ثانوي' : 'Secondaire', years: [{ id: 'y1', name: '1 AS' }, { id: 'y2', name: '2 AS' }, { id: 'y3', name: '3 AS' }] },
-      { id: 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a', name: isAr ? 'تكوين' : 'Formation', years: [] }
+  const levels = [
+    { id: 'primary', name: isAr ? 'ابتدائي' : 'Primaire' },
+    { id: 'middle', name: isAr ? 'متوسط' : 'Moyen' },
+    { id: 'high', name: isAr ? 'ثانوي' : 'Secondaire' },
+    { id: 'formation', name: isAr ? 'تكوين' : 'Formation' }
+  ];
+
+  const years: Record<string, string[]> = {
+    primary: ['1 AP', '2 AP', '3 AP', '4 AP', '5 AP'],
+    middle: ['1 AM', '2 AM', '3 AM', '4 AM'],
+    high: ['1 AS', '2 AS', '3 AS'],
+  };
+
+  const getSubjects = () => {
+    if (selectedLevel === 'formation') {
+      return [
+        isAr ? "لغة فرنسية" : "Français",
+        isAr ? "لغة إنجليزية" : "Anglais",
+        isAr ? "لغة عربية" : "Arabe",
+        isAr ? "لغة ألمانية" : "Allemand",
+        isAr ? "لغة إسبانية" : "Espagnol",
+        isAr ? "إعلام آلي (Bureautique)" : "Informatique Bureautique"
+      ];
+    }
+    return [
+      isAr ? "رياضيات" : "Mathématique",
+      isAr ? "فيزياء" : "Physique",
+      isAr ? "علوم" : "Sciences",
+      isAr ? "لغة عربية" : "Arabe",
+      isAr ? "لغة فرنسية" : "Français",
+      isAr ? "لغة إنجليزية" : "Anglais",
+      isAr ? "تاريخ وجغرافيا" : "Histoire/Géo",
+      isAr ? "فلسفة" : "Philosophie"
     ];
-    setDbLevels(standardLevels);
-
-    const fetchLevels = async () => {
-      try {
-        console.log('Fetching levels from database...');
-        const { data, error: fetchErr } = await supabase
-          .from('levels')
-          .select('*, years(*)');
-        
-        if (fetchErr) throw fetchErr;
-
-        if (data && data.length > 0) {
-          console.log('Successfully fetched levels:', data.length);
-          // Standardize display names for fetched years if they are just simple digits
-          const processedData = data.map(l => {
-            const key = getLevelKey(l.id);
-            const suffix = key === 'primary' ? 'AP' : key === 'middle' ? 'AM' : key === 'high' ? 'AS' : '';
-            return {
-              ...l,
-              years: l.years ? l.years.sort((a: any, b: any) => a.name.localeCompare(b.name)).map((y: any) => ({
-                ...y,
-                name: y.name.length <= 2 ? `${y.name} ${suffix}`.trim() : y.name
-              })) : []
-            };
-          });
-          setDbLevels(processedData);
-        }
-      } catch (err) {
-        console.error('Error fetching levels:', err);
-      }
-    };
-    fetchLevels();
-  }, [isAr]);
-
-  const getLevelKey = (id: string) => {
-    if (id === 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d') return 'primary';
-    if (id === 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e') return 'middle';
-    if (id === 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f') return 'high';
-    if (id === 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a') return 'formation';
-    
-    const level = dbLevels.find(l => l.id === id);
-    if (!level) return '';
-    const name = level.name.toLowerCase();
-    // English/French keywords
-    if (name.includes('prim')) return 'primary';
-    if (name.includes('moy') || name.includes('mid') || name.includes('middle')) return 'middle';
-    if (name.includes('lyc') || name.includes('high') || name.includes('second')) return 'high';
-    if (name.includes('form')) return 'formation';
-    // Arabic keywords
-    if (name.includes('ابتدائ') || name.includes('إبتدائ')) return 'primary';
-    if (name.includes('متوسط')) return 'middle';
-    if (name.includes('ثانوي')) return 'high';
-    if (name.includes('تكوين')) return 'formation';
-    return '';
   };
 
-  const getYearName = (id: string) => {
-    const level = dbLevels.find(l => l.id === selectedLevel);
-    if (!level || !level.years) return '';
-    const year = level.years.find((y: any) => y.id === id);
-    if (!year) return '';
-    // Extract digit for logic if multiple characters exist
-    return year.name.split(' ')[0] || year.name;
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
     
-    try {
-      // 1. Sign up user in Supabase Auth
-      console.log('Attempting auth signUp for:', data.email);
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: data.email as string,
-        password: data.password as string,
-        options: {
-          data: {
-            full_name: data.username,
-            role: role.toUpperCase(),
-          }
-        }
-      });
-
-      if (signUpError) {
-        if (signUpError.message.includes('User already registered') || signUpError.status === 400) {
-          setError(isAr ? "هذا الحساب موجود بالفعل. يرجى تسجيل الدخول." : "This email is already registered. Please login instead.");
-          setLoading(false);
-          return;
-        }
-        throw signUpError;
-      }
-      if (!authData.user) throw new Error('Signup failed');
-      console.log('Auth signUp success, user ID:', authData.user.id);
-
-      // 2. Insert into registration_requests for admin approval
-      const requestPayload: any = {
-        id: authData.user.id,
-        full_name: data.username,
-        email: data.email,
-        phone: data.phone,
-        role: role.toUpperCase(),
-        status: 'PENDING'
-      };
-
-      // Ensure UUID format for foreign keys
-      const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-
-      if (selectedLevel && isUUID(selectedLevel)) {
-        requestPayload.level_id = selectedLevel;
-      }
-      
-      if (selectedYear && isUUID(selectedYear)) {
-        requestPayload.year_id = selectedYear;
-      }
-      
-      if (data.subject) {
-        const subjectsList = subjectsByContext();
-        const subjectObj = subjectsList.find((s: any) => s.key === data.subject);
-        requestPayload.subject_name = subjectObj ? subjectObj.label : (data.subject as string);
-      }
-      
-      if (data.parentPhone) requestPayload.parent_phone = data.parentPhone;
-
-      console.log('Inserting registration request:', requestPayload);
-      
-      // Try to insert - we use upsert to handle case where user might have been created but request failed previously
-      const { error: requestError } = await supabase
-        .from('registration_requests')
-        .upsert([requestPayload], { onConflict: 'id' });
-
-      if (requestError) {
-        console.error('Registration table error:', requestError);
-        // Provide very specific feedback for common issues
-        if (requestError.code === '42703') { // Column not found
-          setError(isAr ? "خطأ في بنية قاعدة البيانات (عمود مفقود)" : "Database schema error: Missing columns in registration_requests.");
-        } else if (requestError.code === '23503') { // FK violation
-          setError(isAr ? "خطأ في المراجعة (المستوى أو السنة غير موجودة)" : "Referential error: Level or Year ID not found in database.");
-        } else {
-          setError(`DB Error: ${requestError.message}`);
-        }
-        setLoading(false);
-        return;
-      }
-
-      console.log('Registration request inserted successfully');
-
-      // WhatsApp message (Keeping it as requested for multi-channel notification)
-      const whatsappNumber = "213790356012";
-      let message = "";
-      
-      const levelName = dbLevels.find(l => l.id === selectedLevel)?.name || '';
-      const yearName = getYearName(selectedYear);
-
-      if (role === 'teacher') {
-        message = `*Nouveau Dossier d'Enseignant - École Nadjah*\n\n` +
+    // WhatsApp message
+    const whatsappNumber = "213790356012";
+    let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
                   `👤 *Nom:* ${data.username}\n` +
-                  `📧 *Email:* ${data.email}\n` +
                   `📱 *Téléphone:* ${data.phone}\n` +
-                  `👨‍🏫 *Role:* Enseignant\n` +
-                  `📚 *Niveau:* ${levelName}\n` +
-                  `📅 *Année:* ${yearName}\n` +
-                  `📖 *Matière:* ${data.subject}`;
-      } else if (role === 'admin') {
-        message = `*Nouveau Dossier d'Administrateur - École Nadjah*\n\n` +
-                  `👤 *Nom:* ${data.username}\n` +
-                  `📧 *Email:* ${data.email}\n` +
-                  `📱 *Téléphone:* ${data.phone}\n` +
-                  `🛡️ *Role:* Admin`;
-      } else {
-        message = `*Nouveau Dossier d'Élève - École Nadjah*\n\n` +
-                  `👤 *Nom:* ${data.username}\n` +
-                  `📧 *Email:* ${data.email}\n` +
-                  `📱 *Téléphone:* ${data.phone}\n` +
-                  `👨‍👩‍👧‍👦 *Parent:* ${data.parentPhone}\n` +
-                  `📚 *Niveau:* ${levelName}\n` +
-                  `📅 *Année:* ${yearName}\n` +
-                  `📖 *Matière:* ${data.subject}`;
-      }
+                  `👨‍🏫 *Role:* ${role === 'student' ? 'Élève' : 'Enseignant'}\n` +
+                  `📚 *Niveau:* ${selectedLevel}\n` +
+                  `📅 *Année:* ${selectedYear}\n` +
+                  `📖 *Matière:* ${selectedSubject}`;
 
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-      window.open(whatsappUrl, '_blank');
-      
-      setIsSuccess(true);
-    } catch (err: any) {
-      console.error('Registration error:', err);
-      setError(err.message || 'Registration failed');
-    } finally {
-      setLoading(false);
-    }
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    setLoading(false);
   };
-
-  const levels = [
-    { key: 'primary', label: t('levels.primary') },
-    { key: 'middle', label: t('levels.middle') },
-    { key: 'high', label: t('levels.high') },
-    { key: 'formation', label: t('levels.formation') },
-  ];
-
-  const subjects = [
-    { key: 'math', label: t('subjects.math') },
-    { key: 'physics', label: t('subjects.physics') },
-    { key: 'philosophy', label: t('subjects.philosophy') },
-    { key: 'history', label: t('subjects.history') },
-    { key: 'arabic', label: t('subjects.arabic') },
-    { key: 'french', label: t('subjects.french') },
-    { key: 'english', label: t('subjects.english') },
-    { key: 'science', label: t('subjects.science') },
-  ];
-
-  const subjectsByContext = () => {
-    const levelKey = getLevelKey(selectedLevel);
-    if (!levelKey) return [];
-    
-    const yearName = getYearName(selectedYear);
-
-    if (levelKey === 'primary') {
-      if (['1', '2'].includes(yearName)) {
-        return [
-          { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
-          { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
-          { key: 'islamic', label: isAr ? "التربية الإسلامية" : "Éducation Islamique" },
-          { key: 'civic', label: isAr ? "التربية المدنية" : "Éducation Civique" },
-          { key: 'scientific', label: isAr ? "التربية العلمية" : "Éducation Scientifique" },
-          { key: 'pe', label: isAr ? "التربية البدنية" : "Éducation Physique" },
-          { key: 'art', label: isAr ? "التربية الفنية" : "Éducation Artistique" },
-        ];
-      }
-      return [
-        { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
-        { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
-        { key: 'fr', label: isAr ? "اللغة الفرنسية" : "Français" },
-        { key: 'en', label: isAr ? "اللغة الإنجليزية" : "Anglais" },
-        { key: 'hist_geo', label: isAr ? "التاريخ والجغرافيا" : "Histoire/Géo" },
-        { key: 'islamic', label: isAr ? "التربية الإسلامية" : "Éducation Islamique" },
-        { key: 'civic', label: isAr ? "التربية المدنية" : "Éducation Civique" },
-        { key: 'scientific', label: isAr ? "التربية العلمية" : "Éducation Scientifique" },
-        { key: 'pe', label: isAr ? "التربية البدنية" : "Éducation Physique" },
-        { key: 'art', label: isAr ? "التربية الفنية" : "Éducation Artistique" },
-      ];
-    }
-
-    if (levelKey === 'middle') {
-      return [
-        { key: 'ar', label: isAr ? "اللغة العربية" : "Arabe" },
-        { key: 'math', label: isAr ? "الرياضيات" : "Mathématique" },
-        { key: 'fr', label: isAr ? "اللغة الفرنسية" : "Français" },
-        { key: 'en', label: isAr ? "اللغة الإنجليزية" : "Anglais" },
-        { key: 'science', label: isAr ? "علوم الطبيعة والحياة" : "Sciences Naturelles" },
-        { key: 'physics', label: isAr ? "العلوم الفيزيائية والتكنولوجيا" : "Physique/Techno" },
-        { key: 'hist_geo', label: isAr ? "التاريخ والجغرافيا" : "Histoire/Géo" },
-        { key: 'islamic', label: isAr ? "التربية الإسلامية" : "Éducation Islamique" },
-        { key: 'civic', label: isAr ? "التربية المدنية" : "Éducation Civique" },
-        { key: 'pe', label: isAr ? "التربية البدنية والرياضية" : "Éducation Physique" },
-        { key: 'it', label: isAr ? "إعلام آلي" : "Informatique" },
-        { key: 'art', label: isAr ? "التربية الفنية/الموسيقية" : "Arts/Musique" },
-      ];
-    }
-
-    if (levelKey === 'high') {
-      if (!selectedYear) return [];
-      
-      if (yearName === '1') {
-        if (!selectedStream) return [];
-        if (selectedStream === 'science') {
-          return [
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
-            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
-            { key: 'tech', label: isAr ? "تكنولوجيا" : "Techno" },
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
-            { key: 'it', label: isAr ? "إعلام آلي" : "Informatique" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
-          ];
-        }
-        if (selectedStream === 'arts') {
-          return [
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-            { key: 'fr', label: isAr ? "لغة فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "لغة إنجليزية" : "Anglais" },
-            { key: 'phil', label: isAr ? "فلسفة" : "Philosophie" },
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-            { key: 'pe', label: isAr ? "تربية بدنية" : "EPS" },
-          ];
-        }
-      } else if (['2', '3'].includes(yearName)) {
-        if (!selectedStream) return [];
-        const branchSubjects: Record<string, any[]> = {
-          exp_science: [
-            { key: 'science', label: isAr ? "علوم الطبيعة والحياة" : "SVT" },
-            { key: 'physics', label: isAr ? "علوم فيزيائية" : "Physique" },
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-          ],
-          math: [
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
-            { key: 'science', label: isAr ? "علوم طبيعية" : "SVT" },
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-          ],
-          tech_math: [
-            { key: 'tech_gm', label: isAr ? "تكنولوجيا - هندسة ميكانيكية" : "Génie Mécanique" },
-            { key: 'tech_ge', label: isAr ? "تكنولوجيا - هندسة كهربائية" : "Génie Électrique" },
-            { key: 'tech_gc', label: isAr ? "تكنولوجيا - هندسة مدنية" : "Génie Civil" },
-            { key: 'tech_gp', label: isAr ? "تكنولوجيا - هندسة الطرائق" : "Génie des Procédés" },
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'physics', label: isAr ? "فيزياء" : "Physique" },
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-          ],
-          mgt_eco: [
-            { key: 'mgt', label: isAr ? "تسيير محاسبي ومالي" : "Gestion/Finance" },
-            { key: 'eco', label: isAr ? "اقتصاد ومناجم" : "Économie" },
-            { key: 'law', label: isAr ? "قانون" : "Droit" },
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-          ],
-          arts_phil: [
-            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-            { key: 'fr', label: isAr ? "فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "إنجليزية" : "Anglais" },
-            { key: 'math', label: isAr ? "رياضيات" : "Maths" },
-            { key: 'islamic', label: isAr ? "تربية إسلامية" : "Religion" },
-          ],
-          languages: [
-            { key: 'fr', label: isAr ? "لغة فرنسية" : "Français" },
-            { key: 'en', label: isAr ? "لغة إنجليزية" : "Anglais" },
-            { key: 'lang3_es', label: isAr ? "إسبانية" : "Espagnol" },
-            { key: 'lang3_de', label: isAr ? "ألمانية" : "Allemand" },
-            { key: 'lang3_it', label: isAr ? "إيطالية" : "Italien" },
-            { key: 'ar', label: isAr ? "لغة عربية" : "Arabe" },
-            { key: 'phil', label: isAr ? "فلسفة" : "Philo" },
-            { key: 'hist_geo', label: isAr ? "تاريخ وجغرافيا" : "Histoire/Géo" },
-          ]
-        };
-        return branchSubjects[selectedStream] || [];
-      }
-    }
-
-    if (levelKey === 'formation') {
-      return [
-        { key: 'en_bus', label: isAr ? "إنجليزية للأعمال" : "English for Business" },
-        { key: 'fr_bus', label: isAr ? "فرنسية للأعمال" : "Français des Affaires" },
-        { key: 'it_office', label: isAr ? "إعلام آلي (Bureautique)" : "Informatique Bureautique" },
-        { key: 'it_dev', label: isAr ? "تطوير الويب" : "Développement Web" },
-        { key: 'it_ds', label: isAr ? "التصميم الغرافيكي" : "Design Graphique" },
-        { key: 'marketing', label: isAr ? "التسويق الرقمي" : "Marketing Digital" },
-        { key: 'comm', label: isAr ? "فنون التواصل" : "Communication" },
-        { key: 'en_general', label: isAr ? "اللغة الإنجليزية (عامة)" : "Anglais Général" },
-        { key: 'fr_general', label: isAr ? "اللغة الفرنسية (عامة)" : "Français Général" },
-        { key: 'es_general', label: isAr ? "اللغة الإسبانية" : "Espagnol" },
-        { key: 'de_general', label: isAr ? "اللغة الألمانية" : "Allemand" },
-      ];
-    }
-
-    return subjects;
-  };
-
-  const getStreams = () => {
-    const levelKey = getLevelKey(selectedLevel);
-    if (levelKey !== 'high') return [];
-    
-    const yearName = getYearName(selectedYear);
-    if (yearName === '1') {
-      return [
-        { key: 'science', label: isAr ? "جذع مشترك علوم وتكنولوجيا" : "Tronc Commun Sciences" },
-        { key: 'arts', label: isAr ? "جذع مشترك آداب" : "Tronc Commun Lettres" },
-      ];
-    }
-    return [
-      { key: 'exp_science', label: isAr ? "شعبة العلوم التجريبية" : "Sciences Expérimentales" },
-      { key: 'math', label: isAr ? "شعبة الرياضيات" : "Mathématiques" },
-      { key: 'tech_math', label: isAr ? "شعبة تقني رياضي" : "Technique Math" },
-      { key: 'mgt_eco', label: isAr ? "شعبة تسيير واقتصاد" : "Gestion & Économie" },
-      { key: 'arts_phil', label: isAr ? "شعبة آداب وفلسفة" : "Lettres & Philosophie" },
-      { key: 'languages', label: isAr ? "شعبة لغات أجنبية" : "Langues Étrangères" },
-    ];
-  };
-
-  const getYearsForLevel = (level: string) => {
-    switch (level) {
-      case 'primary': return [1, 2, 3, 4, 5];
-      case 'middle': return [1, 2, 3, 4];
-      case 'high': return [1, 2, 3];
-      case 'formation': return [];
-      default: return [1];
-    }
-  };
-
-  if (isSuccess) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center p-4 bg-transparent">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-          <Card className="max-w-md text-center p-12 bg-white/60 backdrop-blur-xl border border-white/40 premium-shadow">
-            <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle size={48} />
-            </div>
-            <h2 className="text-3xl font-serif text-navy mb-4 font-bold">{t('auth.registration.success_title')}</h2>
-            <div className="space-y-4 text-navy/60 mb-8 leading-relaxed font-sans text-sm">
-              <p>
-                {isAr 
-                  ? "لقد تم استلام طلبك بنجاح. سنقوم بمراجعة حسابك والرد عليك في أقرب وقت ممكن عبر WhatsApp أو البريد الإلكتروني."
-                  : "Votre demande a été reçue avec succès. Nous allons examiner votre compte et vous répondrons dans les plus brefs délais via WhatsApp ou Email."
-                }
-              </p>
-              <div className="p-4 bg-blue-accent/5 rounded-xl text-blue-accent font-bold">
-                {isAr 
-                  ? "يرجى الانتظار حتى يقوم المدير بتفعيل حسابك."
-                  : "Veuillez patienter jusqu'à ce que l'administrateur active votre compte."
-                }
-              </div>
-              <p className="text-xs italic">
-                {isAr
-                  ? "يرجى التأكد من إرسال الرسالة إلى WhatsApp إذا تم فتح النافذة."
-                  : "Veuillez finaliser l'envoi de votre message sur WhatsApp si la fenêtre s'est ouverte."
-                }
-              </p>
-            </div>
-            <Link to="/">
-              <Button variant="outline" className="w-full">{t('auth.registration.back_home')}</Button>
-            </Link>
-          </Card>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen py-12 bg-transparent">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-12">
-          <img src="/logo.png" alt="Logo" className="w-24 h-24 mx-auto mb-6 object-contain" />
           <Badge variant="navy">{t('auth.registration.step')}</Badge>
           <h1 className="text-4xl md:text-5xl font-serif text-navy mt-4 mb-4 font-bold">{t('auth.registration.title')}</h1>
-          <p className="text-navy/60 italic font-sans">{t('auth.registration.form_subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -497,10 +91,7 @@ export default function RegistrationPage() {
                 <button
                   type="button"
                   onClick={() => setRole('student')}
-                  className={cn(
-                    "flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all",
-                    role === 'student' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60"
-                  )}
+                  className={cn("flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all", role === 'student' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60")}
                 >
                   <User size={18} />
                   {t('auth.registration.i_am_student')}
@@ -508,287 +99,69 @@ export default function RegistrationPage() {
                 <button
                   type="button"
                   onClick={() => setRole('teacher')}
-                  className={cn(
-                    "flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all",
-                    role === 'teacher' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60"
-                  )}
+                  className={cn("flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all", role === 'teacher' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60")}
                 >
                   <BookOpen size={18} />
                   {t('auth.registration.i_am_teacher')}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('admin')}
-                  className={cn(
-                    "flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-bold transition-all",
-                    role === 'admin' ? "bg-white text-blue-accent shadow-sm" : "text-navy/40 hover:text-navy/60"
-                  )}
-                >
-                  <ShieldCheck size={18} />
-                  {t('auth.roles.admin') || 'Admin'}
-                </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {error && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-red-50 border border-red-100 rounded-xl flex flex-col gap-2 text-red-600 text-sm"
-                  >
-                    <div className="flex items-center gap-3">
-                      <AlertCircle size={18} />
-                      {error}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="relative md:col-span-2">
+                    <User size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                    <input name="username" type="text" required placeholder={t('auth.registration.username_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                  </div>
+
+                  <div className="relative">
+                    <Mail size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                    <input name="email" type="email" required placeholder={t('auth.registration.email_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                  </div>
+
+                  <div className="relative">
+                    <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                    <input name="phone" type="tel" placeholder={t('auth.registration.phone_placeholder')} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                  </div>
+
+                  {role === 'student' && (
+                    <div className="relative md:col-span-2">
+                      <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                      <input name="parentPhone" type="tel" placeholder={t('auth.registration.parent_phone')} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                     </div>
-                    {error.includes('registered') && (
-                      <Link to="/login" className="text-blue-600 font-bold hover:underline px-7">
-                        {isAr ? "انتقل إلى صفحة تسجيل الدخول" : "Go to login page"} &rarr;
-                      </Link>
-                    )}
-                  </motion.div>
-                )}
+                  )}
 
-                <div>
-                  <h3 className={cn("text-xl font-serif text-navy mb-6 flex items-center gap-2 font-bold", isAr && "flex-row-reverse")}>
-                    {role === 'student' ? (
-                      <>
-                        <User size={20} className="text-blue-accent" /> {t('auth.registration.student_info')}
-                      </>
-                    ) : role === 'teacher' ? (
-                      <>
-                        <ShieldCheck size={20} className="text-blue-accent" /> {t('auth.registration.teacher_info')}
-                      </>
-                    ) : (
-                      <>
-                        <ShieldCheck size={20} className="text-blue-accent" /> {t('auth.roles.admin') || 'Admin'}
-                      </>
-                    )}
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1 md:col-span-2">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.username')}</label>
-                      <div className="relative">
-                        <User size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input name="username" type="text" required placeholder={t('auth.registration.username_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
-                      </div>
+                  <div className="relative">
+                    <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                  <select name="level" onChange={(e) => {
+                      setSelectedLevel(e.target.value);
+                      setSelectedYear('');
+                    }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                      <option value="">{t('auth.registration.select_level')}</option>
+                      {levels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    </select>
+                  </div>
+
+                  {years[selectedLevel] && (
+                    <div className="relative">
+                      <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                      <select name="year" onChange={(e) => setSelectedYear(e.target.value)} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                        <option value="">{t('auth.registration.year_placeholder')}</option>
+                        {years[selectedLevel].map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
                     </div>
+                  )}
 
-                    <div className="space-y-1">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.contact_email')}</label>
-                      <div className="relative">
-                        <Mail size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input name="email" type="email" required placeholder={t('auth.registration.email_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.password_placeholder')}</label>
-                      <div className="relative">
-                        <Lock size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input name="password" type="password" required minLength={6} placeholder="••••••••" className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1 md:col-span-2">
-                       <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.phone_number')}</label>
-                      <div className="relative">
-                        <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                        <input name="phone" type="tel" placeholder={t('auth.registration.phone_placeholder')} dir="ltr" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
-                      </div>
-                    </div>
-
-                    {role === 'teacher' && (
-                      <>
-                        <div className="space-y-1">
-                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.desired_level')}</label>
-                          <div className="relative">
-                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select 
-                              name="level" 
-                              value={selectedLevel} 
-                              required 
-                              onChange={(e) => {
-                                setSelectedLevel(e.target.value);
-                                setSelectedYear('');
-                                setSelectedStream('');
-                              }}
-                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                            >
-                              <option value="" disabled>{t('auth.registration.select_level')}</option>
-                              {dbLevels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                            </select>
-                          </div>
-                        </div>
-
-                        {getLevelKey(selectedLevel) && getLevelKey(selectedLevel) !== 'formation' && (
-                          <div className="space-y-1">
-                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
-                            <div className="relative">
-                              <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                              <select 
-                                name="year" 
-                                value={selectedYear}
-                                required 
-                                onChange={(e) => {
-                                  setSelectedYear(e.target.value);
-                                  setSelectedStream('');
-                                }}
-                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                              >
-                                <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
-                                {dbLevels.find(l => l.id === selectedLevel)?.years?.map((y: any) => (
-                                  <option key={y.id} value={y.id}>{y.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        )}
-
-                        {getLevelKey(selectedLevel) === 'high' && (
-                          <div className="space-y-1 md:col-span-2">
-                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>
-                              {isAr ? "الشعبة / الجذع المشترك" : "Filière / Tronc Commun"}
-                            </label>
-                            <div className="relative">
-                              <ShieldCheck size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                              <select 
-                                name="stream"
-                                value={selectedStream}
-                                required
-                                onChange={(e) => setSelectedStream(e.target.value)}
-                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                              >
-                                <option value="" disabled>{isAr ? "اختر الشعبة..." : "Choisir la filière..."}</option>
-                                {getStreams().map(s => (
-                                  <option key={s.key} value={s.key}>{s.label}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="space-y-1 md:col-span-2">
-                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
-                          <div className="relative">
-                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select 
-                              name="subject" 
-                              required 
-                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                            >
-                              <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
-                              {subjectsByContext().map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
-                            </select>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {role === 'student' && (
-                      <>
-                        <div className="space-y-1 md:col-span-2">
-                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.parent_phone')}</label>
-                          <div className="relative">
-                            <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <input name="parentPhone" type="tel" placeholder={t('auth.registration.phone_placeholder')} dir="ltr" required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
-                          </div>
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.desired_level')}</label>
-                          <div className="relative">
-                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select 
-                              name="level" 
-                              value={selectedLevel}
-                              required 
-                              onChange={(e) => {
-                                setSelectedLevel(e.target.value);
-                                setSelectedYear('');
-                                setSelectedStream('');
-                              }}
-                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                            >
-                              <option value="" disabled>{t('auth.registration.select_level')}</option>
-                              {dbLevels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                            </select>
-                          </div>
-                        </div>
-
-                        {getLevelKey(selectedLevel) && getLevelKey(selectedLevel) !== 'formation' && (
-                          <div className="space-y-1">
-                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.academic_year')}</label>
-                            <div className="relative">
-                              <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                              <select 
-                                name="year" 
-                                value={selectedYear}
-                                required 
-                                onChange={(e) => {
-                                  setSelectedYear(e.target.value);
-                                  setSelectedStream('');
-                                }}
-                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                              >
-                                <option value="" disabled>{t('auth.registration.year_placeholder')}</option>
-                                {dbLevels.find(l => l.id === selectedLevel)?.years?.map((y: any) => (
-                                  <option key={y.id} value={y.id}>{y.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        )}
-
-                        {getLevelKey(selectedLevel) === 'high' && (
-                          <div className="space-y-1 md:col-span-2">
-                            <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>
-                              {isAr ? "الشعبة / الجذع المشترك" : "Filière / Tronc Commun"}
-                            </label>
-                            <div className="relative">
-                              <ShieldCheck size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                              <select 
-                                name="stream"
-                                value={selectedStream}
-                                required
-                                onChange={(e) => setSelectedStream(e.target.value)}
-                                className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                              >
-                                <option value="" disabled>{isAr ? "اختر الشعبة..." : "Choisir la filière..."}</option>
-                                {getStreams().map(s => (
-                                  <option key={s.key} value={s.key}>{s.label}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="space-y-1 md:col-span-2">
-                          <label className={cn("text-xs font-bold uppercase tracking-widest text-navy/40 px-1 block", isAr && "text-right")}>{t('auth.registration.subject')}</label>
-                          <div className="relative">
-                            <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                            <select 
-                              name="subject" 
-                              required 
-                              className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}
-                            >
-                              <option value="" disabled>{t('auth.registration.subject_placeholder')}</option>
-                              {subjectsByContext().map((s: any) => <option key={s.key} value={s.key}>{s.label}</option>)}
-                            </select>
-                          </div>
-                        </div>
-                      </>
-                    )}
+                  <div className="relative md:col-span-2">
+                    <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                    <select name="subject" onChange={(e) => setSelectedSubject(e.target.value)} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                      <option value="">{t('auth.registration.subject_placeholder')}</option>
+                      {getSubjects().map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  variant="navy" 
-                  disabled={loading}
-                  className="w-full py-5 text-white font-bold uppercase tracking-[0.2em] shadow-xl shadow-blue-accent/20 bg-blue-accent hover:bg-blue-accent/90"
-                >
-                  {loading ? <Loader2 className="animate-spin mx-auto" /> : t('auth.registration.submit_button')}
+                <Button type="submit" className="w-full py-6 text-xl bg-green-500 hover:bg-green-600 rounded-xl" disabled={loading}>
+                  {loading ? <Loader2 className="animate-spin" /> : t('auth.registration.submit_button')}
                 </Button>
               </form>
             </Card>
@@ -807,18 +180,6 @@ export default function RegistrationPage() {
                   <span className="text-white/90">{t('auth.registration.important_note_2')}</span>
                 </li>
               </ul>
-            </Card>
-            
-            <Card className={cn("p-8 bg-white/40 backdrop-blur-lg border-blue-accent/10 border-2 dashed", isAr && "text-right")}>
-              <h4 className="text-lg font-serif text-navy mb-4 font-bold">{t('auth.registration.need_help')}</h4>
-              <p className="text-sm text-navy/60 mb-6 font-sans">
-                {t('auth.registration.help_desc')}
-              </p>
-              <a href="tel:0790356012" className="block w-full">
-                 <Button variant="outline" size="sm" className="w-full">
-                    {t('contact_us')}
-                 </Button>
-              </a>
             </Card>
           </div>
         </div>

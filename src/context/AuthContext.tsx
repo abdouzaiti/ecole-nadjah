@@ -26,7 +26,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.error('Session retrieval error:', error);
           if (error.message.includes('Refresh Token Not Found') || error.message.includes('invalid_grant')) {
             console.warn('Session is invalid, forcing sign out...');
+            // More aggressive cleanup
+            localStorage.clear();
             await supabase.auth.signOut();
+            setUser(null);
+            setLoading(false);
+            return;
           }
         }
 
