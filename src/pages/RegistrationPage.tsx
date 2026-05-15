@@ -79,9 +79,17 @@ export default function RegistrationPage() {
   return (
     <div className="min-h-screen py-12 bg-transparent">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <Badge variant="navy">{t('auth.registration.step')}</Badge>
-          <h1 className="text-4xl md:text-5xl font-serif text-navy mt-4 mb-4 font-bold">{t('auth.registration.title')}</h1>
+        <div className="text-center mb-16 relative">
+          <Badge variant="navy" className="mb-4 bg-white/50 backdrop-blur-sm border-navy/10 px-6 py-1.5 text-xs tracking-widest uppercase font-bold">
+            {t('auth.registration.step')}
+          </Badge>
+          <h1 className="text-5xl md:text-7xl font-serif text-navy mt-2 mb-4 font-extrabold tracking-tighter">
+            {isAr 
+              ? (role === 'student' ? 'تسجيل طالب' : 'تسجيل أستاذ') 
+              : (role === 'student' ? 'Inscription Élève' : 'Inscription Enseignant')
+            }
+          </h1>
+
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -168,18 +176,31 @@ export default function RegistrationPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="bg-blue-accent/90 backdrop-blur-md text-white p-8 border-none ring-1 ring-white/20">
-              <h4 className={cn("text-xl font-serif text-white mb-4 font-bold", isAr && "text-right")}>{t('auth.registration.important_title')}</h4>
-              <ul className="space-y-4 text-sm text-white/70">
-                <li className={cn("flex gap-3", isAr && "flex-row-reverse text-right")}>
-                  <Info size={24} className="text-white shrink-0" />
-                  <span className="text-white/90">{t('auth.registration.important_note_1')}</span>
-                </li>
-                <li className={cn("flex gap-3", isAr && "flex-row-reverse text-right")}>
-                  <CheckCircle size={20} className="text-white shrink-0" />
-                  <span className="text-white/90">{t('auth.registration.important_note_2')}</span>
-                </li>
-              </ul>
+            <Card className="bg-white p-6 shadow-sm border border-navy/10">
+              <h4 className={cn("text-lg font-serif text-navy mb-3 font-bold", isAr && "text-right")}>
+                {isAr ? "هل لديك استفسار؟" : "Besoin d'aide ?"}
+              </h4>
+              <p className={cn("text-navy/70 text-sm mb-4", isAr && "text-right")}>
+                {isAr ? "لأي استفسار إضافي حول التسجيل، لا تتردد في الاتصال بنا." : "Pour toute question supplémentaire concernant l'inscription, n'hésitez pas à nous contacter."}
+              </p>
+              <div className="space-y-3">
+                <a 
+                  href={`https://wa.me/213790356012?text=${encodeURIComponent(isAr ? "مرحباً، لدي استفسار بخصوص التسجيل في مدرسة النجاح." : "Bonjour, j'ai une question concernant l'inscription à l'école Nadjah.")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn("inline-flex items-center gap-2 text-green-600 font-bold hover:underline", isAr && "flex-row-reverse")}
+                >
+                  <Phone size={18} />
+                  {isAr ? "اتصل بنا عبر WhatsApp" : "Contactez-nous sur WhatsApp"}
+                </a>
+                <a 
+                  href="tel:+213790356012"
+                  className={cn("inline-flex items-center gap-2 text-navy font-bold hover:underline", isAr && "flex-row-reverse")}
+                >
+                  <Phone size={18} />
+                  {isAr ? "اتصل بنا هاتفياً: 0790356012" : "Appelez-nous : 0790356012"}
+                </a>
+              </div>
             </Card>
           </div>
         </div>
