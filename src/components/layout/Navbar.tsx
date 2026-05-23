@@ -13,6 +13,7 @@ export function Navbar() {
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const location = useLocation();
   const { t, i18n } = useTranslation();
+  const isAr = i18n.language === 'ar';
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -26,10 +27,12 @@ export function Navbar() {
   ];
 
   const navLinks = [
-    { name: t('nav.home'), path: '/', hash: '' },
-    { name: t('nav.programs'), path: '/', hash: '#programs' },
-    { name: t('nav.about'), path: '/', hash: '#about' },
-    { name: t('nav.contact'), path: '/', hash: '#contact' },
+    { name: t('nav.home', isAr ? 'الرئيسية' : 'Accueil'), path: '/', hash: '' },
+    { name: t('nav.features', isAr ? 'المميزات' : 'Fonctionnalités'), path: '/', hash: '#features' },
+    { name: t('nav.teachers', isAr ? 'للأساتذة' : 'Pour les enseignants'), path: '/', hash: '#teachers' },
+    { name: t('nav.pricing', isAr ? 'الأسعار' : 'Tarifs'), path: '/', hash: '#pricing' },
+    { name: t('nav.about', isAr ? 'عن المدرسة' : 'À propos'), path: '/', hash: '#about' },
+    { name: t('nav.contact', isAr ? 'إتصل بنا' : 'Contact'), path: '/', hash: '#contact' },
   ];
 
   const handleLinkClick = (link: typeof navLinks[0], e: React.MouseEvent) => {
@@ -138,11 +141,11 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <Link to="/login">
-                  <Button size="sm" variant="ghost">{t('login')}</Button>
-                </Link>
+                <a href="https://platform-nadjah.vercel.app/" target="_blank" rel="noopener noreferrer">
+                  <Button size="sm" variant="outline" className="text-navy border-navy/20 hover:bg-navy/5 font-semibold px-6">{isAr ? 'تسجيل الدخول' : 'Se connecter'}</Button>
+                </a>
                 <Link to="/register">
-                  <Button size="sm" variant="navy" style={{ backgroundColor: '#1b1ba3' }}>{t('register_now')}</Button>
+                  <Button size="sm" className="bg-blue-accent hover:bg-blue-700 text-white font-semibold px-6">{isAr ? 'إنشاء حساب' : "S'inscrire"}</Button>
                 </Link>
               </div>
             )}
@@ -187,9 +190,9 @@ export function Navbar() {
                 </a>
               ))}
               <div className="pt-6 flex flex-col gap-3">
-                <Link to="/login" onClick={() => setIsOpen(false)}>
+                <a href="https://platform-nadjah.vercel.app/" target="_blank" rel="noopener noreferrer" onClick={() => setIsOpen(false)}>
                   <Button variant="outline" size="lg" className="w-full py-6 text-lg">{t('login')}</Button>
-                </Link>
+                </a>
                 <Link to="/register" onClick={() => setIsOpen(false)}>
                   <Button variant="navy" size="lg" className="w-full py-6 text-lg" style={{ backgroundColor: '#1b1ba3' }}>{t('register_now')}</Button>
                 </Link>
