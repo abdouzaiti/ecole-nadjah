@@ -417,7 +417,7 @@ export default function LandingPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.2, duration: 0.6, type: "spring" }}
                 className={cn(
-                  "absolute top-32 -right-4 z-50 bg-[#3b82f6] rounded-2xl shadow-[0_15px_40px_rgba(59,130,246,0.3)] p-4 pr-5 text-white flex items-center gap-4 rotate-[6deg]",
+                  "absolute bottom-[-100px] -right-[230px] z-50 bg-[#3b82f6] rounded-2xl shadow-[0_15px_40px_rgba(59,130,246,0.3)] p-4 pr-5 text-white flex items-center gap-4 rotate-[6deg]",
                   isAr && "flex-row-reverse",
                 )}
               >

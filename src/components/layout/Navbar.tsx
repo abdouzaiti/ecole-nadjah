@@ -65,8 +65,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <Link to="/" className="flex items-center gap-3 group" onClick={() => setIsOpen(false)}>
-            <div className="w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <img src="/logo.png" alt="École Nadjah Logo" className="w-full h-full object-contain shadow-sm rounded-lg" />
+            <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <img src="/logo.png" alt="École Nadjah Logo" className="w-full h-full object-contain" />
             </div>
             <div className={i18n.language === 'ar' ? 'text-right' : 'text-left'}>
               <span className="text-xl font-serif font-bold text-navy tracking-tight block leading-none">{t('school_name')}</span>
