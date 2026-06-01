@@ -31,27 +31,192 @@ export default function RegistrationPage() {
     high: ['1 AS', '2 AS', '3 AS'],
   };
 
+  const highSchoolStreams: Record<string, { id: string; name: string }[]> = {
+    '1 AS': [
+      { id: 'tc-st', name: isAr ? 'جذع مشترك علوم وتكنولوجيا' : 'Tronc Commun Sciences & Tech' },
+      { id: 'tc-l', name: isAr ? 'جذع مشترك آداب' : 'Tronc Commun Lettres' }
+    ],
+    '2 AS': [
+      { id: 'sci', name: isAr ? 'علوم تجريبية' : 'Sciences Expérimentales' },
+      { id: 'math', name: isAr ? 'رياضيات' : 'Mathématiques' },
+      { id: 'tech-math', name: isAr ? 'تقني رياضي' : 'Technique Mathématique' },
+      { id: 'gestion', name: isAr ? 'تسيير واقتصاد' : 'Gestion & Économie' },
+      { id: 'philo', name: isAr ? 'آداب وفلسفة' : 'Lettres & Philosophie' },
+      { id: 'lang', name: isAr ? 'لغات أجنبية' : 'Langues Étrangères' }
+    ],
+    '3 AS': [
+      { id: 'sci', name: isAr ? 'علوم تجريبية (ثالثة ثانوي)' : 'Sciences Expérimentales (3AS)' },
+      { id: 'math', name: isAr ? 'رياضيات (ثالثة ثانوي)' : 'Mathématiques (3AS)' },
+      { id: 'tech-math', name: isAr ? 'تقني رياضي (ثالثة ثانوي)' : 'Technique Mathématique (3AS)' },
+      { id: 'gestion', name: isAr ? 'تسيير واقتصاد (ثالثة ثانوي)' : 'Gestion & Économie (3AS)' },
+      { id: 'philo', name: isAr ? 'آداب وفلسفة (ثالثة ثانوي)' : 'Lettres & Philosophie (3AS)' },
+      { id: 'lang', name: isAr ? 'لغات أجنبية (ثالثة ثانوي)' : 'Langues Étrangères (3AS)' }
+    ]
+  };
+
   const getSubjects = () => {
     if (selectedLevel === 'formation') {
       return [
-        isAr ? "لغة فرنسية" : "Français",
-        isAr ? "لغة إنجليزية" : "Anglais",
-        isAr ? "لغة عربية" : "Arabe",
-        isAr ? "لغة ألمانية" : "Allemand",
-        isAr ? "لغة إسبانية" : "Espagnol",
-        isAr ? "إعلام آلي (Bureautique)" : "Informatique Bureautique"
+        { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+        { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+        { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+        { id: 'de', name: isAr ? "لغة ألمانية" : "Allemand" },
+        { id: 'es', name: isAr ? "لغة إسبانية" : "Espagnol" },
+        { id: 'it', name: isAr ? "لغة إيطالية" : "Italien" },
+        { id: 'info', name: isAr ? "إعلام آلي (Bureautique)" : "Informatique Bureautique" }
       ];
     }
-    return [
-      isAr ? "رياضيات" : "Mathématique",
-      isAr ? "فيزياء" : "Physique",
-      isAr ? "علوم" : "Sciences",
-      isAr ? "لغة عربية" : "Arabe",
-      isAr ? "لغة فرنسية" : "Français",
-      isAr ? "لغة إنجليزية" : "Anglais",
-      isAr ? "تاريخ وجغرافيا" : "Histoire/Géo",
-      isAr ? "فلسفة" : "Philosophie"
-    ];
+
+    if (selectedLevel === 'primary') {
+      return [
+        { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+        { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+        { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+        { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+        { id: 'sci', name: isAr ? "تربية علمية وتكنولوجية" : "Éducation Scientifique" },
+        { id: 'civ', name: isAr ? "تربية مدنية" : "Éducation Civique" },
+        { id: 'islam', name: isAr ? "تربية إسلامية" : "Éducation Islamique" },
+        { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" }
+      ];
+    }
+
+    if (selectedLevel === 'middle') {
+      return [
+        { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+        { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+        { id: 'phys', name: isAr ? "علوم فيزيائية وتكنولوجيا" : "Physique" },
+        { id: 'sci', name: isAr ? "علوم الطبيعة والحياة" : "Sciences de la Nature" },
+        { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+        { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+        { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+        { id: 'islam', name: isAr ? "تربية إسلامية" : "Éducation Islamique" },
+        { id: 'civ', name: isAr ? "تربية مدنية" : "Éducation Civique" }
+      ];
+    }
+
+    if (selectedLevel === 'high') {
+      if (!selectedYear) return [];
+
+      if (selectedYear === '1 AS') {
+        if (selectedStream === 'tc-st') {
+          return [
+            { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+            { id: 'phys', name: isAr ? "علوم فيزيائية" : "Sciences Physiques" },
+            { id: 'sci', name: isAr ? "علوم الطبيعة والحياة" : "Sciences de la Nature" },
+            { id: 'tech', name: isAr ? "تكنولوجيا" : "Technologie" },
+            { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+            { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+            { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+            { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+            { id: 'islam', name: isAr ? "تربية إسلامية" : "Éducation Islamique" },
+            { id: 'info', name: isAr ? "إعلام آلي" : "Informatique" }
+          ];
+        }
+        if (selectedStream === 'tc-l') {
+          return [
+            { id: 'ar', name: isAr ? "لغة عربية وآدابها" : "Arabe & Littérature" },
+            { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+            { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+            { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+            { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+            { id: 'islam', name: isAr ? "تربية إسلامية" : "Éducation Islamique" },
+            { id: 'sci', name: isAr ? "علوم الطبيعة والحياة" : "Sciences" }
+          ];
+        }
+        return [
+          { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+          { id: 'phys', name: isAr ? "علوم فيزيائية" : "Sciences Physiques" },
+          { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" }
+        ];
+      }
+
+      if (selectedStream === 'sci') {
+        return [
+          { id: 'sci', name: isAr ? "علوم الطبيعة والحياة" : "Sciences de la Nature" },
+          { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+          { id: 'phys', name: isAr ? "علوم فيزيائية" : "Sciences Physiques" },
+          { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+          { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+          { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+          { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+          { id: 'islam', name: isAr ? "علوم إسلامية" : "Sciences Islamiques" },
+          { id: 'philo', name: isAr ? "فلسفة" : "Philosophie" }
+        ];
+      }
+      if (selectedStream === 'math') {
+        return [
+          { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+          { id: 'phys', name: isAr ? "علوم فيزيائية" : "Sciences Physiques" },
+          { id: 'sci', name: isAr ? "علوم الطبيعة والحياة" : "Sciences de la Nature" },
+          { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+          { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+          { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+          { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+          { id: 'islam', name: isAr ? "علوم إسلامية" : "Sciences Islamiques" },
+          { id: 'philo', name: isAr ? "فلسفة" : "Philosophie" }
+        ];
+      }
+      if (selectedStream === 'tech-math') {
+        return [
+          { id: 'tech', name: isAr ? "تكنولوجيا (هندسة)" : "Technologie (Génie)" },
+          { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+          { id: 'phys', name: isAr ? "علوم فيزيائية" : "Sciences Physiques" },
+          { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+          { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+          { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+          { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+          { id: 'islam', name: isAr ? "علوم إسلامية" : "Sciences Islamiques" },
+          { id: 'philo', name: isAr ? "فلسفة" : "Philosophie" }
+        ];
+      }
+      if (selectedStream === 'gestion') {
+        return [
+          { id: 'compta', name: isAr ? "تسيير محاسبي ومالي" : "Gestion Comptable & Financière" },
+          { id: 'eco', name: isAr ? "اقتصاد ومناجمنت" : "Économie & Management" },
+          { id: 'droit', name: isAr ? "قانون" : "Droit" },
+          { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+          { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+          { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+          { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+          { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+          { id: 'islam', name: isAr ? "علوم إسلامية" : "Sciences Islamiques" }
+        ];
+      }
+      if (selectedStream === 'philo') {
+        return [
+          { id: 'philo', name: isAr ? "فلسفة" : "Philosophie" },
+          { id: 'ar', name: isAr ? "لغة عربية وآدابها" : "Arabe & Littérature" },
+          { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+          { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+          { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+          { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+          { id: 'islam', name: isAr ? "علوم إسلامية" : "Sciences Islamiques" }
+        ];
+      }
+      if (selectedStream === 'lang') {
+        return [
+          { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+          { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+          { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
+          { id: 'es', name: isAr ? "لغة إسبانية" : "Espagnol" },
+          { id: 'de', name: isAr ? "لغة ألمانية" : "Allemand" },
+          { id: 'it', name: isAr ? "لغة إيطالية" : "Italien" },
+          { id: 'hist-geo', name: isAr ? "تاريخ وجغرافيا" : "Histoire/Géographie" },
+          { id: 'philo', name: isAr ? "فلسفة" : "Philosophie" },
+          { id: 'islam', name: isAr ? "علوم إسلامية" : "Sciences Islamiques" }
+        ];
+      }
+
+      return [
+        { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
+        { id: 'phys', name: isAr ? "علوم فيزيائية" : "Physique" },
+        { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
+        { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
+        { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" }
+      ];
+    }
+
+    return [];
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -60,16 +225,28 @@ export default function RegistrationPage() {
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-    
+
+    const getLevelName = (lvl: string) => {
+      const found = levels.find(l => l.id === lvl);
+      return found ? found.name : lvl;
+    };
+
+    const getStreamName = (str: string) => {
+      if (!selectedYear || !highSchoolStreams[selectedYear]) return str;
+      const found = highSchoolStreams[selectedYear].find(s => s.id === str);
+      return found ? found.name : str;
+    };
+
     // WhatsApp message
-    const whatsappNumber = "213790356012";
+    const whatsappNumber = "2136577097226";
     let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
-                  `👤 *Nom:* ${data.username}\n` +
-                  `📱 *Téléphone:* ${data.phone}\n` +
-                  `👨‍🏫 *Role:* ${role === 'student' ? 'Élève' : 'Enseignant'}\n` +
-                  `📚 *Niveau:* ${selectedLevel}\n` +
-                  `📅 *Année:* ${selectedYear}\n` +
-                  `📖 *Matière:* ${selectedSubject}`;
+                  `👤 *الاسم الكامل / Nom:* ${data.username}\n` +
+                  `📱 *الهاتف / Téléphone:* ${data.phone}\n` +
+                  `👨‍🏫 *الصفة / Rôle:* ${role === 'student' ? (isAr ? 'تلميذ' : 'Élève') : (isAr ? 'أستاذ' : 'Enseignant')}\n` +
+                  `📚 *المستوى / Niveau:* ${getLevelName(selectedLevel)}\n` +
+                  `📅 *السنة / Année:* ${selectedYear || 'N/A'}\n` +
+                  (selectedLevel === 'high' && selectedStream ? `🧬 *الشعبة / Filière:* ${getStreamName(selectedStream)}\n` : '') +
+                  `📖 *المادة / Matière:* ${selectedSubject}`;
 
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -140,9 +317,11 @@ export default function RegistrationPage() {
 
                   <div className="relative">
                     <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                  <select name="level" onChange={(e) => {
+                    <select name="level" onChange={(e) => {
                       setSelectedLevel(e.target.value);
                       setSelectedYear('');
+                      setSelectedStream('');
+                      setSelectedSubject('');
                     }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                       <option value="">{t('auth.registration.select_level')}</option>
                       {levels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
@@ -152,18 +331,35 @@ export default function RegistrationPage() {
                   {years[selectedLevel] && (
                     <div className="relative">
                       <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                      <select name="year" onChange={(e) => setSelectedYear(e.target.value)} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                      <select name="year" onChange={(e) => {
+                        setSelectedYear(e.target.value);
+                        setSelectedStream('');
+                        setSelectedSubject('');
+                      }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                         <option value="">{t('auth.registration.year_placeholder')}</option>
                         {years[selectedLevel].map(y => <option key={y} value={y}>{y}</option>)}
                       </select>
                     </div>
                   )}
 
+                  {selectedLevel === 'high' && selectedYear && highSchoolStreams[selectedYear] && (
+                    <div className="relative md:col-span-2">
+                      <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                      <select name="stream" onChange={(e) => {
+                        setSelectedStream(e.target.value);
+                        setSelectedSubject('');
+                      }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                        <option value="">{isAr ? "اختر الشعبة..." : "Choisir la filière / شعبة..."}</option>
+                        {highSchoolStreams[selectedYear].map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
+                      </select>
+                    </div>
+                  )}
+
                   <div className="relative md:col-span-2">
                     <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                    <select name="subject" onChange={(e) => setSelectedSubject(e.target.value)} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                    <select name="subject" value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                       <option value="">{t('auth.registration.subject_placeholder')}</option>
-                      {getSubjects().map(s => <option key={s} value={s}>{s}</option>)}
+                      {getSubjects().map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
                     </select>
                   </div>
                 </div>
@@ -185,7 +381,7 @@ export default function RegistrationPage() {
               </p>
               <div className="space-y-3">
                 <a 
-                  href={`https://wa.me/213790356012?text=${encodeURIComponent(isAr ? "مرحباً، لدي استفسار بخصوص التسجيل في مدرسة النجاح." : "Bonjour, j'ai une question concernant l'inscription à l'école Nadjah.")}`}
+                  href={`https://wa.me/2136577097226?text=${encodeURIComponent(isAr ? "مرحباً، لدي استفسار بخصوص التسجيل في مدرسة النجاح." : "Bonjour, j'ai une question concernant l'inscription à l'école Nadjah.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn("inline-flex items-center gap-2 text-green-600 font-bold hover:underline", isAr && "flex-row-reverse")}
@@ -194,11 +390,11 @@ export default function RegistrationPage() {
                   {isAr ? "اتصل بنا عبر WhatsApp" : "Contactez-nous sur WhatsApp"}
                 </a>
                 <a 
-                  href="tel:+213790356012"
+                  href="tel:+2136577097226"
                   className={cn("inline-flex items-center gap-2 text-navy font-bold hover:underline", isAr && "flex-row-reverse")}
                 >
                   <Phone size={18} />
-                  {isAr ? "اتصل بنا هاتفياً: 0790356012" : "Appelez-nous : 0790356012"}
+                  {isAr ? "اتصل بنا هاتفياً: 06577097226" : "Appelez-nous : 06577097226"}
                 </a>
               </div>
             </Card>
