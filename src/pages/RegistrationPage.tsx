@@ -241,7 +241,9 @@ export default function RegistrationPage() {
     const whatsappNumber = "213657097226";
     let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
                   `👤 *الاسم الكامل / Nom:* ${data.username}\n` +
+                  `📧 *البريد الإلكتروني / Email:* ${data.email || 'N/A'}\n` +
                   `📱 *الهاتف / Téléphone:* ${data.phone}\n` +
+                  (role === 'student' && data.parentPhone ? `📞 *هاتف الولي / Tél Parent:* ${data.parentPhone}\n` : '') +
                   `👨‍🏫 *الصفة / Rôle:* ${role === 'student' ? (isAr ? 'تلميذ' : 'Élève') : (isAr ? 'أستاذ' : 'Enseignant')}\n` +
                   `📚 *المستوى / Niveau:* ${getLevelName(selectedLevel)}\n` +
                   `📅 *السنة / Année:* ${selectedYear || 'N/A'}\n` +
