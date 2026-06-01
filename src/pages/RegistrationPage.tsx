@@ -238,7 +238,7 @@ export default function RegistrationPage() {
     };
 
     // WhatsApp message
-    const whatsappNumber = "2136577097226";
+    const whatsappNumber = "213657097226";
     let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
                   `👤 *الاسم الكامل / Nom:* ${data.username}\n` +
                   `📱 *الهاتف / Téléphone:* ${data.phone}\n` +
@@ -381,7 +381,7 @@ export default function RegistrationPage() {
               </p>
               <div className="space-y-3">
                 <a 
-                  href={`https://wa.me/2136577097226?text=${encodeURIComponent(isAr ? "مرحباً، لدي استفسار بخصوص التسجيل في مدرسة النجاح." : "Bonjour, j'ai une question concernant l'inscription à l'école Nadjah.")}`}
+                  href={`https://wa.me/213657097226?text=${encodeURIComponent(isAr ? "مرحباً، لدي استفسار بخصوص التسجيل في مدرسة النجاح." : "Bonjour, j'ai une question concernant l'inscription à l'école Nadjah.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn("inline-flex items-center gap-2 text-green-600 font-bold hover:underline", isAr && "flex-row-reverse")}
@@ -390,11 +390,11 @@ export default function RegistrationPage() {
                   {isAr ? "اتصل بنا عبر WhatsApp" : "Contactez-nous sur WhatsApp"}
                 </a>
                 <a 
-                  href="tel:+2136577097226"
+                  href="tel:+213657097226"
                   className={cn("inline-flex items-center gap-2 text-navy font-bold hover:underline", isAr && "flex-row-reverse")}
                 >
                   <Phone size={18} />
-                  {isAr ? "اتصل بنا هاتفياً: 06577097226" : "Appelez-nous : 06577097226"}
+                  {isAr ? "اتصل بنا هاتفياً: 0657097226" : "Appelez-nous : 0657097226"}
                 </a>
               </div>
             </Card>
