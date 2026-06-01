@@ -252,7 +252,7 @@ export default function RegistrationPage() {
     return [];
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -261,68 +261,26 @@ export default function RegistrationPage() {
     const data = Object.fromEntries(formData.entries());
 
     const getLevelName = (lvl: string) => {
-      const found = levels.find(l => l.id === lvl);
-      return found ? found.name : lvl;
+      const found = dbLevels.find(l => l.id === lvl);
+      if (found) {
+        return isAr ? found.name.split(' (')[0] : (found.name.includes('(') ? found.name.split('(')[1].replace(')', '') : found.name);
+      }
+      return lvl;
     };
 
     const getStreamName = (str: string) => {
-      if (!selectedYear || !highSchoolStreams[selectedYear]) return str;
-      const found = highSchoolStreams[selectedYear].find(s => s.id === str);
+      if (!selectedYearName || !highSchoolStreams[selectedYearName]) return str;
+      const found = highSchoolStreams[selectedYearName].find(s => s.id === str);
       return found ? found.name : str;
     };
 
     try {
       const emailVal = data.email as string;
-      const passwordVal = data.password as string;
       const usernameVal = data.username as string;
-
-      if (!passwordVal || passwordVal.length < 6) {
-        throw new Error(isAr ? "يجب أن تكون كلمة المرور 6 أحرف على الأقل." : "Password must be at least 6 characters.");
-      }
-
-      // 1. Sign up user in Supabase auth
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: emailVal,
-        password: passwordVal,
-        options: {
-          data: {
-            full_name: usernameVal,
-          },
-        },
-      });
-
-      if (signUpError) {
-        throw signUpError;
-      }
-
-      const userId = signUpData.user?.id;
-      if (!userId) {
-        throw new Error(isAr ? "فشل استرداد معرف المستخدم." : "Failed to retrieve user ID.");
-      }
-
-      // 2. Insert request in registration_requests
-      const { error: reqError } = await supabase
-        .from('registration_requests')
-        .insert({
-          id: userId,
-          full_name: usernameVal,
-          email: emailVal,
-          phone: data.phone as string,
-          parent_phone: (role === 'student' ? data.parentPhone : null) as string | null,
-          role: role.toUpperCase(),
-          level_id: selectedLevel || null,
-          year_id: selectedYear || null,
-          subject_name: selectedSubject || null,
-          status: 'PENDING'
-        });
-
-      if (reqError) {
-        throw reqError;
-      }
 
       setIsSuccess(true);
 
-      // 3. WhatsApp notification
+      // WhatsApp message
       const whatsappNumber = "213657097226";
       let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
                     `👤 *الاسم الكامل / Nom:* ${usernameVal}\n` +
@@ -331,8 +289,8 @@ export default function RegistrationPage() {
                     (role === 'student' && data.parentPhone ? `📞 *هاتف الولي / Tél Parent:* ${data.parentPhone}\n` : '') +
                     `👨‍🏫 *الصفة / Rôle:* ${role === 'student' ? (isAr ? 'تلميذ' : 'Élève') : (isAr ? 'أستاذ' : 'Enseignant')}\n` +
                     `📚 *المستوى / Niveau:* ${getLevelName(selectedLevel)}\n` +
-                    `📅 *السنة / Année:* ${selectedYear || 'N/A'}\n` +
-                    (selectedLevel === 'high' && selectedStream ? `🧬 *الشعبة / Filière:* ${getStreamName(selectedStream)}\n` : '') +
+                    `📅 *السنة / Année:* ${selectedYearName || 'N/A'}\n` +
+                    (selectedLevelType === 'high' && selectedStream ? `🧬 *الشعبة / Filière:* ${getStreamName(selectedStream)}\n` : '') +
                     `📖 *المادة / Matière:* ${selectedSubject}`;
 
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -340,9 +298,6 @@ export default function RegistrationPage() {
     } catch (err: any) {
       console.error('Registration error:', err);
       let errMsg = err.message || 'Registration failed';
-      if (errMsg.includes('already registered') || errMsg.includes('slug')) {
-        errMsg = isAr ? "هذا البريد الإلكتروني مسجل بالفعل." : "This email is already registered.";
-      }
       setError(errMsg);
     } finally {
       setLoading(false);
@@ -438,14 +393,9 @@ export default function RegistrationPage() {
                     <input name="username" type="text" required placeholder={t('auth.registration.username_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                   </div>
 
-                  <div className="relative">
+                  <div className="relative md:col-span-2">
                     <Mail size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                     <input name="email" type="email" required placeholder={t('auth.registration.email_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
-                  </div>
-
-                  <div className="relative">
-                    <Lock size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                    <input name="password" type="password" required placeholder={t('auth.password_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                   </div>
 
                   <div className="relative md:col-span-2">
