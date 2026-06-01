@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Card, Badge } from '../components/ui';
 import { motion } from 'motion/react';
 import { CheckCircle, Info, User, Mail, Phone, Calendar, BookOpen, ShieldCheck, Lock, Loader2, AlertCircle } from 'lucide-react';
@@ -10,6 +10,8 @@ import { supabase } from '../lib/supabase';
 export default function RegistrationPage() {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<'student' | 'teacher'>('student');
+  const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
 
@@ -17,6 +19,37 @@ export default function RegistrationPage() {
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedStream, setSelectedStream] = useState<string>('');
   const [selectedSubject, setSelectedSubject] = useState<string>('');
+
+  const [dbLevels, setDbLevels] = useState<any[]>([]);
+  const [dbYears, setDbYears] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchDbData() {
+      try {
+        const { data: lvls } = await supabase.from('levels').select('*');
+        const { data: yrs } = await supabase.from('years').select('*');
+        if (lvls) setDbLevels(lvls);
+        if (yrs) setDbYears(yrs);
+      } catch (err) {
+        console.error('Error fetching database levels & years:', err);
+      }
+    }
+    fetchDbData();
+  }, []);
+
+  const dbLevelToType = (lvlId: string): 'primary' | 'middle' | 'high' | 'formation' | '' => {
+    switch (lvlId) {
+      case 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d': return 'primary';
+      case 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e': return 'middle';
+      case 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f': return 'high';
+      case 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a': return 'formation';
+      default: return '';
+    }
+  };
+
+  const selectedLevelType = dbLevelToType(selectedLevel);
+  const selectedYearObj = dbYears.find(y => y.id === selectedYear);
+  const selectedYearName = selectedYearObj ? selectedYearObj.name : '';
 
   const levels = [
     { id: 'primary', name: isAr ? 'ابتدائي' : 'Primaire' },
@@ -55,7 +88,7 @@ export default function RegistrationPage() {
   };
 
   const getSubjects = () => {
-    if (selectedLevel === 'formation') {
+    if (selectedLevelType === 'formation') {
       return [
         { id: 'fr', name: isAr ? "لغة فرنسية" : "Français" },
         { id: 'en', name: isAr ? "لغة إنجليزية" : "Anglais" },
@@ -67,7 +100,7 @@ export default function RegistrationPage() {
       ];
     }
 
-    if (selectedLevel === 'primary') {
+    if (selectedLevelType === 'primary') {
       return [
         { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
         { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
@@ -80,7 +113,7 @@ export default function RegistrationPage() {
       ];
     }
 
-    if (selectedLevel === 'middle') {
+    if (selectedLevelType === 'middle') {
       return [
         { id: 'ar', name: isAr ? "لغة عربية" : "Arabe" },
         { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
@@ -94,10 +127,10 @@ export default function RegistrationPage() {
       ];
     }
 
-    if (selectedLevel === 'high') {
-      if (!selectedYear) return [];
+    if (selectedLevelType === 'high') {
+      if (!selectedYearName) return [];
 
-      if (selectedYear === '1 AS') {
+      if (selectedYearName === '1 AS') {
         if (selectedStream === 'tc-st') {
           return [
             { id: 'math', name: isAr ? "رياضيات" : "Mathématiques" },
@@ -219,9 +252,10 @@ export default function RegistrationPage() {
     return [];
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
@@ -237,23 +271,120 @@ export default function RegistrationPage() {
       return found ? found.name : str;
     };
 
-    // WhatsApp message
-    const whatsappNumber = "213657097226";
-    let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
-                  `👤 *الاسم الكامل / Nom:* ${data.username}\n` +
-                  `📧 *البريد الإلكتروني / Email:* ${data.email || 'N/A'}\n` +
-                  `📱 *الهاتف / Téléphone:* ${data.phone}\n` +
-                  (role === 'student' && data.parentPhone ? `📞 *هاتف الولي / Tél Parent:* ${data.parentPhone}\n` : '') +
-                  `👨‍🏫 *الصفة / Rôle:* ${role === 'student' ? (isAr ? 'تلميذ' : 'Élève') : (isAr ? 'أستاذ' : 'Enseignant')}\n` +
-                  `📚 *المستوى / Niveau:* ${getLevelName(selectedLevel)}\n` +
-                  `📅 *السنة / Année:* ${selectedYear || 'N/A'}\n` +
-                  (selectedLevel === 'high' && selectedStream ? `🧬 *الشعبة / Filière:* ${getStreamName(selectedStream)}\n` : '') +
-                  `📖 *المادة / Matière:* ${selectedSubject}`;
+    try {
+      const emailVal = data.email as string;
+      const passwordVal = data.password as string;
+      const usernameVal = data.username as string;
 
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    setLoading(false);
+      if (!passwordVal || passwordVal.length < 6) {
+        throw new Error(isAr ? "يجب أن تكون كلمة المرور 6 أحرف على الأقل." : "Password must be at least 6 characters.");
+      }
+
+      // 1. Sign up user in Supabase auth
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: emailVal,
+        password: passwordVal,
+        options: {
+          data: {
+            full_name: usernameVal,
+          },
+        },
+      });
+
+      if (signUpError) {
+        throw signUpError;
+      }
+
+      const userId = signUpData.user?.id;
+      if (!userId) {
+        throw new Error(isAr ? "فشل استرداد معرف المستخدم." : "Failed to retrieve user ID.");
+      }
+
+      // 2. Insert request in registration_requests
+      const { error: reqError } = await supabase
+        .from('registration_requests')
+        .insert({
+          id: userId,
+          full_name: usernameVal,
+          email: emailVal,
+          phone: data.phone as string,
+          parent_phone: (role === 'student' ? data.parentPhone : null) as string | null,
+          role: role.toUpperCase(),
+          level_id: selectedLevel || null,
+          year_id: selectedYear || null,
+          subject_name: selectedSubject || null,
+          status: 'PENDING'
+        });
+
+      if (reqError) {
+        throw reqError;
+      }
+
+      setIsSuccess(true);
+
+      // 3. WhatsApp notification
+      const whatsappNumber = "213657097226";
+      let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
+                    `👤 *الاسم الكامل / Nom:* ${usernameVal}\n` +
+                    `📧 *البريد الإلكتروني / Email:* ${emailVal || 'N/A'}\n` +
+                    `📱 *الهاتف / Téléphone:* ${data.phone}\n` +
+                    (role === 'student' && data.parentPhone ? `📞 *هاتف الولي / Tél Parent:* ${data.parentPhone}\n` : '') +
+                    `👨‍🏫 *الصفة / Rôle:* ${role === 'student' ? (isAr ? 'تلميذ' : 'Élève') : (isAr ? 'أستاذ' : 'Enseignant')}\n` +
+                    `📚 *المستوى / Niveau:* ${getLevelName(selectedLevel)}\n` +
+                    `📅 *السنة / Année:* ${selectedYear || 'N/A'}\n` +
+                    (selectedLevel === 'high' && selectedStream ? `🧬 *الشعبة / Filière:* ${getStreamName(selectedStream)}\n` : '') +
+                    `📖 *المادة / Matière:* ${selectedSubject}`;
+
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      let errMsg = err.message || 'Registration failed';
+      if (errMsg.includes('already registered') || errMsg.includes('slug')) {
+        errMsg = isAr ? "هذا البريد الإلكتروني مسجل بالفعل." : "This email is already registered.";
+      }
+      setError(errMsg);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen py-12 bg-transparent flex items-center justify-center">
+        <div className="max-w-2xl w-full mx-auto px-4">
+          <Card className="p-10 bg-white/60 backdrop-blur-xl border border-white/40 shadow-2xl text-center flex flex-col items-center">
+            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-6 border border-green-100">
+              <CheckCircle size={44} />
+            </div>
+            <h2 className="text-3xl font-serif text-navy font-bold mb-4">
+              {t('auth.registration.success_title')}
+            </h2>
+            <p className="text-navy/60 text-lg mb-8 leading-relaxed max-w-lg">
+              {t('auth.registration.success_message')}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+              <a 
+                href={`https://wa.me/213657097226?text=${encodeURIComponent(isAr ? "مرحباً، لقد أرسلت طلب التسجيل." : "Bonjour, j'ai soumis ma demande d'inscription.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-green-500/25"
+              >
+                <Phone size={18} />
+                {isAr ? "تأكيد عبر WhatsApp" : "Confirmer par WhatsApp"}
+              </a>
+              <Link
+                to="/"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-navy hover:bg-navy/95 text-white font-bold rounded-xl transition-all shadow-md"
+              >
+                {t('auth.registration.back_home')}
+              </Link>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 bg-transparent">
@@ -293,6 +424,13 @@ export default function RegistrationPage() {
                 </button>
               </div>
 
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 text-sm">
+                  <AlertCircle size={18} className="shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="relative md:col-span-2">
@@ -306,6 +444,11 @@ export default function RegistrationPage() {
                   </div>
 
                   <div className="relative">
+                    <Lock size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                    <input name="password" type="password" required placeholder={t('auth.password_placeholder')} className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
+                  </div>
+
+                  <div className="relative md:col-span-2">
                     <Phone size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                     <input name="phone" type="tel" placeholder={t('auth.registration.phone_placeholder')} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")} />
                   </div>
@@ -326,11 +469,15 @@ export default function RegistrationPage() {
                       setSelectedSubject('');
                     }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                       <option value="">{t('auth.registration.select_level')}</option>
-                      {levels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                      {dbLevels.map(l => (
+                        <option key={l.id} value={l.id}>
+                          {isAr ? l.name.split(' (')[0] : (l.name.includes('(') ? l.name.split('(')[1].replace(')', '') : l.name)}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
-                  {years[selectedLevel] && (
+                  {selectedLevel && dbYears.filter(y => y.level_id === selectedLevel).length > 0 && (
                     <div className="relative">
                       <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                       <select name="year" onChange={(e) => {
@@ -339,12 +486,12 @@ export default function RegistrationPage() {
                         setSelectedSubject('');
                       }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                         <option value="">{t('auth.registration.year_placeholder')}</option>
-                        {years[selectedLevel].map(y => <option key={y} value={y}>{y}</option>)}
+                        {dbYears.filter(y => y.level_id === selectedLevel).map(y => <option key={y.id} value={y.id}>{y.name}</option>)}
                       </select>
                     </div>
                   )}
 
-                  {selectedLevel === 'high' && selectedYear && highSchoolStreams[selectedYear] && (
+                  {selectedLevelType === 'high' && selectedYearName && highSchoolStreams[selectedYearName] && (
                     <div className="relative md:col-span-2">
                       <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
                       <select name="stream" onChange={(e) => {
@@ -352,7 +499,7 @@ export default function RegistrationPage() {
                         setSelectedSubject('');
                       }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                         <option value="">{isAr ? "اختر الشعبة..." : "Choisir la filière / شعبة..."}</option>
-                        {highSchoolStreams[selectedYear].map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
+                        {highSchoolStreams[selectedYearName].map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
                       </select>
                     </div>
                   )}
