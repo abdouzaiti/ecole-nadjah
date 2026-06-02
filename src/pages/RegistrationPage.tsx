@@ -20,36 +20,8 @@ export default function RegistrationPage() {
   const [selectedStream, setSelectedStream] = useState<string>('');
   const [selectedSubject, setSelectedSubject] = useState<string>('');
 
-  const [dbLevels, setDbLevels] = useState<any[]>([]);
-  const [dbYears, setDbYears] = useState<any[]>([]);
-
-  useEffect(() => {
-    async function fetchDbData() {
-      try {
-        const { data: lvls } = await supabase.from('levels').select('*');
-        const { data: yrs } = await supabase.from('years').select('*');
-        if (lvls) setDbLevels(lvls);
-        if (yrs) setDbYears(yrs);
-      } catch (err) {
-        console.error('Error fetching database levels & years:', err);
-      }
-    }
-    fetchDbData();
-  }, []);
-
-  const dbLevelToType = (lvlId: string): 'primary' | 'middle' | 'high' | 'formation' | '' => {
-    switch (lvlId) {
-      case 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d': return 'primary';
-      case 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e': return 'middle';
-      case 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f': return 'high';
-      case 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a': return 'formation';
-      default: return '';
-    }
-  };
-
-  const selectedLevelType = dbLevelToType(selectedLevel);
-  const selectedYearObj = dbYears.find(y => y.id === selectedYear);
-  const selectedYearName = selectedYearObj ? selectedYearObj.name : '';
+  const selectedLevelType = selectedLevel;
+  const selectedYearName = selectedYear;
 
   const levels = [
     { id: 'primary', name: isAr ? 'ابتدائي' : 'Primaire' },
@@ -261,11 +233,8 @@ export default function RegistrationPage() {
     const data = Object.fromEntries(formData.entries());
 
     const getLevelName = (lvl: string) => {
-      const found = dbLevels.find(l => l.id === lvl);
-      if (found) {
-        return isAr ? found.name.split(' (')[0] : (found.name.includes('(') ? found.name.split('(')[1].replace(')', '') : found.name);
-      }
-      return lvl;
+      const found = levels.find(l => l.id === lvl);
+      return found ? found.name : lvl;
     };
 
     const getStreamName = (str: string) => {
@@ -278,6 +247,11 @@ export default function RegistrationPage() {
       const emailVal = data.email as string;
       const usernameVal = data.username as string;
 
+      const lvlVal = (data.level as string) || selectedLevel;
+      const yrVal = (data.year as string) || selectedYearName;
+      const streamVal = (data.stream as string) || selectedStream;
+      const subjectVal = (data.subject as string) || selectedSubject;
+
       setIsSuccess(true);
 
       // WhatsApp message
@@ -288,10 +262,10 @@ export default function RegistrationPage() {
                     `📱 *الهاتف / Téléphone:* ${data.phone}\n` +
                     (role === 'student' && data.parentPhone ? `📞 *هاتف الولي / Tél Parent:* ${data.parentPhone}\n` : '') +
                     `👨‍🏫 *الصفة / Rôle:* ${role === 'student' ? (isAr ? 'تلميذ' : 'Élève') : (isAr ? 'أستاذ' : 'Enseignant')}\n` +
-                    `📚 *المستوى / Niveau:* ${getLevelName(selectedLevel)}\n` +
-                    `📅 *السنة / Année:* ${selectedYearName || 'N/A'}\n` +
-                    (selectedLevelType === 'high' && selectedStream ? `🧬 *الشعبة / Filière:* ${getStreamName(selectedStream)}\n` : '') +
-                    `📖 *المادة / Matière:* ${selectedSubject}`;
+                    `📚 *المستوى / Niveau:* ${getLevelName(lvlVal)}\n` +
+                    (lvlVal !== 'formation' && yrVal ? `📅 *السنة / Année:* ${yrVal}\n` : '') +
+                    (lvlVal === 'high' && streamVal ? `🧬 *الشعبة / Filière:* ${getStreamName(streamVal)}\n` : '') +
+                    `📖 *المادة / Matière:* ${subjectVal}`;
 
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
@@ -412,31 +386,29 @@ export default function RegistrationPage() {
 
                   <div className="relative">
                     <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                    <select name="level" onChange={(e) => {
+                    <select name="level" value={selectedLevel} onChange={(e) => {
                       setSelectedLevel(e.target.value);
                       setSelectedYear('');
                       setSelectedStream('');
                       setSelectedSubject('');
                     }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                       <option value="">{t('auth.registration.select_level')}</option>
-                      {dbLevels.map(l => (
-                        <option key={l.id} value={l.id}>
-                          {isAr ? l.name.split(' (')[0] : (l.name.includes('(') ? l.name.split('(')[1].replace(')', '') : l.name)}
-                        </option>
+                      {levels.map(l => (
+                        <option key={l.id} value={l.id}>{l.name}</option>
                       ))}
                     </select>
                   </div>
 
-                  {selectedLevel && dbYears.filter(y => y.level_id === selectedLevel).length > 0 && (
+                  {selectedLevel && years[selectedLevel] && (
                     <div className="relative">
                       <Calendar size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                      <select name="year" onChange={(e) => {
+                      <select name="year" value={selectedYear} onChange={(e) => {
                         setSelectedYear(e.target.value);
                         setSelectedStream('');
                         setSelectedSubject('');
                       }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
                         <option value="">{t('auth.registration.year_placeholder')}</option>
-                        {dbYears.filter(y => y.level_id === selectedLevel).map(y => <option key={y.id} value={y.id}>{y.name}</option>)}
+                        {years[selectedLevel].map(y => <option key={y} value={y}>{y}</option>)}
                       </select>
                     </div>
                   )}
@@ -444,7 +416,7 @@ export default function RegistrationPage() {
                   {selectedLevelType === 'high' && selectedYearName && highSchoolStreams[selectedYearName] && (
                     <div className="relative md:col-span-2">
                       <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                      <select name="stream" onChange={(e) => {
+                      <select name="stream" value={selectedStream} onChange={(e) => {
                         setSelectedStream(e.target.value);
                         setSelectedSubject('');
                       }} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
@@ -454,13 +426,17 @@ export default function RegistrationPage() {
                     </div>
                   )}
 
-                  <div className="relative md:col-span-2">
-                    <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
-                    <select name="subject" value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
-                      <option value="">{t('auth.registration.subject_placeholder')}</option>
-                      {getSubjects().map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
-                    </select>
-                  </div>
+                  {((selectedLevel === 'formation') ||
+                    ((selectedLevel === 'primary' || selectedLevel === 'middle') && selectedYear) ||
+                    (selectedLevel === 'high' && selectedYear && selectedStream)) && (
+                    <div className="relative md:col-span-2">
+                      <BookOpen size={18} className={cn("absolute top-1/2 -translate-y-1/2 text-navy/20", isAr ? "right-4" : "left-4")} />
+                      <select name="subject" value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} required className={cn("w-full py-4 bg-white/40 border border-transparent rounded-xl focus:ring-2 focus:ring-blue-accent outline-none appearance-none", isAr ? "pr-12 pl-4 text-right" : "pl-12 pr-4 text-left")}>
+                        <option value="">{t('auth.registration.subject_placeholder')}</option>
+                        {getSubjects().map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 <Button type="submit" className="w-full py-6 text-xl bg-green-500 hover:bg-green-600 rounded-xl" disabled={loading}>
