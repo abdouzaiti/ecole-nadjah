@@ -52,3 +52,51 @@
 .navy-gradient {
   background: linear-gradient(135deg, #0A1D37 0%, #0056D2 100%);
 }
+
+/* Custom background animations for Programs section doodles */
+@keyframes float-airplane {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(-5deg);
+  }
+  25% {
+    transform: translateY(-10px) translateX(6px) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(5px) translateX(-5px) rotate(-9deg);
+  }
+  75% {
+    transform: translateY(-5px) translateX(3px) rotate(-3deg);
+  }
+}
+
+@keyframes float-backpack {
+  0%, 100% {
+    transform: translateY(0) rotate(12deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(6deg);
+  }
+}
+
+@keyframes path-flow {
+  0% {
+    stroke-dashoffset: 40;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-float-airplane {
+  animation: float-airplane 6s ease-in-out infinite;
+}
+
+.animate-float-backpack {
+  animation: float-backpack 8s ease-in-out infinite;
+}
+
+.animate-path-flow {
+  stroke-dasharray: 6 6;
+  animation: path-flow 3s linear infinite;
+}
+

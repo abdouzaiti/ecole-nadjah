@@ -21,6 +21,14 @@ import {
   Bell,
   Star,
   ChevronRight,
+  Target,
+  ClipboardList,
+  TrendingUp,
+  Palette,
+  Smile,
+  Send,
+  Backpack,
+  Sparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "../lib/utils";
@@ -111,6 +119,107 @@ export default function LandingPage() {
       ],
     },
   ];
+
+  const getProgramTheme = (id: string) => {
+    switch (id) {
+      case "high":
+        return {
+          glow: "blue" as const,
+          accent: "text-blue-600",
+          bg: "bg-blue-accent/5",
+          badgeBg: "bg-blue-500",
+          capsuleBg: "bg-blue-50/60 hover:bg-blue-100/50 border border-blue-100/50",
+          capsuleText: "text-blue-700",
+          arrowColor: "text-blue-600 hover:text-blue-700",
+          icon: <GraduationCap size={24} className="text-white" />
+        };
+      case "middle":
+        return {
+          glow: "green" as const,
+          accent: "text-green-600",
+          bg: "bg-green-50/5",
+          badgeBg: "bg-green-500",
+          capsuleBg: "bg-green-50/60 hover:bg-green-100/50 border border-green-100/50",
+          capsuleText: "text-green-700",
+          arrowColor: "text-green-600 hover:text-green-700",
+          icon: <BookOpen size={24} className="text-white" />
+        };
+      case "formation":
+        return {
+          glow: "purple" as const,
+          accent: "text-purple-600",
+          bg: "bg-purple-50/5",
+          badgeBg: "bg-purple-500",
+          capsuleBg: "bg-purple-50/60 hover:bg-purple-100/50 border border-purple-100/50",
+          capsuleText: "text-purple-700",
+          arrowColor: "text-purple-600 hover:text-purple-700",
+          icon: <Monitor size={24} className="text-white" />
+        };
+      case "courses":
+        return {
+          glow: "red" as const,
+          accent: "text-red-500",
+          bg: "bg-red-50/5",
+          badgeBg: "bg-red-500",
+          capsuleBg: "bg-red-50/60 hover:bg-red-100/50 border border-red-100/50",
+          capsuleText: "text-red-700",
+          arrowColor: "text-red-500 hover:text-red-600",
+          icon: <Sparkles size={24} className="text-white" />
+        };
+      case "primary":
+      default:
+        return {
+          glow: "orange" as const,
+          accent: "text-amber-500",
+          bg: "bg-amber-50/5",
+          badgeBg: "bg-amber-500",
+          capsuleBg: "bg-amber-50/60 hover:bg-amber-100/50 border border-amber-100/50",
+          capsuleText: "text-amber-700",
+          arrowColor: "text-amber-500 hover:text-amber-600",
+          icon: <Users size={24} className="text-white" />
+        };
+    }
+  };
+
+  const getProgramFeatures = (id: string) => {
+    const isFr = i18n.language === "fr";
+    if (id === "high") {
+      return [
+        { label: isAr ? "توجيه جامعي" : isFr ? "Orientation univ" : "College Prep", icon: BookOpen },
+        { label: isAr ? "مراجعات مركزة" : isFr ? "Examens ciblés" : "Target TestPrep", icon: ClipboardList },
+        { label: isAr ? "دروس شاملة" : isFr ? "Cours complets" : "Core Classes", icon: Target }
+      ];
+    }
+    if (id === "middle") {
+      return [
+        { label: isAr ? "متابعة شخصية" : isFr ? "Suivi individuel" : "1-on-1 Coaching", icon: Monitor },
+        { label: isAr ? "أنشطة تفاعلية" : isFr ? "Activités interactives" : "Active Learning", icon: Users },
+        { label: isAr ? "دروس مبسطة" : isFr ? "Cours simplifiés" : "Clear Lessons", icon: BookOpen }
+      ];
+    }
+    if (id === "primary") {
+      return [
+        { label: isAr ? "متابعة مستمرة" : isFr ? "Suivi régulier" : "Daily Tracking", icon: TrendingUp },
+        { label: isAr ? "أنشطة إبداعية" : isFr ? "Activités créatives" : "Art & Craft", icon: Palette },
+        { label: isAr ? "تعلم ممتع" : isFr ? "Jeux éducatifs" : "Gamified Prep", icon: Smile }
+      ];
+    }
+    if (id === "formation") {
+      return [
+        { label: isAr ? "مهارات مهنية" : isFr ? "Compétences pro" : "Pro Skills", icon: Monitor },
+        { label: isAr ? "شهادات معتمدة" : isFr ? "Certifications" : "Certificates", icon: ShieldCheck },
+        { label: isAr ? "مشاريع تطبيقية" : isFr ? "Projets pratiques" : "Hands-on", icon: Target }
+      ];
+    }
+    if (id === "courses") {
+      return [
+        { label: isAr ? "دورات مكثفة" : isFr ? "Cours intensifs" : "Intensive Camps", icon: Sparkles },
+        { label: isAr ? "أساتذة خبراء" : isFr ? "Profs experts" : "Expert Tutors", icon: Users },
+        { label: isAr ? "دعم مستمر" : isFr ? "Soutien continu" : "Continuous", icon: CheckCircle2 }
+      ];
+    }
+    return [];
+  };
 
   const handleLearnMore = (id: string, levelName: string, icon: ReactNode) => {
     // Access details from i18n
@@ -871,17 +980,44 @@ export default function LandingPage() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-50/20 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2" />
 
+        {/* Playful background doodles & illustrations to match mock exactly */}
+        <div className="absolute top-[30%] left-6 md:left-12 lg:left-24 text-blue-400 opacity-60 hidden md:flex flex-col items-center select-none pointer-events-none animate-float-airplane">
+          <Send size={44} className="-rotate-45 text-blue-400" />
+          <svg className="w-32 h-16 pointer-events-none -mt-4 text-blue-300" viewBox="0 0 120 60" fill="none">
+             <path d="M10,50 Q40,10 80,40 T120,10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="animate-path-flow" />
+          </svg>
+        </div>
+
+        <div className="absolute bottom-[20%] right-6 md:right-12 lg:right-24 text-blue-400 opacity-60 hidden md:flex flex-col items-center select-none pointer-events-none animate-float-backpack">
+          <Backpack size={48} className="text-blue-500/80 rotate-12" />
+          <svg className="w-24 h-24 pointer-events-none -mt-1 text-blue-300" viewBox="0 0 100 100" fill="none">
+             <path d="M10,10 C40,40 20,80 85,75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="animate-path-flow" />
+          </svg>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-16 relative"
           >
-            <h2 className="text-4xl md:text-5xl font-serif text-navy mb-4 tracking-tight">
-              {t("nav.programs")}
-            </h2>
-            <div className="h-1.5 w-16 bg-blue-accent mx-auto rounded-full"></div>
+            {/* Top title star doodle */}
+            <div className="absolute top-0 left-[15%] hidden lg:block animate-pulse text-yellow-400">
+              <Sparkles size={32} />
+            </div>
+            <div className="absolute -bottom-6 right-[15%] hidden lg:block animate-pulse text-blue-400">
+              <Sparkles size={24} />
+            </div>
+
+            <div className="relative inline-block">
+              <h2 className="text-4xl md:text-5xl font-serif text-navy mb-4 tracking-tight relative z-10">
+                {t("nav.programs")}
+              </h2>
+              {/* Blue hand-drawn style tick/underline under title */}
+              <div className="w-24 h-1.5 bg-blue-accent mx-auto rounded-full mt-2" />
+            </div>
+
             <p
               className={cn(
                 "mt-6 text-navy/60 max-w-2xl mx-auto italic text-lg leading-relaxed",
@@ -890,102 +1026,154 @@ export default function LandingPage() {
             >
               {t("path_subtitle")}
             </p>
+            {/* Curved underline helper below subtitle */}
+            <div className="w-56 h-3 mx-auto mt-2 opacity-80 text-yellow-500">
+              <svg viewBox="0 0 200 10" preserveAspectRatio="none" className="w-full h-full">
+                <path d="M10,5 Q100,10 190,4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" />
+              </svg>
+            </div>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 mt-12">
-            {programs.map((p, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-              >
-                <Card
-                  className={cn(
-                    "p-0 group border-none bg-transparent relative shadow-none",
-                    isAr && "text-right flex flex-col h-full",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "h-[400px] flex items-center justify-center transition-colors duration-500 relative rounded-3xl bg-transparent",
-                    )}
+            {programs.map((p, i) => {
+                const theme = getProgramTheme(p.id);
+                const features = getProgramFeatures(p.id);
+                return (
+                  <motion.div
+                    key={p.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ delay: i * 0.1, duration: 0.6 }}
                   >
-                    {/* Bouquet of Images - Emerging Pattern */}
-                    <div className="relative w-full h-full flex items-end justify-center z-20 pb-0">
-                      {p.images.map((img, idx) => (
-                        <motion.div
-                          key={idx}
-                          className="absolute w-56 h-56 rounded-2xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-black/5 origin-bottom"
-                          initial={false}
-                          animate={{
-                            rotate: idx === 0 ? -15 : idx === 1 ? 0 : 15,
-                            x: idx === 0 ? -60 : idx === 1 ? 0 : 60,
-                            y: idx === 1 ? -10 : 30,
-                            scale: idx === 1 ? 1.05 : 0.9,
-                            zIndex: idx === 1 ? 25 : 10,
-                          }}
-                          whileHover={{
-                            rotate: idx === 0 ? -25 : idx === 1 ? 0 : 25,
-                            x: idx === 0 ? -100 : idx === 1 ? 0 : 100,
-                            y: idx === 1 ? -80 : -40,
-                            scale: 1.25,
-                            zIndex: 40,
-                          }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 200,
-                            damping: 20,
-                            mass: 0.8,
-                          }}
-                        >
-                          <img
-                            src={img}
-                            alt=""
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <GlowCard
-                    customSize
-                    glowColor="blue"
-                    className="p-10 pt-16 flex-grow bg-white rounded-3xl -mt-24 relative z-30 shadow-2xl overflow-visible border-transparent"
-                  >
-                    <h3 className="text-3xl font-serif mb-4 text-navy">
-                      {p.level}
-                    </h3>
-                    <p className="text-navy/60 mb-8 leading-relaxed line-clamp-3 text-lg">
-                      {p.desc}
-                    </p>
-
-                    <Button
-                      onClick={() => handleLearnMore(p.id, p.level, p.icon)}
-                      variant="ghost"
+                    <Card
                       className={cn(
-                        "p-0 group-hover:text-blue-accent flex items-center gap-2 mt-auto w-fit",
-                        isAr && "flex-row-reverse ml-auto",
+                        "p-0 group border-none bg-transparent relative shadow-none flex flex-col h-full text-center"
                       )}
                     >
-                      {t("learn_more")}
-                      <ArrowRight
-                        size={18}
+                      <div
                         className={cn(
-                          "transition-transform",
-                          isAr
-                            ? "group-hover:-translate-x-2 rotate-180"
-                            : "group-hover:translate-x-2",
+                          "h-[400px] flex items-center justify-center transition-colors duration-500 relative rounded-3xl bg-transparent",
                         )}
-                      />
-                    </Button>
-                  </GlowCard>
-                </Card>
-              </motion.div>
-            ))}
+                      >
+                        {/* Decorative card background for illustration to enhance depth */}
+                        <div className={cn(
+                          "absolute inset-x-4 top-12 bottom-0 rounded-3xl -z-10 border-2 border-dashed opacity-40 transition-colors duration-300",
+                          p.id === "high" ? "border-blue-200 bg-blue-50/20" :
+                          p.id === "middle" ? "border-green-200 bg-green-50/20" :
+                          p.id === "formation" ? "border-purple-200 bg-purple-50/20" :
+                          p.id === "courses" ? "border-red-200 bg-red-50/20" :
+                          "border-amber-200 bg-amber-50/20"
+                        )} />
+
+                        {/* Bouquet of Images - Emerging Pattern */}
+                        <div className="relative w-full h-full flex items-end justify-center z-20 pb-0">
+                          {p.images.map((img, idx) => (
+                            <motion.div
+                              key={idx}
+                              className="absolute w-56 h-56 rounded-2xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-black/5 origin-bottom"
+                              initial={false}
+                              animate={{
+                                rotate: idx === 0 ? -15 : idx === 1 ? 0 : 15,
+                                x: idx === 0 ? -60 : idx === 1 ? 0 : 60,
+                                y: idx === 1 ? -10 : 30,
+                                scale: idx === 1 ? 1.05 : 0.9,
+                                zIndex: idx === 1 ? 25 : 10,
+                              }}
+                              whileHover={{
+                                rotate: idx === 0 ? -25 : idx === 1 ? 0 : 25,
+                                x: idx === 0 ? -100 : idx === 1 ? 0 : 100,
+                                y: idx === 1 ? -80 : -40,
+                                scale: 1.25,
+                                zIndex: 40,
+                              }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 200,
+                                damping: 20,
+                                mass: 0.8,
+                              }}
+                            >
+                              <img
+                                src={img}
+                                alt=""
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                              />
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <GlowCard
+                        customSize
+                        glowColor={theme.glow}
+                        className="p-10 pt-16 flex-grow bg-white rounded-3xl -mt-24 relative z-30 shadow-2xl overflow-visible border-transparent flex flex-col items-center text-center"
+                      >
+                        {/* Circular Icon Badge on Top Edge */}
+                        <div className={cn(
+                          "absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-4 border-white transition-transform duration-300 group-hover:scale-110",
+                          theme.badgeBg
+                        )}>
+                          {theme.icon}
+                        </div>
+
+                        <h3 className="text-3xl font-serif mb-4 text-navy font-bold">
+                          {p.level}
+                        </h3>
+                        <p className="text-navy/60 mb-8 leading-relaxed text-base">
+                          {p.desc}
+                        </p>
+
+                        {/* Tag/Capsule grid mirroring mock */}
+                        <div className="grid grid-cols-3 gap-3 w-full mb-8">
+                          {features.map((feat, idx) => {
+                            const FeatIcon = feat.icon;
+                            return (
+                              <div
+                                key={idx}
+                                className={cn(
+                                  "p-3 rounded-2xl flex flex-col items-center justify-center gap-2 text-center transition-all duration-300",
+                                  theme.capsuleBg
+                                )}
+                              >
+                                <div className={cn("p-1.5 rounded-full bg-white/70 shadow-xs", theme.accent)}>
+                                  <FeatIcon size={18} />
+                                </div>
+                                <span className={cn("text-xs font-bold leading-tight font-sans tracking-tight", theme.capsuleText)}>
+                                  {feat.label}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        <Button
+                          onClick={() => handleLearnMore(p.id, p.level, p.icon)}
+                          variant="ghost"
+                          className={cn(
+                            "p-0 flex items-center gap-2 mt-auto w-fit font-bold text-lg transition-colors duration-300",
+                            theme.arrowColor,
+                            isAr && "flex-row-reverse"
+                          )}
+                        >
+                          {t("learn_more")}
+                          <ArrowRight
+                            size={18}
+                            className={cn(
+                              "transition-transform duration-300",
+                              isAr
+                                ? "group-hover:-translate-x-2 rotate-180"
+                                : "group-hover:translate-x-2",
+                            )}
+                          />
+                        </Button>
+                      </GlowCard>
+                    </Card>
+                  </motion.div>
+                );
+              })}
           </div>
         </div>
       </section>
