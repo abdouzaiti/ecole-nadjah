@@ -1,6 +1,11 @@
 import { motion } from "motion/react";
 import { Button, Card, Badge } from "../components/ui";
 import {
+  Trophy,
+  Building2,
+  Clock,
+  Share2,
+  Heart,
   ArrowRight,
   CheckCircle2,
   ShieldCheck,
@@ -1405,181 +1410,277 @@ export default function LandingPage() {
         <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-gray-50/50 to-transparent"></div>
 
         <div className="max-w-7xl mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
+          {/* Header Title & Subtitle */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16 relative"
+          >
+            {/* Background doodles for style */}
+            <div className="absolute top-0 left-[10%] hidden lg:block text-blue-200/50 -rotate-12">
+              <svg className="w-16 h-16" viewBox="0 0 100 100" fill="none">
+                <path d="M10,80 Q50,20 90,80" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" fill="none" />
+              </svg>
+            </div>
+            <div className="absolute -bottom-8 right-[10%] hidden lg:block text-blue-200/50 rotate-12">
+              <svg className="w-16 h-16" viewBox="0 0 100 100" fill="none">
+                <rect x="20" y="20" width="60" height="60" rx="10" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" fill="none" />
+              </svg>
+            </div>
+
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-navy mb-4 tracking-tight">
+              {t("contact_us")}
+            </h2>
+            <div className="h-1.5 w-16 bg-blue-accent mx-auto rounded-full mb-6"></div>
+            <p className={cn(
+              "text-navy/60 max-w-2xl mx-auto text-lg leading-relaxed font-medium",
+              isAr ? "font-serif" : ""
+            )}>
+              {isAr 
+                ? "نحن هنا للإجابة على استفساراتكم. لا تترددوا في التواصل معنا وسنكون سعداء بخدمتكم." 
+                : i18n.language === "fr" 
+                ? "Nous sommes là pour répondre à vos questions. N'hésitez pas à nous contacter, nous serons ravis de vous aider." 
+                : "We are here to answer your questions. Feel free to reach out to us and we will be happy to help you."
+              }
+            </p>
+          </motion.div>
+
+          {/* Centered beautiful contact details card matching mock exactly */}
+          <div className="max-w-2xl mx-auto mb-16">
+            {/* Column 2: Single beautiful unified layout card with dashed dividers */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className={cn(
-                "text-center mb-16",
-                isAr ? "text-right" : "text-left",
-              )}
+              transition={{ duration: 0.6 }}
+              className="bg-white rounded-3xl shadow-[0_15px_45px_rgba(0,0,0,0.03)] border border-gray-100 p-8 flex flex-col justify-between h-full"
             >
-              <h2 className="text-4xl md:text-5xl font-serif text-navy mb-8 text-center tracking-tight">
-                {t("contact_us")}
-              </h2>
-              <div className="h-1.5 w-16 bg-blue-accent mx-auto rounded-full mb-12"></div>
-
-              <div className="space-y-8">
-                <motion.div
-                  initial={{ opacity: 0, x: isAr ? 20 : -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 }}
-                  className={cn(
-                    "flex items-center gap-6 group",
-                    isAr && "flex-row-reverse",
-                  )}
-                >
-                  <a
-                    href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-16 h-16 rounded-2xl bg-cream flex items-center justify-center text-navy shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:bg-blue-accent transition-all duration-300 group-hover:text-white shrink-0 group-hover:scale-110"
-                  >
-                    <MapPin size={24} />
-                  </a>
-                  <a
-                    href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      "text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors underline-offset-4 hover:underline leading-tight",
-                      isAr && "font-serif",
-                    )}
-                  >
-                    {t("school_name")}, {t("location")}
-                  </a>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: isAr ? 20 : -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className={cn(
-                    "flex items-start gap-6 group",
-                    isAr && "flex-row-reverse",
-                  )}
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-cream flex items-center justify-center text-navy shadow-[0_8px_30px_rgb(0,0,0,0.04)] shrink-0 group-hover:bg-blue-accent transition-all duration-300 group-hover:text-white group-hover:scale-110">
-                    <Phone size={24} />
-                  </div>
-                  <div
-                    className={cn("flex flex-col gap-2", isAr && "text-right")}
-                  >
-                    <a
-                      href="tel:0669812895"
-                      className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors font-sans"
-                      dir="ltr"
-                    >
-                      0669 81 28 95
-                    </a>
-                    <div className="flex items-center gap-2 group/wa">
+              {[
+                {
+                  id: "right-address",
+                  title: isAr ? "العنوان" : i18n.language === "fr" ? "Adresse" : "Address",
+                  icon: MapPin,
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-50/60",
+                  element: (
+                    <span className="text-navy/70 font-semibold leading-relaxed">
+                      {t("school_name")}، {isAr ? "حي مستقبل، الجزائر 27000 مستغانم" : "Cité Mostaqbal, Mostaganem 27000"}
+                    </span>
+                  )
+                },
+                {
+                  id: "right-phone",
+                  title: isAr ? "الهاتف" : i18n.language === "fr" ? "Téléphone" : "Phone",
+                  icon: Phone,
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-50/60",
+                  element: (
+                    <div className="flex flex-col gap-1.5 text-navy/70 font-semibold" dir="ltr">
+                      <span>0669 81 28 95</span>
+                      <span>0790 35 60 12</span>
+                      <span>045 41 61 34</span>
+                    </div>
+                  )
+                },
+                {
+                  id: "right-email",
+                  title: isAr ? "البريد الإلكتروني" : i18n.language === "fr" ? "E-mail" : "Email",
+                  icon: Mail,
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-50/60",
+                  element: (
+                    <span className="text-navy/70 font-semibold break-all">
+                      ecole.el.nadjah.mosta.27@gmail.com
+                    </span>
+                  )
+                },
+                {
+                  id: "right-hours",
+                  title: isAr ? "ساعات العمل" : i18n.language === "fr" ? "Heures de Travail" : "Working Hours",
+                  icon: Clock,
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-50/60",
+                  element: (
+                    <div className="text-navy/70 font-semibold space-y-1 text-sm">
+                      <div>{isAr ? "الأحد - الخميس: 08:00 صباحاً - 17:00 مساءً" : i18n.language === "fr" ? "Dimanche - Jeudi : 08:00 - 17:00" : "Sunday - Thursday: 08:00 AM - 05:00 PM"}</div>
+                      <div>{isAr ? "الجمعة: 08:00 صباحاً - 12:00 زوالاً" : i18n.language === "fr" ? "Vendredi : 08:00 - 12:00" : "Friday: 08:00 AM - 12:00 PM"}</div>
+                    </div>
+                  )
+                },
+                {
+                  id: "right-socials",
+                  title: isAr ? "تابعونا على" : i18n.language === "fr" ? "Suivez-nous" : "Follow Us",
+                  icon: Share2,
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-50/60",
+                  element: (
+                    <div className="flex gap-4 justify-start">
                       <a
-                        href="tel:0790356012"
-                        className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors font-sans"
-                        dir="ltr"
-                      >
-                        0790 35 60 12
-                      </a>
-                      <a
-                        href="https://wa.me/213790356012"
+                        href="https://www.facebook.com/Ecole.nadjhah.27?locale=fr_FR"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] bg-green-500 text-white px-3 py-1 rounded-full font-bold opacity-0 group-hover/wa:opacity-100 transition-all hover:bg-green-600 shadow-lg translate-y-2 group-hover/wa:translate-y-0"
+                        className="w-9 h-9 rounded-full bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 flex items-center justify-center transition-all duration-300 shadow-xs hover:scale-110"
                       >
-                        WhatsApp
+                        <Facebook size={16} />
+                      </a>
+                      <a
+                        href="https://www.instagram.com/ecole.nadjah.27/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-9 h-9 rounded-full bg-pink-50 hover:bg-gradient-to-tr hover:from-yellow-400 hover:to-purple-600 hover:text-white text-pink-600 flex items-center justify-center transition-all duration-300 shadow-xs hover:scale-110"
+                      >
+                        <Instagram size={16} />
+                      </a>
+                      <a
+                        href="https://www.youtube.com/@ecolenadjahmostaganem304"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-9 h-9 rounded-full bg-red-50 hover:bg-red-600 hover:text-white text-red-600 flex items-center justify-center transition-all duration-300 shadow-xs hover:scale-110"
+                      >
+                        <Youtube size={16} />
+                      </a>
+                      <a
+                        href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-9 h-9 rounded-full bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-600 flex items-center justify-center transition-all duration-300 shadow-xs hover:scale-110"
+                      >
+                        <MapPin size={16} />
                       </a>
                     </div>
-                    <a
-                      href="tel:045416134"
-                      className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors font-sans"
-                      dir="ltr"
-                    >
-                      045 41 61 34
-                    </a>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: isAr ? 20 : -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
+                  )
+                }
+              ].map((item, idx) => (
+                <div
+                  key={item.id}
                   className={cn(
-                    "flex items-center gap-6 group",
-                    isAr && "flex-row-reverse",
+                    "flex items-start gap-4 py-5",
+                    idx < 4 ? "border-b border-dashed border-gray-200/80" : "",
+                    isAr ? "flex-row-reverse text-right" : "text-left"
                   )}
                 >
-                  <a
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-16 h-16 rounded-2xl bg-cream flex items-center justify-center text-navy shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:bg-blue-accent transition-all duration-300 group-hover:text-white shrink-0 group-hover:scale-110"
-                  >
-                    <Mail size={24} />
-                  </a>
-                  <a
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=ecole.el.nadjah.mosta.27@gmail.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xl md:text-2xl text-navy/70 hover:text-blue-accent transition-colors break-all"
-                  >
-                    ecole.el.nadjah.mosta.27@gmail.com
-                  </a>
-                </motion.div>
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-blue-50 text-blue-600")}>
+                    <item.icon size={20} />
+                  </div>
+                  <div className="flex-grow">
+                    <div className="text-xs font-bold text-navy/40 uppercase tracking-wider mb-1 font-sans">
+                      {item.title}
+                    </div>
+                    <div className="text-sm text-navy">
+                      {item.element}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Wide-view Beautiful Google Maps frame */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mt-12"
+          >
+            <a
+              href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block h-96 bg-gray-50 rounded-[2.5rem] border border-gray-100 flex items-center justify-center overflow-hidden hover:border-blue-accent/30 transition-all group relative shadow-2xl"
+            >
+              <div className="absolute inset-0 z-0 scale-110 group-hover:scale-125 transition-transform duration-1000">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1632.748!2d0.089!3d35.930!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1282036a050e3715%3A0xdc2a35b12a46b33f!2s%C3%A9cole%20el%20nadjah!5e1!3m2!1sfr!2sdz!4v1714821000000!5m2!1sfr!2sdz"
+                  className="w-full h-full border-0 pointer-events-none"
+                  style={{
+                    filter: "contrast(1.1) brightness(0.9) saturate(0.8)",
+                  }}
+                  title={t("school_name")}
+                  loading="lazy"
+                />
+              </div>
+              <div className="absolute inset-0 bg-navy/30 group-hover:bg-navy/10 transition-colors duration-500"></div>
+
+              <div className="text-center group-hover:opacity-0 transition-opacity relative z-10 px-6 pointer-events-none">
+                <div className="w-24 h-24 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_15px_35px_rgba(0,0,0,0.1)]">
+                  <MapPin
+                    size={48}
+                    className="text-blue-accent animate-bounce"
+                  />
+                </div>
+                <div className="font-serif text-white font-bold uppercase tracking-[0.2em] text-2xl drop-shadow-2xl">
+                  {t("view_google_maps")}
+                </div>
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-                className="mt-16"
+              <div
+                className={cn(
+                  "absolute bottom-8 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-2xl text-xs font-bold text-navy uppercase tracking-widest z-10 transition-all hover:scale-105 shadow-xl border border-white/20",
+                  isAr ? "left-8" : "right-8",
+                )}
               >
-                <a
-                  href="https://www.google.com/maps/place/%C3%A9cole+el+nadjah/@35.9299739,0.0905572,855m/data=!3m1!1e3!4m6!3m5!1s0x1282036a050e3715:0xdc2a35b12a46b33f!8m2!3d35.9301282!4d0.090025!16s%2Fg%2F11j7vq8llv?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block h-96 bg-gray-50 rounded-[2.5rem] border border-gray-100 flex items-center justify-center overflow-hidden hover:border-blue-accent/30 transition-all group relative shadow-2xl"
+                {t("open_maps_app")}
+              </div>
+            </a>
+          </motion.div>
+
+          {/* Pillars of School Bottom Card Grid corresponding to the mock footer bar */}
+          <div className="bg-[#f8fafc]/60 rounded-3xl p-8 border border-gray-100/60 mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                title: isAr ? "التميز هدفنا" : i18n.language === "fr" ? "L'Excellence est Notre But" : "Our Goal is Excellence",
+                desc: isAr ? "نسعى دوماً لتحقيق التميز والنجاح في كل المجالات." : i18n.language === "fr" ? "Nous nous efforçons toujours d'atteindre l'excellence et le succès." : "We always strive to achieve excellence and success.",
+                icon: Star,
+                color: "text-amber-500 border-amber-100",
+                bgColor: "bg-amber-50/50"
+              },
+              {
+                title: isAr ? "تعليم متميز" : i18n.language === "fr" ? "Enseignement de Prestige" : "Prestige Teaching",
+                desc: isAr ? "مناهج حديثة وفريق تربوي مؤهل لمستقبل أفضل." : i18n.language === "fr" ? "Des programmes modernes et des enseignants qualifiés." : "Modern curricula and qualified teachers.",
+                icon: BookOpen,
+                color: "text-blue-600 border-blue-100",
+                bgColor: "bg-blue-50/50"
+              },
+              {
+                title: isAr ? "قيم راسخة" : i18n.language === "fr" ? "Valeurs Solides" : "Core Values",
+                desc: isAr ? "نغرس قيم الاحترام والانضباط والمسؤولية لدى التلاميذ." : i18n.language === "fr" ? "Instaurer le respect, la discipline et la responsabilité." : "Instilling respect, discipline, and responsibility.",
+                icon: Users,
+                color: "text-purple-600 border-purple-100",
+                bgColor: "bg-purple-50/50"
+              },
+              {
+                title: isAr ? "بيئة آمنة" : i18n.language === "fr" ? "Environnement Sûr" : "Safe Environment",
+                desc: isAr ? "نوفر بيئة تعليمية آمنة ومحفزة لجميع التلاميذ." : i18n.language === "fr" ? "Un milieu d'apprentissage sécurisé et motivant." : "A safe and motivating learning environment.",
+                icon: ShieldCheck,
+                color: "text-green-600 border-green-100",
+                bgColor: "bg-green-50/50"
+              }
+            ].map((pillar, index) => {
+              const PillarIcon = pillar.icon;
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    "flex items-start gap-4 p-4 rounded-2xl border border-gray-50 bg-white/40 shadow-xs hover:bg-white hover:shadow-md transition-all duration-300",
+                    isAr ? "flex-row-reverse text-right" : "text-left"
+                  )}
                 >
-                  <div className="absolute inset-0 z-0 scale-110 group-hover:scale-125 transition-transform duration-1000">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1632.748!2d0.089!3d35.930!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1282036a050e3715%3A0xdc2a35b12a46b33f!2s%C3%A9cole%20el%20nadjah!5e1!3m2!1sfr!2sdz!4v1714821000000!5m2!1sfr!2sdz"
-                      className="w-full h-full border-0 pointer-events-none"
-                      style={{
-                        filter: "contrast(1.1) brightness(0.9) saturate(0.8)",
-                      }}
-                      title={t("school_name")}
-                      loading="lazy"
-                    />
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border", pillar.color, pillar.bgColor)}>
+                    <PillarIcon size={20} />
                   </div>
-                  <div className="absolute inset-0 bg-navy/30 group-hover:bg-navy/10 transition-colors duration-500"></div>
-
-                  <div className="text-center group-hover:opacity-0 transition-opacity relative z-10 px-6 pointer-events-none">
-                    <div className="w-24 h-24 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_15px_35px_rgba(0,0,0,0.1)]">
-                      <MapPin
-                        size={48}
-                        className="text-blue-accent animate-bounce"
-                      />
-                    </div>
-                    <div className="font-serif text-white font-bold uppercase tracking-[0.2em] text-2xl drop-shadow-2xl">
-                      {t("view_google_maps")}
-                    </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-navy mb-1">
+                      {pillar.title}
+                    </h4>
+                    <p className="text-xs text-navy/60 leading-relaxed font-semibold">
+                      {pillar.desc}
+                    </p>
                   </div>
-
-                  <div
-                    className={cn(
-                      "absolute bottom-8 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-2xl text-xs font-bold text-navy uppercase tracking-widest z-10 transition-all hover:scale-105 shadow-xl border border-white/20",
-                      isAr ? "left-8" : "right-8",
-                    )}
-                  >
-                    {t("open_maps_app")}
-                  </div>
-                </a>
-              </motion.div>
-            </motion.div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
