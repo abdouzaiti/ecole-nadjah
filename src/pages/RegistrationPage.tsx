@@ -224,7 +224,7 @@ export default function RegistrationPage() {
     return [];
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -232,45 +232,87 @@ export default function RegistrationPage() {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    const getLevelName = (lvl: string) => {
-      const found = levels.find(l => l.id === lvl);
-      return found ? found.name : lvl;
-    };
-
-    const getStreamName = (str: string) => {
-      if (!selectedYearName || !highSchoolStreams[selectedYearName]) return str;
-      const found = highSchoolStreams[selectedYearName].find(s => s.id === str);
-      return found ? found.name : str;
-    };
-
     try {
       const emailVal = data.email as string;
       const usernameVal = data.username as string;
 
       const lvlVal = (data.level as string) || selectedLevel;
       const yrVal = (data.year as string) || selectedYearName;
-      const streamVal = (data.stream as string) || selectedStream;
       const subjectVal = (data.subject as string) || selectedSubject;
 
+      // 1. Map client-side level slugs to Seed Level UUIDs from database
+      const LEVEL_UUID_MAP: Record<string, string> = {
+        primary: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',
+        middle: 'b2c3d4e5-f6a7-4b6c-9d0e-1f2a3b4c5d6e',
+        high: 'c3d4e5f6-a7b8-4c7d-0e1f-2a3b4c5d6e7f',
+        formation: 'd4e5f6a7-b8c9-4d8e-1f2a-3b4c5d6e7f8a'
+      };
+
+      const mappedLevelUuid = LEVEL_UUID_MAP[lvlVal] || null;
+
+      // 2. Fetch corresponding year UUID matching this level and selected year name
+      let dbYearId: string | null = null;
+      if (yrVal && mappedLevelUuid) {
+        const { data: yearData, error: yearQueryError } = await supabase
+          .from('years')
+          .select('id')
+          .eq('level_id', mappedLevelUuid)
+          .eq('name', yrVal)
+          .maybeSingle();
+
+        if (yearQueryError) {
+          console.error('Error matching year:', yearQueryError);
+        } else if (yearData) {
+          dbYearId = yearData.id;
+        }
+      }
+
+      // 3. Browser-safe UUID Generator fallback
+      const generateUUID = () => {
+        if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+          return crypto.randomUUID();
+        }
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
+
+      const dbRole = role === 'student' ? 'STUDENT' : 'TEACHER';
+
+      // 4. Save request details into 'registration_requests' table
+      const { error: insertError } = await supabase
+        .from('registration_requests')
+        .insert({
+          id: generateUUID(),
+          full_name: usernameVal,
+          email: emailVal,
+          phone: data.phone as string,
+          parent_phone: role === 'student' ? (data.parentPhone as string) : null,
+          role: dbRole,
+          level_id: mappedLevelUuid,
+          year_id: dbYearId,
+          subject_name: subjectVal || null,
+          status: 'PENDING'
+        });
+
+      if (insertError) {
+        console.error('Database insertion error:', insertError);
+        if (insertError.code === '23505') {
+          throw new Error(isAr 
+            ? "هذا البريد الإلكتروني مسجل بالفعل لتسجيل مسبق." 
+            : i18n.language === 'fr'
+            ? "Cet e-mail est déjà associé à une demande d'inscription." 
+            : "This email is already associated with another registration request."
+          );
+        }
+        throw insertError;
+      }
+
       setIsSuccess(true);
-
-      // WhatsApp message
-      const whatsappNumber = "213657097226";
-      let message = `*Nouvelle Inscription - École Nadjah*\n\n` +
-                    `👤 *الاسم الكامل / Nom:* ${usernameVal}\n` +
-                    `📧 *البريد الإلكتروني / Email:* ${emailVal || 'N/A'}\n` +
-                    `📱 *الهاتف / Téléphone:* ${data.phone}\n` +
-                    (role === 'student' && data.parentPhone ? `📞 *هاتف الولي / Tél Parent:* ${data.parentPhone}\n` : '') +
-                    `👨‍🏫 *الصفة / Rôle:* ${role === 'student' ? (isAr ? 'تلميذ' : 'Élève') : (isAr ? 'أستاذ' : 'Enseignant')}\n` +
-                    `📚 *المستوى / Niveau:* ${getLevelName(lvlVal)}\n` +
-                    (lvlVal !== 'formation' && yrVal ? `📅 *السنة / Année:* ${yrVal}\n` : '') +
-                    (lvlVal === 'high' && streamVal ? `🧬 *الشعبة / Filière:* ${getStreamName(streamVal)}\n` : '') +
-                    `📖 *المادة / Matière:* ${subjectVal}`;
-
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
     } catch (err: any) {
-      console.error('Registration error:', err);
+      console.error('Registration submission error:', err);
       let errMsg = err.message || 'Registration failed';
       setError(errMsg);
     } finally {
@@ -293,18 +335,9 @@ export default function RegistrationPage() {
               {t('auth.registration.success_message')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <a 
-                href={`https://wa.me/213657097226?text=${encodeURIComponent(isAr ? "مرحباً، لقد أرسلت طلب التسجيل." : "Bonjour, j'ai soumis ma demande d'inscription.")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-green-500/25"
-              >
-                <Phone size={18} />
-                {isAr ? "تأكيد عبر WhatsApp" : "Confirmer par WhatsApp"}
-              </a>
               <Link
                 to="/"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-navy hover:bg-navy/95 text-white font-bold rounded-xl transition-all shadow-md"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-navy hover:bg-navy/95 text-white font-bold rounded-xl transition-all shadow-md"
               >
                 {t('auth.registration.back_home')}
               </Link>
